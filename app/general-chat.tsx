@@ -38,9 +38,7 @@ import { ThemedText } from '@shared/ui';
 
 const API_URL =
   Constants.expoConfig?.extra?.apiUrl ||
-  (Platform.OS === 'android'
-    ? 'http://10.0.2.2:8000'
-    : 'http://localhost:8000');
+  (Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000');
 const makeId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 type Message = {
@@ -81,9 +79,7 @@ export default function GeneralChatScreen() {
 
   const [isRecording, setIsRecording] = useState(false);
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
-  const [voiceModeSessionId, setVoiceModeSessionId] = useState<
-    string | undefined
-  >(undefined);
+  const [voiceModeSessionId, setVoiceModeSessionId] = useState<string | undefined>(undefined);
   const [isCaptionOn, setIsCaptionOn] = useState(true);
 
   // Monitor playback status to clean up temp files
@@ -211,7 +207,7 @@ export default function GeneralChatScreen() {
       if (!permissionResponse.granted) {
         Alert.alert(
           'Microphone permission required',
-          'For voice input, microphone permission is required. Please allow permission in settings.'
+          'For voice input, microphone permission is required. Please allow permission in settings.',
         );
         return;
       }
@@ -221,13 +217,10 @@ export default function GeneralChatScreen() {
       recorder.record();
       setIsRecording(true);
     } catch (err: any) {
-      if (
-        err?.message?.includes('permission') ||
-        err?.code === 'ERR_PERMISSION_DENIED'
-      ) {
+      if (err?.message?.includes('permission') || err?.code === 'ERR_PERMISSION_DENIED') {
         Alert.alert(
           'Microphone permission denied',
-          'Microphone permission is denied. Please allow permission in settings.'
+          'Microphone permission is denied. Please allow permission in settings.',
         );
       } else {
         Alert.alert('Recording failed', 'Recording failed. Please try again.');
@@ -331,8 +324,7 @@ export default function GeneralChatScreen() {
         await sendMessageFromSTT(text);
       }
     } catch (e: any) {
-      const errorMessage =
-        e?.message || 'Voice recognition failed. Please try again.';
+      const errorMessage = e?.message || 'Voice recognition failed. Please try again.';
 
       if (showVoiceMode) {
         Alert.alert('Voice Recognition Failed', errorMessage);
@@ -422,25 +414,13 @@ export default function GeneralChatScreen() {
     >
       <View style={styles.container}>
         <View style={styles.backgroundStars}>
-          <Svg
-            width="194"
-            height="195"
-            viewBox="0 0 194 195"
-            fill="none"
-            style={styles.bigStar}
-          >
+          <Svg width="194" height="195" viewBox="0 0 194 195" fill="none" style={styles.bigStar}>
             <Path
               d="M193.967 97.1671C194.05 100.086 193.128 102.947 191.356 105.268C189.584 107.589 187.069 109.232 184.231 109.922C167.582 116.056 151.03 122.191 134.284 128.033C132.771 128.5 131.395 129.33 130.275 130.45C129.155 131.57 128.325 132.945 127.858 134.458C122.113 150.717 116.174 166.879 110.235 183.139C109.578 186.182 107.913 188.913 105.51 190.892C103.107 192.871 100.106 193.983 96.9939 194.044C93.8025 193.952 90.7321 192.8 88.265 190.773C85.7979 188.747 84.0735 185.959 83.363 182.846C77.5212 166.684 71.5822 150.522 65.7404 134.165C65.316 132.736 64.5417 131.437 63.4876 130.383C62.4335 129.329 61.133 128.554 59.704 128.13C42.9577 122.191 26.406 116.056 9.75708 109.922C6.85892 109.24 4.29446 107.559 2.51374 105.173C0.73302 102.787 -0.149966 99.8496 0.0208503 96.8771C-0.0708871 93.9332 0.844134 91.0449 2.61417 88.6907C4.3842 86.3366 6.90348 84.6566 9.75708 83.9272C26.2113 77.8908 42.6657 71.756 59.2173 65.9143C60.7302 65.4465 62.1064 64.6166 63.2261 63.4969C64.3459 62.3771 65.1752 61.0022 65.643 59.4893C71.3873 43.3272 77.327 27.0677 83.2661 10.8082C83.9263 7.77517 85.5945 5.05522 87.9993 3.09248C90.4041 1.12975 93.4034 0.0390538 96.5073 0C102.836 0 107.315 3.60373 110.041 11.1006C115.98 27.2627 121.918 43.5222 127.76 59.7816C128.162 61.2327 128.928 62.5568 129.984 63.63C131.04 64.7032 132.352 65.4891 133.797 65.9143C150.673 71.8209 167.452 77.9235 184.133 84.2196C187.032 84.8794 189.606 86.5369 191.404 88.9047C193.202 91.2724 194.11 94.1975 193.967 97.1671Z"
               fill="#659DF2"
             />
           </Svg>
-          <Svg
-            width="91"
-            height="112"
-            viewBox="0 0 111 112"
-            fill="none"
-            style={styles.smallStar}
-          >
+          <Svg width="91" height="112" viewBox="0 0 111 112" fill="none" style={styles.smallStar}>
             <Path
               d="M110.129 55.5958C110.171 57.2594 109.657 58.8889 108.67 60.2286C107.683 61.5683 106.278 62.5421 104.677 62.9954L76.1501 73.4115C75.2756 73.6429 74.4753 74.0973 73.8271 74.7283C73.179 75.3594 72.7049 76.147 72.4502 77.015C69.1399 86.7512 65.7323 95.6099 62.714 104.957C62.3368 106.692 61.3782 108.246 59.9971 109.361C58.616 110.477 56.8948 111.088 55.1195 111.092C53.2932 111.087 51.5238 110.456 50.1064 109.304C48.6889 108.153 47.7092 106.548 47.3306 104.762C43.9229 95.0256 40.5152 86.1669 37.5944 76.9176C37.3434 76.0902 36.8925 75.3373 36.2811 74.726C35.6697 74.1146 34.9169 73.6625 34.0895 73.4115L5.46492 62.9954C3.8288 62.5701 2.39098 61.5887 1.39667 60.2215C0.402362 58.8543 -0.0868065 57.186 0.0126555 55.4984C-0.0223303 53.7967 0.515252 52.1324 1.53929 50.7729C2.56333 49.4134 4.01462 48.4374 5.65984 48.0013L33.992 37.7778C34.8614 37.5053 35.6523 37.0268 36.2965 36.3825C36.9408 35.7383 37.4193 34.9462 37.6918 34.0768C41.0021 24.3406 44.4098 15.482 47.4281 6.23262C47.7686 4.47141 48.7142 2.88508 50.101 1.74721C51.4878 0.609352 53.2282 -0.00980297 55.022 0.000117385C56.8483 0.00498416 58.6183 0.635961 60.0357 1.78762C61.4532 2.93929 62.4329 4.54344 62.8115 6.33008C66.2192 16.0663 69.6268 24.9249 72.5477 34.1743C72.7548 35.0236 73.1912 35.8001 73.8093 36.4182C74.4274 37.0363 75.2033 37.4733 76.0526 37.6804C85.7888 41.088 95.5251 44.6912 105.261 48.1962C106.762 48.7395 108.048 49.7531 108.925 51.0867C109.802 52.4202 110.225 54.0024 110.129 55.5958Z"
               fill="#659DF2"
@@ -477,11 +457,7 @@ export default function GeneralChatScreen() {
           </Pressable>
         </View>
 
-        <ScrollView
-          ref={scrollRef}
-          style={{ flex: 1 }}
-          contentContainerStyle={styles.messages}
-        >
+        <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={styles.messages}>
           {messages.map((msg) => (
             <View key={msg.id} style={styles.messageContainer}>
               {msg.role === 'assistant' ? (
@@ -497,9 +473,7 @@ export default function GeneralChatScreen() {
                     <ThemedText style={styles.nickname}>AI Docent</ThemedText>
                     <View style={styles.bubbleWithTime}>
                       <View style={styles.assistantBubble}>
-                        <ThemedText style={styles.assistantBubbleText}>
-                          {msg.text}
-                        </ThemedText>
+                        <ThemedText style={styles.assistantBubbleText}>{msg.text}</ThemedText>
                       </View>
                       <ThemedText style={styles.timestamp}>
                         {formatTimestamp(msg.timestamp)}
@@ -509,9 +483,7 @@ export default function GeneralChatScreen() {
                 </View>
               ) : (
                 <View style={styles.userBubbleContainer}>
-                  <ThemedText style={styles.timestamp}>
-                    {formatTimestamp(msg.timestamp)}
-                  </ThemedText>
+                  <ThemedText style={styles.timestamp}>{formatTimestamp(msg.timestamp)}</ThemedText>
                   <View style={styles.userBubble}>
                     <ThemedText style={styles.userText}>{msg.text}</ThemedText>
                   </View>
@@ -534,11 +506,7 @@ export default function GeneralChatScreen() {
                 onSubmitEditing={sendMessage}
               />
               {input.trim() ? (
-                <Pressable
-                  style={styles.actionButton}
-                  onPress={sendMessage}
-                  disabled={isLoading}
-                >
+                <Pressable style={styles.actionButton} onPress={sendMessage} disabled={isLoading}>
                   {isLoading ? (
                     <ActivityIndicator color="#FF7F50" size="small" />
                   ) : (
@@ -561,10 +529,7 @@ export default function GeneralChatScreen() {
                   )}
                 </Pressable>
               ) : (
-                <Pressable
-                  style={styles.actionButton}
-                  onPress={() => setShowVoiceMode(true)}
-                >
+                <Pressable style={styles.actionButton} onPress={() => setShowVoiceMode(true)}>
                   <Svg width="30" height="30" viewBox="0 0 30 30" fill="none">
                     <Defs>
                       <Mask
@@ -623,31 +588,28 @@ export default function GeneralChatScreen() {
 
               if (savedSessionId) {
                 try {
-                  const sessionData =
-                    await aiStationApi.getChatSession(savedSessionId);
+                  const sessionData = await aiStationApi.getChatSession(savedSessionId);
                   if (sessionData.chats && sessionData.chats.length > 0) {
-                    const messagesToAdd: Message[] = sessionData.chats.flatMap(
-                      (chat) => {
-                        const messages: Message[] = [];
-                        if (chat.user_message) {
-                          messages.push({
-                            id: makeId(),
-                            role: 'user',
-                            text: chat.user_message,
-                            timestamp: new Date(chat.created_at),
-                          });
-                        }
-                        if (chat.ai_response) {
-                          messages.push({
-                            id: makeId(),
-                            role: 'assistant',
-                            text: chat.ai_response,
-                            timestamp: new Date(chat.created_at),
-                          });
-                        }
-                        return messages;
+                    const messagesToAdd: Message[] = sessionData.chats.flatMap((chat) => {
+                      const messages: Message[] = [];
+                      if (chat.user_message) {
+                        messages.push({
+                          id: makeId(),
+                          role: 'user',
+                          text: chat.user_message,
+                          timestamp: new Date(chat.created_at),
+                        });
                       }
-                    );
+                      if (chat.ai_response) {
+                        messages.push({
+                          id: makeId(),
+                          role: 'assistant',
+                          text: chat.ai_response,
+                          timestamp: new Date(chat.created_at),
+                        });
+                      }
+                      return messages;
+                    });
                     setMessages((prev) => [...prev, ...messagesToAdd]);
                   }
                 } catch (err) {
@@ -690,9 +652,7 @@ function VoiceModeOverlay({
     <View style={overlayStyles.overlay}>
       <Image
         source={
-          isRecording
-            ? require('@/assets/images/exist.png')
-            : require('@/assets/images/zero.png')
+          isRecording ? require('@/assets/images/exist.png') : require('@/assets/images/zero.png')
         }
         style={overlayStyles.backgroundImage}
         resizeMode="cover"
@@ -745,13 +705,7 @@ function VoiceModeOverlay({
                 <Stop offset="1" stopColor="white" stopOpacity="0.8" />
               </RadialGradient>
             </Defs>
-            <Circle
-              cx="40"
-              cy="40"
-              r="39.5"
-              fill="url(#paint0_left)"
-              stroke="white"
-            />
+            <Circle cx="40" cy="40" r="39.5" fill="url(#paint0_left)" stroke="white" />
           </Svg>
           <View style={overlayStyles.circleButtonIconContainer}>
             {isCaptionOn ? (
@@ -804,10 +758,7 @@ function VoiceModeOverlay({
               </Svg>
             )}
             <ThemedText
-              style={[
-                overlayStyles.buttonLabel,
-                !isCaptionOn && overlayStyles.buttonLabelOff,
-              ]}
+              style={[overlayStyles.buttonLabel, !isCaptionOn && overlayStyles.buttonLabelOff]}
             >
               {isCaptionOn ? 'ON' : 'OFF'}
             </ThemedText>
@@ -839,13 +790,7 @@ function VoiceModeOverlay({
                 <Stop offset="1" stopColor="white" stopOpacity="0.8" />
               </RadialGradient>
             </Defs>
-            <Circle
-              cx="40"
-              cy="40"
-              r="39.5"
-              fill="url(#paint0_center)"
-              stroke="white"
-            />
+            <Circle cx="40" cy="40" r="39.5" fill="url(#paint0_center)" stroke="white" />
           </Svg>
           <View style={overlayStyles.circleButtonIconContainer}>
             {isRecording ? (
@@ -876,10 +821,7 @@ function VoiceModeOverlay({
               </Svg>
             )}
             <ThemedText
-              style={[
-                overlayStyles.buttonLabel,
-                isRecording && overlayStyles.buttonLabelOff,
-              ]}
+              style={[overlayStyles.buttonLabel, isRecording && overlayStyles.buttonLabelOff]}
             >
               {isRecording ? 'OFF' : 'ON'}
             </ThemedText>
@@ -902,13 +844,7 @@ function VoiceModeOverlay({
                 <Stop offset="1" stopColor="white" stopOpacity="0.8" />
               </RadialGradient>
             </Defs>
-            <Circle
-              cx="40"
-              cy="40"
-              r="39.5"
-              fill="url(#paint0_right)"
-              stroke="white"
-            />
+            <Circle cx="40" cy="40" r="39.5" fill="url(#paint0_right)" stroke="white" />
           </Svg>
           <View style={overlayStyles.circleButtonIconContainer}>
             <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">

@@ -13,7 +13,8 @@
     "analyze:duplicate": "jscpd .",
     "android:log": "echo \"\\n--- Android Session Started: $(date '+%Y-%m-%d %H:%M:%S') ---\" >> api_performance.log && expo run:android | tee /dev/tty | grep --line-buffered \"🚀 \\[API\\]\" >> api_performance.log",
     "ios:log": "echo \"\\n--- iOS Session Started: $(date '+%Y-%m-%d %H:%M:%S') ---\" >> api_performance.log && expo run:ios | tee /dev/tty | grep --line-buffered \"🚀 \\[API\\]\" >> api_performance.log",
-    "start:log": "echo \"\\n--- Session Started: $(date '+%Y-%m-%d %H:%M:%S') ---\" >> api_performance.log && expo start | tee /dev/tty | grep --line-buffered \"🚀 \\[API\\]\" >> api_performance.log"
+    "start:log": "echo \"\\n--- Session Started: $(date '+%Y-%m-%d %H:%M:%S') ---\" >> api_performance.log && expo start | tee /dev/tty | grep --line-buffered \"🚀 \\[API\\]\" >> api_performance.log",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

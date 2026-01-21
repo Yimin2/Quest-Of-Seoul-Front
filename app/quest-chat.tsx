@@ -44,9 +44,7 @@ import { ThemedText } from '@shared/ui';
 
 const API_URL =
   Constants.expoConfig?.extra?.apiUrl ||
-  (Platform.OS === 'android'
-    ? 'http://10.0.2.2:8000'
-    : 'http://localhost:8000');
+  (Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000');
 const makeId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 const formatTimestamp = (date: Date): string => {
@@ -95,9 +93,7 @@ export default function QuestChatScreen() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('Quest');
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [voiceModeSessionId, setVoiceModeSessionId] = useState<string | null>(
-    null
-  );
+  const [voiceModeSessionId, setVoiceModeSessionId] = useState<string | null>(null);
   const [isCaptionOn, setIsCaptionOn] = useState(true);
 
   useEffect(() => {
@@ -133,8 +129,7 @@ export default function QuestChatScreen() {
 
   const pickImageFromLibrary = async () => {
     try {
-      const permission =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!permission.granted) {
         setShowImageModal(false);
         return;
@@ -176,12 +171,9 @@ export default function QuestChatScreen() {
 
       if (!result.canceled && result.assets?.[0]?.uri) {
         try {
-          const base64 = await FileSystem.readAsStringAsync(
-            result.assets[0].uri,
-            {
-              encoding: 'base64',
-            }
-          );
+          const base64 = await FileSystem.readAsStringAsync(result.assets[0].uri, {
+            encoding: 'base64',
+          });
           await handleImageSelected(base64);
         } catch (convertError) {
           // Ignore
@@ -422,7 +414,7 @@ ${userText}`;
       if (!permissionResponse.granted) {
         Alert.alert(
           'Microphone permission required',
-          'For voice input, microphone permission is required. Please allow permission in settings.'
+          'For voice input, microphone permission is required. Please allow permission in settings.',
         );
         return;
       }
@@ -430,13 +422,10 @@ ${userText}`;
       recorder.record();
       setIsRecording(true);
     } catch (err: any) {
-      if (
-        err?.message?.includes('permission') ||
-        err?.code === 'ERR_PERMISSION_DENIED'
-      ) {
+      if (err?.message?.includes('permission') || err?.code === 'ERR_PERMISSION_DENIED') {
         Alert.alert(
           'Microphone permission denied',
-          'Microphone permission is denied. Please allow permission in settings.'
+          'Microphone permission is denied. Please allow permission in settings.',
         );
       } else {
         Alert.alert('Recording failed', 'Recording failed. Please try again.');
@@ -525,8 +514,7 @@ ${userText}`;
         await sendMessageFromSTT(text);
       }
     } catch (e: any) {
-      const errorMessage =
-        e?.message || 'Voice recognition failed. Please try again.';
+      const errorMessage = e?.message || 'Voice recognition failed. Please try again.';
       const errorMsg: Message = {
         id: makeId(),
         role: 'assistant',
@@ -706,10 +694,7 @@ ${text}`;
           <View style={styles.container}>
             <View style={styles.headerContainer}>
               <View style={styles.headerContent}>
-                <Pressable
-                  onPress={() => router.push('/chat-history')}
-                  style={styles.headerButton}
-                >
+                <Pressable onPress={() => router.push('/chat-history')} style={styles.headerButton}>
                   <HamburgerIcon />
                 </Pressable>
                 <ThemedText style={styles.headerTitle}>
@@ -721,11 +706,7 @@ ${text}`;
               </View>
             </View>
 
-            <ScrollView
-              ref={scrollRef}
-              style={{ flex: 1 }}
-              contentContainerStyle={styles.messages}
-            >
+            <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={styles.messages}>
               {messages.map((msg) => (
                 <View key={msg.id} style={styles.messageContainer}>
                   {msg.role === 'assistant' ? (
@@ -738,15 +719,11 @@ ${text}`;
                         />
                       </View>
                       <View style={styles.assistantContentColumn}>
-                        <ThemedText style={styles.nickname}>
-                          AI Docent
-                        </ThemedText>
+                        <ThemedText style={styles.nickname}>AI Docent</ThemedText>
                         <View style={styles.bubbleWithTime}>
                           <View style={styles.assistantBubble}>
                             {msg.text && (
-                              <ThemedText style={styles.assistantBubbleText}>
-                                {msg.text}
-                              </ThemedText>
+                              <ThemedText style={styles.assistantBubbleText}>{msg.text}</ThemedText>
                             )}
                             {msg.imageUrl && (
                               <Image
@@ -772,11 +749,7 @@ ${text}`;
                         {formatTimestamp(msg.timestamp)}
                       </ThemedText>
                       <View style={styles.userBubble}>
-                        {msg.text && (
-                          <ThemedText style={styles.userText}>
-                            {msg.text}
-                          </ThemedText>
-                        )}
+                        {msg.text && <ThemedText style={styles.userText}>{msg.text}</ThemedText>}
                         {msg.imageUrl && (
                           <Image
                             source={{ uri: msg.imageUrl }}
@@ -819,9 +792,7 @@ ${text}`;
                       setInput('');
                     }}
                   >
-                    <ThemedText style={styles.cancelPreviewText}>
-                      Cancel
-                    </ThemedText>
+                    <ThemedText style={styles.cancelPreviewText}>Cancel</ThemedText>
                   </Pressable>
                   <Pressable
                     style={[
@@ -834,9 +805,7 @@ ${text}`;
                     {isLoading ? (
                       <ActivityIndicator color="#FFF" size="small" />
                     ) : (
-                      <ThemedText style={styles.sendPreviewText}>
-                        Send
-                      </ThemedText>
+                      <ThemedText style={styles.sendPreviewText}>Send</ThemedText>
                     )}
                   </Pressable>
                 </View>
@@ -864,9 +833,7 @@ ${text}`;
                         stroke="white"
                       />
                     </Svg>
-                    <ThemedText style={styles.categoryTabText}>
-                      Quest
-                    </ThemedText>
+                    <ThemedText style={styles.categoryTabText}>Quest</ThemedText>
                   </Pressable>
 
                   {['Fun Facts', 'History', 'Tips!'].map((category) => (
@@ -874,14 +841,11 @@ ${text}`;
                       key={category}
                       style={[
                         styles.categoryTab,
-                        selectedCategory === category &&
-                          styles.categoryTabActive,
+                        selectedCategory === category && styles.categoryTabActive,
                       ]}
                       onPress={() => setSelectedCategory(category)}
                     >
-                      <ThemedText style={styles.categoryTabText}>
-                        {category}
-                      </ThemedText>
+                      <ThemedText style={styles.categoryTabText}>{category}</ThemedText>
                     </Pressable>
                   ))}
                 </ScrollView>
@@ -927,12 +891,7 @@ ${text}`;
                       {isLoading ? (
                         <ActivityIndicator color="#FF7F50" size="small" />
                       ) : (
-                        <Svg
-                          width="15"
-                          height="15"
-                          viewBox="0 0 15 15"
-                          fill="none"
-                        >
+                        <Svg width="15" height="15" viewBox="0 0 15 15" fill="none">
                           <G clipPath="url(#clip0_417_8458)">
                             <Path
                               fillRule="evenodd"
@@ -951,16 +910,8 @@ ${text}`;
                       )}
                     </Pressable>
                   ) : (
-                    <Pressable
-                      style={styles.actionButton}
-                      onPress={() => setShowVoiceMode(true)}
-                    >
-                      <Svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 30 30"
-                        fill="none"
-                      >
+                    <Pressable style={styles.actionButton} onPress={() => setShowVoiceMode(true)}>
+                      <Svg width="30" height="30" viewBox="0 0 30 30" fill="none">
                         <Defs>
                           <Mask
                             id="mask0_410_8325"
@@ -1004,26 +955,14 @@ ${text}`;
                 <View style={styles.modalBox}>
                   <Pressable style={styles.modalItem} onPress={takePhoto}>
                     <Ionicons name="camera" size={20} color="#111" />
-                    <ThemedText style={styles.modalText}>
-                      Take a photo
-                    </ThemedText>
+                    <ThemedText style={styles.modalText}>Take a photo</ThemedText>
                   </Pressable>
-                  <Pressable
-                    style={styles.modalItem}
-                    onPress={pickImageFromLibrary}
-                  >
+                  <Pressable style={styles.modalItem} onPress={pickImageFromLibrary}>
                     <Ionicons name="image" size={20} color="#111" />
-                    <ThemedText style={styles.modalText}>
-                      Select from album
-                    </ThemedText>
+                    <ThemedText style={styles.modalText}>Select from album</ThemedText>
                   </Pressable>
-                  <Pressable
-                    style={styles.modalCancel}
-                    onPress={() => setShowImageModal(false)}
-                  >
-                    <ThemedText style={styles.modalCancelText}>
-                      Cancel
-                    </ThemedText>
+                  <Pressable style={styles.modalCancel} onPress={() => setShowImageModal(false)}>
+                    <ThemedText style={styles.modalCancelText}>Cancel</ThemedText>
                   </Pressable>
                 </View>
               </View>
@@ -1053,30 +992,28 @@ ${text}`;
 
                   if (savedSessionId) {
                     try {
-                      const sessionData =
-                        await aiStationApi.getChatSession(savedSessionId);
+                      const sessionData = await aiStationApi.getChatSession(savedSessionId);
                       if (sessionData.chats && sessionData.chats.length > 0) {
-                        const messagesToAdd: Message[] =
-                          sessionData.chats.flatMap((chat) => {
-                            const messages: Message[] = [];
-                            if (chat.user_message) {
-                              messages.push({
-                                id: makeId(),
-                                role: 'user',
-                                text: chat.user_message,
-                                timestamp: new Date(chat.created_at),
-                              });
-                            }
-                            if (chat.ai_response) {
-                              messages.push({
-                                id: makeId(),
-                                role: 'assistant',
-                                text: chat.ai_response,
-                                timestamp: new Date(chat.created_at),
-                              });
-                            }
-                            return messages;
-                          });
+                        const messagesToAdd: Message[] = sessionData.chats.flatMap((chat) => {
+                          const messages: Message[] = [];
+                          if (chat.user_message) {
+                            messages.push({
+                              id: makeId(),
+                              role: 'user',
+                              text: chat.user_message,
+                              timestamp: new Date(chat.created_at),
+                            });
+                          }
+                          if (chat.ai_response) {
+                            messages.push({
+                              id: makeId(),
+                              role: 'assistant',
+                              text: chat.ai_response,
+                              timestamp: new Date(chat.created_at),
+                            });
+                          }
+                          return messages;
+                        });
                         setMessages((prev) => [...prev, ...messagesToAdd]);
                       }
                     } catch (err) {
@@ -1121,9 +1058,7 @@ function VoiceModeOverlay({
     <View style={overlayStyles.overlay}>
       <Image
         source={
-          isRecording
-            ? require('@/assets/images/exist.png')
-            : require('@/assets/images/zero.png')
+          isRecording ? require('@/assets/images/exist.png') : require('@/assets/images/zero.png')
         }
         style={overlayStyles.backgroundImage}
         resizeMode="cover"
@@ -1176,13 +1111,7 @@ function VoiceModeOverlay({
                 <Stop offset="1" stopColor="white" stopOpacity="0.8" />
               </RadialGradient>
             </Defs>
-            <Circle
-              cx="40"
-              cy="40"
-              r="39.5"
-              fill="url(#paint0_left)"
-              stroke="white"
-            />
+            <Circle cx="40" cy="40" r="39.5" fill="url(#paint0_left)" stroke="white" />
           </Svg>
           <View style={overlayStyles.circleButtonIconContainer}>
             {isCaptionOn ? (
@@ -1232,12 +1161,7 @@ function VoiceModeOverlay({
                   strokeWidth="2.5"
                   strokeLinecap="round"
                 />
-                <Path
-                  d="M5 29L30 6"
-                  stroke="#FF7F50"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
+                <Path d="M5 29L30 6" stroke="#FF7F50" strokeWidth="2.5" strokeLinecap="round" />
               </Svg>
             )}
           </View>
@@ -1294,13 +1218,7 @@ function VoiceModeOverlay({
                 <Stop offset="1" stopColor="white" stopOpacity="0.8" />
               </RadialGradient>
             </Defs>
-            <Circle
-              cx="40"
-              cy="40"
-              r="39.5"
-              fill="url(#paint0_right)"
-              stroke="white"
-            />
+            <Circle cx="40" cy="40" r="39.5" fill="url(#paint0_right)" stroke="white" />
           </Svg>
           <View style={overlayStyles.circleButtonIconContainer}>
             <Svg width="30" height="30" viewBox="0 0 30 30" fill="none">

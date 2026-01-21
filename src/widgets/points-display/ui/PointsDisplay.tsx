@@ -11,11 +11,7 @@ interface PointsDisplayProps {
   style?: any;
 }
 
-export function PointsDisplay({
-  showIcon = true,
-  size = 'medium',
-  style,
-}: PointsDisplayProps) {
+export function PointsDisplay({ showIcon = true, size = 'medium', style }: PointsDisplayProps) {
   const { totalPoints, isLoading, fetchPoints } = usePointsStore();
   const { isAuthenticated } = useAuthStore();
 
@@ -43,16 +39,9 @@ export function PointsDisplay({
   return (
     <View style={[styles.container, style]}>
       {showIcon && (
-        <Ionicons
-          name="cash-outline"
-          size={iconSize}
-          color="#fff"
-          style={styles.icon}
-        />
+        <Ionicons name="cash-outline" size={iconSize} color="#fff" style={styles.icon} />
       )}
-      <ThemedText style={[styles.points, { fontSize }]}>
-        {totalPoints.toLocaleString()}
-      </ThemedText>
+      <ThemedText style={[styles.points, { fontSize }]}>{totalPoints.toLocaleString()}</ThemedText>
     </View>
   );
 }
