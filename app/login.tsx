@@ -1,3 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -10,13 +13,9 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useAuthStore } from '@entities/user';
+import { ThemedText } from '@shared/ui';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -24,7 +23,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const login = useAuthStore((state) => state.login);
   const loginAsGuest = useAuthStore((state) => state.loginAsGuest);
 
@@ -42,7 +41,7 @@ export default function LoginScreen() {
     } catch (error) {
       Alert.alert(
         'Login Failed',
-        error instanceof Error ? error.message : 'Login failed. Please try again.'
+        error instanceof Error ? error.message : 'Login failed. Please try again.',
       );
     } finally {
       setIsLoading(false);
@@ -59,10 +58,7 @@ export default function LoginScreen() {
       // 게스트 로그인 성공 시 메인 화면으로 이동
       router.replace('/(tabs)/map');
     } catch (error) {
-      Alert.alert(
-        'Error',
-        'Guest login failed. Please try again.'
-      );
+      Alert.alert('Error', 'Guest login failed. Please try again.');
     }
   };
 
@@ -71,10 +67,7 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.container}
     >
-      <LinearGradient
-        colors={['#7EC8E3', '#4A90E2']}
-        style={styles.gradient}
-      >
+      <LinearGradient colors={['#7EC8E3', '#4A90E2']} style={styles.gradient}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
@@ -83,9 +76,7 @@ export default function LoginScreen() {
             <ThemedText type="title" style={styles.title}>
               Quest of Seoul
             </ThemedText>
-            <ThemedText style={styles.subtitle}>
-              Start exploring Seoul
-            </ThemedText>
+            <ThemedText style={styles.subtitle}>Start exploring Seoul</ThemedText>
           </View>
 
           <View style={styles.form}>
@@ -105,7 +96,12 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="Password"
@@ -117,10 +113,7 @@ export default function LoginScreen() {
                 autoCorrect={false}
                 editable={!isLoading}
               />
-              <Pressable
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.eyeIcon}
-              >
+              <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
                 <Ionicons
                   name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                   size={20}
@@ -142,7 +135,7 @@ export default function LoginScreen() {
             </Pressable>
 
             <View style={styles.signupContainer}>
-              <ThemedText style={styles.signupText}>Don't have an account? </ThemedText>
+              <ThemedText style={styles.signupText}>Don't have an account?</ThemedText>
               <Pressable onPress={goToSignup} disabled={isLoading}>
                 <ThemedText style={styles.signupLink}>Sign Up</ThemedText>
               </Pressable>
@@ -154,12 +147,13 @@ export default function LoginScreen() {
               <View style={styles.dividerLine} />
             </View>
 
-            <Pressable
-              style={styles.guestButton}
-              onPress={handleGuestLogin}
-              disabled={isLoading}
-            >
-              <Ionicons name="person-outline" size={20} color="#4A90E2" style={{ marginRight: 8 }} />
+            <Pressable style={styles.guestButton} onPress={handleGuestLogin} disabled={isLoading}>
+              <Ionicons
+                name="person-outline"
+                size={20}
+                color="#4A90E2"
+                style={{ marginRight: 8 }}
+              />
               <ThemedText style={styles.guestButtonText}>Continue as Guest</ThemedText>
             </Pressable>
           </View>
@@ -283,4 +277,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

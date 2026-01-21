@@ -1,16 +1,9 @@
-import { ThemedText } from "@/components/themed-text";
-import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import {
-  Image,
-  ImageBackground,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
-import Svg, { Path } from "react-native-svg";
+import { Ionicons } from '@expo/vector-icons';
+import { ThemedText } from '@shared/ui';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import { Image, ImageBackground, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
 export default function DayPassScreen() {
   const router = useRouter();
@@ -18,12 +11,12 @@ export default function DayPassScreen() {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("@/assets/images/daypass.jpg")}
+        source={require('@/assets/images/daypass.jpg')}
         style={styles.backgroundImage}
         resizeMode="cover"
       >
         <LinearGradient
-          colors={["rgba(52, 73, 94, 0.00)", "#34495E"]}
+          colors={['rgba(52, 73, 94, 0.00)', '#34495E']}
           locations={[0, 1]}
           style={styles.gradient}
         >
@@ -37,9 +30,7 @@ export default function DayPassScreen() {
                     fill="white"
                   />
                 </Svg>
-                <ThemedText style={styles.headerTitle}>
-                  Day Pass Purchase
-                </ThemedText>
+                <ThemedText style={styles.headerTitle}>Day Pass Purchase</ThemedText>
               </View>
               <Pressable onPress={() => router.back()}>
                 <Ionicons name="close" size={26} color="#fff" />
@@ -48,18 +39,14 @@ export default function DayPassScreen() {
 
             {/* Title */}
             <View style={styles.titleBox}>
-              <ThemedText style={styles.title}>
-                Your best choice{"\n"}for Seoul Tour
-              </ThemedText>
+              <ThemedText style={styles.title}>Your best choice{'\n'}for Seoul Tour</ThemedText>
             </View>
 
             {/* Main Title */}
             <View style={styles.mainTitleBox}>
-              <ThemedText style={styles.mainTitle}>
-                Quest of Seoul{"\n"}Day Pass Trials
-              </ThemedText>
+              <ThemedText style={styles.mainTitle}>Quest of Seoul{'\n'}Day Pass Trials</ThemedText>
               <Image
-                source={require("@/assets/images/main-2.png")}
+                source={require('@/assets/images/main-2.png')}
                 style={styles.mainIcon}
                 resizeMode="contain"
               />
@@ -75,9 +62,7 @@ export default function DayPassScreen() {
                     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <Path d="M11 15H6L13 1V9H18L11 23V15Z" fill="white" />
                     </Svg>
-                    <ThemedText style={styles.passDesc}>
-                      Mint 1.3X collects
-                    </ThemedText>
+                    <ThemedText style={styles.passDesc}>Mint 1.3X collects</ThemedText>
                   </View>
                   <View style={styles.passDescRow}>
                     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -86,9 +71,7 @@ export default function DayPassScreen() {
                         fill="white"
                       />
                     </Svg>
-                    <ThemedText style={styles.passDesc}>
-                      Infinite AI Docent Chat
-                    </ThemedText>
+                    <ThemedText style={styles.passDesc}>Infinite AI Docent Chat</ThemedText>
                   </View>
                 </View>
                 <View style={styles.priceContainer}>
@@ -105,9 +88,7 @@ export default function DayPassScreen() {
                     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <Path d="M11 15H6L13 1V9H18L11 23V15Z" fill="white" />
                     </Svg>
-                    <ThemedText style={styles.passDesc}>
-                      Mint 1.3X collects
-                    </ThemedText>
+                    <ThemedText style={styles.passDesc}>Mint 1.3X collects</ThemedText>
                   </View>
                   <View style={styles.passDescRow}>
                     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -116,9 +97,7 @@ export default function DayPassScreen() {
                         fill="white"
                       />
                     </Svg>
-                    <ThemedText style={styles.passDesc}>
-                      Infinite AI Docent Chat
-                    </ThemedText>
+                    <ThemedText style={styles.passDesc}>Infinite AI Docent Chat</ThemedText>
                   </View>
                   <View style={styles.passDescRow}>
                     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -127,9 +106,7 @@ export default function DayPassScreen() {
                         fill="white"
                       />
                     </Svg>
-                    <ThemedText style={styles.passDesc}>
-                      Automatic tour route generate
-                    </ThemedText>
+                    <ThemedText style={styles.passDesc}>Automatic tour route generate</ThemedText>
                   </View>
                 </View>
                 <View style={styles.priceContainer}>
@@ -146,9 +123,7 @@ export default function DayPassScreen() {
                     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <Path d="M11 15H6L13 1V9H18L11 23V15Z" fill="white" />
                     </Svg>
-                    <ThemedText style={styles.passDesc}>
-                      Mint 1.4X collects
-                    </ThemedText>
+                    <ThemedText style={styles.passDesc}>Mint 1.4X collects</ThemedText>
                   </View>
                   <View style={styles.passDescRow}>
                     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -157,9 +132,7 @@ export default function DayPassScreen() {
                         fill="white"
                       />
                     </Svg>
-                    <ThemedText style={styles.passDesc}>
-                      Infinite AI Docent Chat
-                    </ThemedText>
+                    <ThemedText style={styles.passDesc}>Infinite AI Docent Chat</ThemedText>
                   </View>
                   <View style={styles.passDescRow}>
                     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -168,18 +141,22 @@ export default function DayPassScreen() {
                         fill="white"
                       />
                     </Svg>
-                    <ThemedText style={styles.passDesc}>
-                      Automatic tour route generate
-                    </ThemedText>
+                    <ThemedText style={styles.passDesc}>Automatic tour route generate</ThemedText>
                   </View>
                   <View style={styles.passDescRow}>
                     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <Path d="M10.5769 8.704C11.2099 7.568 11.5269 7 11.9999 7C12.4729 7 12.7899 7.568 13.4229 8.704L13.5869 8.998C13.7669 9.321 13.8569 9.482 13.9969 9.588C14.1369 9.695 14.3129 9.735 14.6619 9.814L14.9799 9.886C16.2099 10.164 16.8249 10.303 16.9709 10.774C17.1179 11.244 16.6979 11.734 15.8599 12.715L15.6429 12.969C15.4049 13.247 15.2859 13.387 15.2329 13.559C15.1779 13.731 15.1959 13.917 15.2329 14.289L15.2649 14.627C15.3919 15.935 15.4549 16.589 15.0719 16.88C14.6889 17.17 14.1139 16.906 12.9619 16.376L12.6639 16.238C12.3369 16.088 12.1739 16.012 11.9999 16.012C11.8269 16.012 11.6629 16.088 11.3359 16.238L11.0379 16.376C9.88592 16.906 9.31092 17.171 8.92792 16.88C8.54492 16.59 8.60792 15.935 8.73492 14.627L8.76692 14.289C8.80392 13.917 8.82192 13.731 8.76692 13.559C8.71392 13.387 8.59492 13.247 8.35692 12.969L8.13992 12.715C7.30192 11.735 6.88192 11.245 7.02892 10.774C7.17492 10.304 7.78892 10.164 9.01892 9.886L9.33792 9.814C9.68792 9.734 9.86192 9.695 10.0029 9.589C10.1429 9.482 10.2329 9.321 10.4129 8.999L10.5769 8.704Z" fill="white"/>
-                      <Path fillRule="evenodd" clipRule="evenodd" d="M12 1.25C12.1989 1.25 12.3897 1.32902 12.5303 1.46967C12.671 1.61032 12.75 1.80109 12.75 2V4C12.75 4.19891 12.671 4.38968 12.5303 4.53033C12.3897 4.67098 12.1989 4.75 12 4.75C11.8011 4.75 11.6103 4.67098 11.4697 4.53033C11.329 4.38968 11.25 4.19891 11.25 4V2C11.25 1.80109 11.329 1.61032 11.4697 1.46967C11.6103 1.32902 11.8011 1.25 12 1.25ZM18.53 5.47C18.6705 5.61063 18.7493 5.80125 18.7493 6C18.7493 6.19875 18.6705 6.38937 18.53 6.53L18.187 6.873C18.0448 7.00548 17.8568 7.0776 17.6625 7.07417C17.4682 7.07075 17.2828 6.99203 17.1454 6.85462C17.008 6.71721 16.9293 6.53182 16.9258 6.33752C16.9224 6.14322 16.9945 5.95518 17.127 5.813L17.47 5.47C17.6106 5.32955 17.8012 5.25066 18 5.25066C18.1988 5.25066 18.3894 5.32955 18.53 5.47ZM5.47 5.47C5.61063 5.32955 5.80125 5.25066 6 5.25066C6.19875 5.25066 6.38937 5.32955 6.53 5.47L6.874 5.813C7.01055 5.95452 7.08606 6.144 7.08426 6.34065C7.08246 6.5373 7.00349 6.72537 6.86437 6.86436C6.72525 7.00335 6.5371 7.08214 6.34045 7.08376C6.1438 7.08537 5.95439 7.00969 5.813 6.873L5.47 6.53C5.32955 6.38937 5.25066 6.19875 5.25066 6C5.25066 5.80125 5.32955 5.61063 5.47 5.47ZM1.25 12C1.25 11.8011 1.32902 11.6103 1.46967 11.4697C1.61032 11.329 1.80109 11.25 2 11.25H4C4.19891 11.25 4.38968 11.329 4.53033 11.4697C4.67098 11.6103 4.75 11.8011 4.75 12C4.75 12.1989 4.67098 12.3897 4.53033 12.5303C4.38968 12.671 4.19891 12.75 4 12.75H2C1.80109 12.75 1.61032 12.671 1.46967 12.5303C1.32902 12.3897 1.25 12.1989 1.25 12ZM19.25 12C19.25 11.8011 19.329 11.6103 19.4697 11.4697C19.6103 11.329 19.8011 11.25 20 11.25H22C22.1989 11.25 22.3897 11.329 22.5303 11.4697C22.671 11.6103 22.75 11.8011 22.75 12C22.75 12.1989 22.671 12.3897 22.5303 12.5303C22.3897 12.671 22.1989 12.75 22 12.75H20C19.8011 12.75 19.6103 12.671 19.4697 12.5303C19.329 12.3897 19.25 12.1989 19.25 12ZM6.873 17.127C7.01345 17.2676 7.09234 17.4582 7.09234 17.657C7.09234 17.8558 7.01345 18.0464 6.873 18.187L6.53 18.53C6.38783 18.6625 6.19978 18.7346 6.00548 18.7312C5.81118 18.7277 5.62579 18.649 5.48838 18.5116C5.35097 18.3742 5.27225 18.1888 5.26883 17.9945C5.2654 17.8002 5.33752 17.6122 5.47 17.47L5.813 17.127C5.95363 16.9866 6.14425 16.9077 6.343 16.9077C6.54175 16.9077 6.73237 16.9866 6.873 17.127ZM17.126 17.127C17.1957 17.0573 17.2784 17.002 17.3694 16.9643C17.4604 16.9266 17.558 16.9072 17.6565 16.9072C17.755 16.9072 17.8526 16.9266 17.9436 16.9643C18.0347 17.002 18.1173 17.0573 18.187 17.127L18.53 17.47C18.6625 17.6122 18.7346 17.8002 18.7312 17.9945C18.7277 18.1888 18.649 18.3742 18.5116 18.5116C18.3742 18.649 18.1888 18.7277 17.9945 18.7312C17.8002 18.7346 17.6122 18.6625 17.47 18.53L17.127 18.187C16.9866 18.0464 16.9077 17.8558 16.9077 17.657C16.9077 17.4582 16.9866 17.2676 17.127 17.127M12 19.25C12.1989 19.25 12.3897 19.329 12.5303 19.4697C12.671 19.6103 12.75 19.8011 12.75 20V22C12.75 22.1989 12.671 22.3897 12.5303 22.5303C12.3897 22.671 12.1989 22.75 12 22.75C11.8011 22.75 11.6103 22.671 11.4697 22.5303C11.329 22.3897 11.25 22.1989 11.25 22V20C11.25 19.8011 11.329 19.6103 11.4697 19.4697C11.6103 19.329 11.8011 19.25 12 19.25Z" fill="white"/>
+                      <Path
+                        d="M10.5769 8.704C11.2099 7.568 11.5269 7 11.9999 7C12.4729 7 12.7899 7.568 13.4229 8.704L13.5869 8.998C13.7669 9.321 13.8569 9.482 13.9969 9.588C14.1369 9.695 14.3129 9.735 14.6619 9.814L14.9799 9.886C16.2099 10.164 16.8249 10.303 16.9709 10.774C17.1179 11.244 16.6979 11.734 15.8599 12.715L15.6429 12.969C15.4049 13.247 15.2859 13.387 15.2329 13.559C15.1779 13.731 15.1959 13.917 15.2329 14.289L15.2649 14.627C15.3919 15.935 15.4549 16.589 15.0719 16.88C14.6889 17.17 14.1139 16.906 12.9619 16.376L12.6639 16.238C12.3369 16.088 12.1739 16.012 11.9999 16.012C11.8269 16.012 11.6629 16.088 11.3359 16.238L11.0379 16.376C9.88592 16.906 9.31092 17.171 8.92792 16.88C8.54492 16.59 8.60792 15.935 8.73492 14.627L8.76692 14.289C8.80392 13.917 8.82192 13.731 8.76692 13.559C8.71392 13.387 8.59492 13.247 8.35692 12.969L8.13992 12.715C7.30192 11.735 6.88192 11.245 7.02892 10.774C7.17492 10.304 7.78892 10.164 9.01892 9.886L9.33792 9.814C9.68792 9.734 9.86192 9.695 10.0029 9.589C10.1429 9.482 10.2329 9.321 10.4129 8.999L10.5769 8.704Z"
+                        fill="white"
+                      />
+                      <Path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M12 1.25C12.1989 1.25 12.3897 1.32902 12.5303 1.46967C12.671 1.61032 12.75 1.80109 12.75 2V4C12.75 4.19891 12.671 4.38968 12.5303 4.53033C12.3897 4.67098 12.1989 4.75 12 4.75C11.8011 4.75 11.6103 4.67098 11.4697 4.53033C11.329 4.38968 11.25 4.19891 11.25 4V2C11.25 1.80109 11.329 1.61032 11.4697 1.46967C11.6103 1.32902 11.8011 1.25 12 1.25ZM18.53 5.47C18.6705 5.61063 18.7493 5.80125 18.7493 6C18.7493 6.19875 18.6705 6.38937 18.53 6.53L18.187 6.873C18.0448 7.00548 17.8568 7.0776 17.6625 7.07417C17.4682 7.07075 17.2828 6.99203 17.1454 6.85462C17.008 6.71721 16.9293 6.53182 16.9258 6.33752C16.9224 6.14322 16.9945 5.95518 17.127 5.813L17.47 5.47C17.6106 5.32955 17.8012 5.25066 18 5.25066C18.1988 5.25066 18.3894 5.32955 18.53 5.47ZM5.47 5.47C5.61063 5.32955 5.80125 5.25066 6 5.25066C6.19875 5.25066 6.38937 5.32955 6.53 5.47L6.874 5.813C7.01055 5.95452 7.08606 6.144 7.08426 6.34065C7.08246 6.5373 7.00349 6.72537 6.86437 6.86436C6.72525 7.00335 6.5371 7.08214 6.34045 7.08376C6.1438 7.08537 5.95439 7.00969 5.813 6.873L5.47 6.53C5.32955 6.38937 5.25066 6.19875 5.25066 6C5.25066 5.80125 5.32955 5.61063 5.47 5.47ZM1.25 12C1.25 11.8011 1.32902 11.6103 1.46967 11.4697C1.61032 11.329 1.80109 11.25 2 11.25H4C4.19891 11.25 4.38968 11.329 4.53033 11.4697C4.67098 11.6103 4.75 11.8011 4.75 12C4.75 12.1989 4.67098 12.3897 4.53033 12.5303C4.38968 12.671 4.19891 12.75 4 12.75H2C1.80109 12.75 1.61032 12.671 1.46967 12.5303C1.32902 12.3897 1.25 12.1989 1.25 12ZM19.25 12C19.25 11.8011 19.329 11.6103 19.4697 11.4697C19.6103 11.329 19.8011 11.25 20 11.25H22C22.1989 11.25 22.3897 11.329 22.5303 11.4697C22.671 11.6103 22.75 11.8011 22.75 12C22.75 12.1989 22.671 12.3897 22.5303 12.5303C22.3897 12.671 22.1989 12.75 22 12.75H20C19.8011 12.75 19.6103 12.671 19.4697 12.5303C19.329 12.3897 19.25 12.1989 19.25 12ZM6.873 17.127C7.01345 17.2676 7.09234 17.4582 7.09234 17.657C7.09234 17.8558 7.01345 18.0464 6.873 18.187L6.53 18.53C6.38783 18.6625 6.19978 18.7346 6.00548 18.7312C5.81118 18.7277 5.62579 18.649 5.48838 18.5116C5.35097 18.3742 5.27225 18.1888 5.26883 17.9945C5.2654 17.8002 5.33752 17.6122 5.47 17.47L5.813 17.127C5.95363 16.9866 6.14425 16.9077 6.343 16.9077C6.54175 16.9077 6.73237 16.9866 6.873 17.127ZM17.126 17.127C17.1957 17.0573 17.2784 17.002 17.3694 16.9643C17.4604 16.9266 17.558 16.9072 17.6565 16.9072C17.755 16.9072 17.8526 16.9266 17.9436 16.9643C18.0347 17.002 18.1173 17.0573 18.187 17.127L18.53 17.47C18.6625 17.6122 18.7346 17.8002 18.7312 17.9945C18.7277 18.1888 18.649 18.3742 18.5116 18.5116C18.3742 18.649 18.1888 18.7277 17.9945 18.7312C17.8002 18.7346 17.6122 18.6625 17.47 18.53L17.127 18.187C16.9866 18.0464 16.9077 17.8558 16.9077 17.657C16.9077 17.4582 16.9866 17.2676 17.127 17.127M12 19.25C12.1989 19.25 12.3897 19.329 12.5303 19.4697C12.671 19.6103 12.75 19.8011 12.75 20V22C12.75 22.1989 12.671 22.3897 12.5303 22.5303C12.3897 22.671 12.1989 22.75 12 22.75C11.8011 22.75 11.6103 22.671 11.4697 22.5303C11.329 22.3897 11.25 22.1989 11.25 22V20C11.25 19.8011 11.329 19.6103 11.4697 19.4697C11.6103 19.329 11.8011 19.25 12 19.25Z"
+                        fill="white"
+                      />
                     </Svg>
-                    <ThemedText style={styles.passDesc}>
-                      Premium Quest access
-                    </ThemedText>
+                    <ThemedText style={styles.passDesc}>Premium Quest access</ThemedText>
                   </View>
                 </View>
                 <View style={styles.priceContainer}>
@@ -210,12 +187,12 @@ export default function DayPassScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
   },
   backgroundImage: {
     flex: 1,
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
   gradient: {
     flex: 1,
@@ -225,23 +202,23 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 20,
   },
   headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
   },
   headerTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   titleBox: {
@@ -249,10 +226,10 @@ const styles = StyleSheet.create({
     marginTop: 31,
   },
   title: {
-    color: "#8BFFDA",
-    fontFamily: "Pretendard",
+    color: '#8BFFDA',
+    fontFamily: 'Pretendard',
     fontSize: 16,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: 0,
   },
@@ -260,15 +237,15 @@ const styles = StyleSheet.create({
   mainTitleBox: {
     paddingHorizontal: 20,
     marginTop: 95,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
   },
   mainTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 24,
     letterSpacing: 0,
   },
@@ -280,23 +257,23 @@ const styles = StyleSheet.create({
   },
 
   cardsRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
     paddingVertical: 20,
     marginHorizontal: -30,
   },
   passCard: {
     width: 170,
     padding: 10,
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#76C7AD",
-    backgroundColor: "#76C7AD",
-    shadowColor: "#000",
+    borderColor: '#76C7AD',
+    backgroundColor: '#76C7AD',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -304,87 +281,87 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   passCardCenter: {
-    backgroundColor: "#76C7AD",
+    backgroundColor: '#76C7AD',
     zIndex: 2,
   },
   passCardSide: {
-    backgroundColor: "rgba(118, 199, 173, 0.80)",
+    backgroundColor: 'rgba(118, 199, 173, 0.80)',
     opacity: 0.8,
     zIndex: 1,
   },
   passTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 22,
     letterSpacing: -0.18,
   },
   passDescContainer: {
-    flexDirection: "column",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: 5,
-    alignSelf: "stretch",
+    alignSelf: 'stretch',
   },
   passDescRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 5,
   },
   passDesc: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 22,
     letterSpacing: -0.18,
   },
   priceContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 4,
   },
   priceAmount: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 22,
     letterSpacing: -0.18,
   },
   priceDuration: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 22,
     letterSpacing: -0.18,
   },
 
   ctaButton: {
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
     width: 320,
     height: 50,
     padding: 10,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 35,
     marginHorizontal: 20,
     marginBottom: 40,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   ctaText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   ctaTextLight: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 16,
-    fontWeight: "400",
+    fontWeight: '400',
   },
 });

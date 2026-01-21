@@ -1,13 +1,13 @@
-import { Ionicons } from "@expo/vector-icons";
-import MaskedView from "@react-native-masked-view/masked-view";
-import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import { Image, Pressable, StyleSheet, View } from "react-native";
-import Svg, { Defs, Path, RadialGradient, Stop } from "react-native-svg";
+import { Ionicons } from '@expo/vector-icons';
+import MaskedView from '@react-native-masked-view/masked-view';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
+import Svg, { Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 
-import { ThemedText } from "@/components/themed-text";
-import { Images } from "@/constants/images";
-import { useQuestStore } from "@/store/useQuestStore";
+import { useQuestStore } from '@entities/quest';
+import { Images } from '@shared/config';
+import { ThemedText } from '@shared/ui';
 
 export default function QuizModeScreen() {
   const router = useRouter();
@@ -16,10 +16,9 @@ export default function QuizModeScreen() {
   // Access quest_id and place_id from active quest
   const questId = activeQuest?.quest_id;
   const placeId = activeQuest?.place_id;
-  const questName = activeQuest?.quest.name || "Unknown Place";
+  const questName = activeQuest?.quest.name || 'Unknown Place';
   const rewardPoint = activeQuest?.quest.reward_point || 300;
-  const placeImageUrl =
-    activeQuest?.quest.place_image_url || null;
+  const placeImageUrl = activeQuest?.quest.place_image_url || null;
 
   // 현재 퀴즈 진행 상태 (0 = 아직 시작 안함)
   const currentQuizIndex = 0;
@@ -30,20 +29,20 @@ export default function QuizModeScreen() {
     if (questId) {
       // Quest mode: pass quest_id to use quest quizzes with scoring system
       router.replace({
-        pathname: "/quiz-screen",
+        pathname: '/quiz-screen',
         params: {
           questId: questId.toString(),
           questName: questName,
           rewardPoint: rewardPoint.toString(),
-          quizScoreMax: "100",
-          perQuestionScore: "20",
-          hintPenaltyScore: "10",
+          quizScoreMax: '100',
+          perQuestionScore: '20',
+          hintPenaltyScore: '10',
         },
       });
     } else {
       // Fallback to general quiz mode
       router.replace({
-        pathname: "/quiz-screen",
+        pathname: '/quiz-screen',
         params: { landmark: questName },
       });
     }
@@ -53,7 +52,7 @@ export default function QuizModeScreen() {
     <View style={styles.container}>
       {/* Gradient Background */}
       <LinearGradient
-        colors={["#34495E", "#76C7AD", "#FF7F50"]}
+        colors={['#34495E', '#76C7AD', '#FF7F50']}
         locations={[0, 0.601, 1]}
         style={styles.gradientBackgroundTop}
       />
@@ -119,10 +118,7 @@ export default function QuizModeScreen() {
           {[...Array(totalQuizzes)].map((_, index) => (
             <View
               key={index}
-              style={[
-                styles.progressDot,
-                index < currentQuizIndex && styles.progressDotCompleted,
-              ]}
+              style={[styles.progressDot, index < currentQuizIndex && styles.progressDotCompleted]}
             />
           ))}
         </View>
@@ -132,19 +128,15 @@ export default function QuizModeScreen() {
       <View style={styles.content}>
         {/* Gradient Quiz Time Title */}
         <MaskedView
-          maskElement={
-            <ThemedText style={styles.gradientTitle}>{"Quiz\nTime"}</ThemedText>
-          }
+          maskElement={<ThemedText style={styles.gradientTitle}>{'Quiz\nTime'}</ThemedText>}
         >
           <LinearGradient
-            colors={["#FF8051", "#A7FFE3"]}
+            colors={['#FF8051', '#A7FFE3']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0.7 }}
             style={styles.gradientBackground}
           >
-            <ThemedText style={[styles.gradientTitle, { opacity: 0 }]}>
-              {"Quiz\nTime"}
-            </ThemedText>
+            <ThemedText style={[styles.gradientTitle, { opacity: 0 }]}>{'Quiz\nTime'}</ThemedText>
           </LinearGradient>
         </MaskedView>
 
@@ -175,11 +167,7 @@ export default function QuizModeScreen() {
           </View>
           {/* Thumbnail Image */}
           <Image
-            source={
-              placeImageUrl
-                ? { uri: placeImageUrl }
-                : Images.quizThumbnail
-            }
+            source={placeImageUrl ? { uri: placeImageUrl } : Images.quizThumbnail}
             style={styles.thumbnail}
             resizeMode="cover"
           />
@@ -192,18 +180,12 @@ export default function QuizModeScreen() {
         {questId ? (
           <>
             <ThemedText style={styles.points}>Quiz Score: 100 pts</ThemedText>
-            <ThemedText style={styles.subPoints}>
-              5 questions × 20 pts each
-            </ThemedText>
+            <ThemedText style={styles.subPoints}>5 questions × 20 pts each</ThemedText>
           </>
         ) : (
           <>
-            <ThemedText style={styles.points}>
-              Total {rewardPoint} pts
-            </ThemedText>
-            <ThemedText style={styles.subPoints}>
-              5 questions × 60 pts each
-            </ThemedText>
+            <ThemedText style={styles.points}>Total {rewardPoint} pts</ThemedText>
+            <ThemedText style={styles.subPoints}>5 questions × 60 pts each</ThemedText>
           </>
         )}
 
@@ -218,11 +200,11 @@ export default function QuizModeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
     paddingTop: 60,
   },
   gradientBackgroundTop: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
@@ -230,11 +212,11 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   sparkleImage: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    width: "100%",
+    width: '100%',
     height: 343,
     zIndex: 1,
     opacity: 1,
@@ -242,95 +224,95 @@ const styles = StyleSheet.create({
 
   /* Header */
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
     marginBottom: 17,
   },
   headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
   },
   headerTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   /* Point Container */
   pointContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 20,
     gap: 10,
   },
   pointBox: {
-    flexDirection: "row",
+    flexDirection: 'row',
     width: 76,
     height: 47,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 10,
-    backgroundColor: "#76C7AD",
+    backgroundColor: '#76C7AD',
   },
   mintSection: {
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
     width: 26,
     gap: 2,
   },
   mintLabel: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Inter",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Inter',
     fontSize: 9,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 10,
   },
   pointValue: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Inter",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 16,
   },
 
   /* Progress Indicators */
   progressContainer: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 6,
   },
   progressDot: {
     width: 40,
     height: 10,
     borderRadius: 25,
-    backgroundColor: "#222D39",
+    backgroundColor: '#222D39',
   },
   progressDotCompleted: {
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
 
   /* Content */
   content: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     paddingTop: 40,
   },
   gradientTitle: {
-    fontFamily: "BagelFatOne-Regular",
+    fontFamily: 'BagelFatOne-Regular',
     fontSize: 48,
     lineHeight: 56,
-    textAlign: "center",
-    textShadowColor: "rgba(0, 0, 0, 0.25)",
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.25)',
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 4,
   },
@@ -338,9 +320,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   imageContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 20,
   },
   quizIconWrapper: {
@@ -352,31 +334,31 @@ const styles = StyleSheet.create({
     width: 120,
     height: 124,
     borderRadius: 10,
-    backgroundColor: "#EF6A39",
-    shadowColor: "#000",
+    backgroundColor: '#EF6A39',
+    shadowColor: '#000',
     shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 6.5,
     elevation: 8,
   },
   placeName: {
-    color: "#FFF",
-    textAlign: "center",
+    color: '#FFF',
+    textAlign: 'center',
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: '700',
     marginBottom: 60,
   },
   points: {
-    color: "#FFF",
-    textAlign: "center",
+    color: '#FFF',
+    textAlign: 'center',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 22,
   },
   subPoints: {
-    color: "#FFF",
+    color: '#FFF',
     fontSize: 16,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 22,
     marginBottom: 40,
   },
@@ -384,17 +366,17 @@ const styles = StyleSheet.create({
     width: 320,
     height: 50,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 35,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     marginHorizontal: 20,
   },
   startBtnText: {
-    color: "#659DF2",
-    fontFamily: "Inter",
+    color: '#659DF2',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 });

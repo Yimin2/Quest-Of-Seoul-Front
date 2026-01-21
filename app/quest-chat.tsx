@@ -1,12 +1,17 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-av";
-import Constants from "expo-constants";
-import * as FileSystem from "expo-file-system/legacy";
-import * as ImagePicker from "expo-image-picker";
-import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import * as Speech from "expo-speech";
-import { useEffect, useRef, useState } from "react";
+import { Ionicons } from '@expo/vector-icons';
+import {
+  RecordingPresets,
+  requestRecordingPermissionsAsync,
+  useAudioPlayer,
+  useAudioRecorder,
+} from 'expo-audio';
+import Constants from 'expo-constants';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import * as Speech from 'expo-speech';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -19,30 +24,38 @@ import {
   ScrollView,
   StyleSheet,
   TextInput,
-  View
-} from "react-native";
-import Svg, { ClipPath, Defs, G, Mask, Path, Rect } from "react-native-svg";
+  View,
+} from 'react-native';
+import Svg, {
+  Circle,
+  ClipPath,
+  Defs,
+  G,
+  Mask,
+  Path,
+  RadialGradient,
+  Rect,
+  Stop,
+} from 'react-native-svg';
 
-import { ThemedText } from "@/components/themed-text";
-import { aiStationApi } from "@/services/api";
-import { useQuestStore } from "@/store/useQuestStore";
+import { aiStationApi } from '@shared/api';
+import { useQuestStore } from '@entities/quest';
+import { ThemedText } from '@shared/ui';
 
 const API_URL =
   Constants.expoConfig?.extra?.apiUrl ||
-  (Platform.OS === "android"
-    ? "http://10.0.2.2:8000"
-    : "http://localhost:8000");
+  (Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000');
 const makeId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 const formatTimestamp = (date: Date): string => {
-  const hours = date.getHours().toString().padStart(2, "0");
-  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
   return `${hours}:${minutes}`;
 };
 
 type Message = {
   id: string;
-  role: "assistant" | "user";
+  role: 'assistant' | 'user';
   text?: string;
   imageUrl?: string;
   timestamp: Date;
@@ -67,22 +80,21 @@ export default function QuestChatScreen() {
     {
       id: makeId(),
       role: 'assistant',
-      text: 'Hello! Ask me anything about Seoul tourism. 🏛️\n\nUpload a photo and I\'ll analyze the place for you! 📸',
+      text: "Hello! Ask me anything about Seoul tourism. 🏛️\n\nUpload a photo and I'll analyze the place for you! 📸",
       timestamp: new Date(),
     },
   ]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [showImageModal, setShowImageModal] = useState(false);
   const [vlmContext, setVlmContext] = useState<VLMContext | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showVoiceMode, setShowVoiceMode] = useState(false);
-  const recordRef = useRef<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>("Quest");
+  const [selectedCategory, setSelectedCategory] = useState<string>('Quest');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [voiceModeSessionId, setVoiceModeSessionId] = useState<string | null>(null);
-  const currentSoundRef = useRef<Audio.Sound | null>(null);
+  const [isCaptionOn, setIsCaptionOn] = useState(true);
 
   useEffect(() => {
     return () => {
@@ -181,7 +193,6 @@ export default function QuestChatScreen() {
     });
     try {
       if (questId) {
-
         const data = await aiStationApi.questVlmChat({
           image: base64img,
           user_message: userMessage || undefined,
@@ -201,7 +212,7 @@ export default function QuestChatScreen() {
 
           addMessage({
             id: makeId(),
-            role: "assistant",
+            role: 'assistant',
             text: data.message,
             timestamp: new Date(),
           });
@@ -231,7 +242,6 @@ export default function QuestChatScreen() {
           });
         }
       } else {
-
         const data = await aiStationApi.vlmAnalyze({
           image: base64img,
           language: 'en',
@@ -249,7 +259,7 @@ export default function QuestChatScreen() {
 
           addMessage({
             id: makeId(),
-            role: "assistant",
+            role: 'assistant',
             text: data.description,
             timestamp: new Date(),
           });
@@ -295,7 +305,7 @@ export default function QuestChatScreen() {
 
       addMessage({
         id: makeId(),
-        role: "user",
+        role: 'user',
         imageUrl: `data:image/jpeg;base64,${selectedImage}`,
         text: userText || undefined,
         timestamp: new Date(),
@@ -304,7 +314,7 @@ export default function QuestChatScreen() {
       const imageToSend = selectedImage;
       const messageToSend = userText || undefined;
 
-      setInput("");
+      setInput('');
       setSelectedImage(null);
       setIsLoading(true);
 
@@ -318,11 +328,11 @@ export default function QuestChatScreen() {
     const userText = input.trim();
     addMessage({
       id: makeId(),
-      role: "user",
+      role: 'user',
       text: userText,
       timestamp: new Date(),
     });
-    setInput("");
+    setInput('');
     setIsLoading(true);
 
     try {
@@ -395,41 +405,30 @@ ${userText}`;
     router.back();
   };
 
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const player = useAudioPlayer(null);
+
   const startRecording = async () => {
     try {
-      const permissionResponse = await Audio.requestPermissionsAsync();
+      const permissionResponse = await requestRecordingPermissionsAsync();
       if (!permissionResponse.granted) {
         Alert.alert(
-          "Microphone permission required",
-          "For voice input, microphone permission is required. Please allow permission in settings."
+          'Microphone permission required',
+          'For voice input, microphone permission is required. Please allow permission in settings.',
         );
         return;
       }
 
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-
-      const recording = new Audio.Recording();
-      await recording.prepareToRecordAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
-      );
-      await recording.startAsync();
-
-      recordRef.current = recording;
+      recorder.record();
       setIsRecording(true);
     } catch (err: any) {
-      if (err?.message?.includes("permission") || err?.code === "ERR_PERMISSION_DENIED") {
+      if (err?.message?.includes('permission') || err?.code === 'ERR_PERMISSION_DENIED') {
         Alert.alert(
-          "Microphone permission denied",
-          "Microphone permission is denied. Please allow permission in settings."
+          'Microphone permission denied',
+          'Microphone permission is denied. Please allow permission in settings.',
         );
       } else {
-        Alert.alert(
-          "Recording failed",
-          "Recording failed. Please try again."
-        );
+        Alert.alert('Recording failed', 'Recording failed. Please try again.');
       }
       setIsRecording(false);
     }
@@ -437,17 +436,11 @@ ${userText}`;
 
   const stopRecording = async () => {
     try {
-      const recording = recordRef.current;
-      if (!recording) return null;
+      if (!recorder.isRecording) return null;
 
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
+      await recorder.stop();
+      const uri = recorder.uri;
       setIsRecording(false);
-
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
-      });
 
       if (!uri) return null;
 
@@ -464,42 +457,16 @@ ${userText}`;
 
   const playTTSAudio = async (audioBase64: string) => {
     try {
-      if (currentSoundRef.current) {
-        try {
-          await currentSoundRef.current.stopAsync();
-          await currentSoundRef.current.unloadAsync();
-        } catch (err) {
-          // Ignore
-        }
-        currentSoundRef.current = null;
-      }
-
-      const sound = new Audio.Sound();
-      currentSoundRef.current = sound;
-
       const fileUri = `${FileSystem.cacheDirectory}tts_${Date.now()}.mp3`;
       await FileSystem.writeAsStringAsync(fileUri, audioBase64, {
         encoding: 'base64',
       });
 
-      await sound.loadAsync({ uri: fileUri });
-      await sound.playAsync();
+      player.replace({ uri: fileUri });
+      player.play();
 
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          sound.unloadAsync();
-          FileSystem.deleteAsync(fileUri, { idempotent: true }).catch(() => { });
-          if (currentSoundRef.current === sound) {
-            currentSoundRef.current = null;
-          }
-        }
-      });
-
-      return sound;
+      return player;
     } catch (ttsError: any) {
-      if (currentSoundRef.current) {
-        currentSoundRef.current = null;
-      }
       throw ttsError;
     }
   };
@@ -511,7 +478,7 @@ ${userText}`;
         return;
       }
 
-      const languageCode = "en-US";
+      const languageCode = 'en-US';
 
       const data = await aiStationApi.sttTts({
         audio: base64Audio,
@@ -522,8 +489,8 @@ ${userText}`;
       if (!data.transcribed_text || data.transcribed_text.trim().length === 0) {
         const errorMsg: Message = {
           id: makeId(),
-          role: "assistant",
-          text: "Voice recognition failed. Please try again.",
+          role: 'assistant',
+          text: 'Voice recognition failed. Please try again.',
           timestamp: new Date(),
         };
         if (!showVoiceMode) {
@@ -539,7 +506,7 @@ ${userText}`;
       } else {
         const userMsg: Message = {
           id: makeId(),
-          role: "user",
+          role: 'user',
           text: text,
           timestamp: new Date(),
         };
@@ -547,15 +514,15 @@ ${userText}`;
         await sendMessageFromSTT(text);
       }
     } catch (e: any) {
-      const errorMessage = e?.message || "Voice recognition failed. Please try again.";
+      const errorMessage = e?.message || 'Voice recognition failed. Please try again.';
       const errorMsg: Message = {
         id: makeId(),
-        role: "assistant",
+        role: 'assistant',
         text: errorMessage,
         timestamp: new Date(),
       };
       if (showVoiceMode) {
-        Alert.alert("Voice Recognition Failed", errorMessage);
+        Alert.alert('Voice Recognition Failed', errorMessage);
       } else {
         addMessage(errorMsg);
       }
@@ -712,7 +679,7 @@ ${text}`;
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1 }}
     >
       <ImageBackground
@@ -721,20 +688,17 @@ ${text}`;
         imageStyle={styles.backgroundImageStyle}
       >
         <LinearGradient
-          colors={["rgba(101, 157, 242, 0.00)", "#659DF2"]}
+          colors={['rgba(101, 157, 242, 0.00)', '#659DF2']}
           style={styles.backgroundGradient}
         >
           <View style={styles.container}>
             <View style={styles.headerContainer}>
               <View style={styles.headerContent}>
-                <Pressable
-                  onPress={() => router.push("/chat-history")}
-                  style={styles.headerButton}
-                >
+                <Pressable onPress={() => router.push('/chat-history')} style={styles.headerButton}>
                   <HamburgerIcon />
                 </Pressable>
                 <ThemedText style={styles.headerTitle}>
-                  {activeQuest?.quest.name || "Gyeongbokgung Palace"}
+                  {activeQuest?.quest.name || 'Gyeongbokgung Palace'}
                 </ThemedText>
                 <Pressable onPress={exitToPrevious} style={styles.headerButton}>
                   <CloseIcon />
@@ -742,32 +706,24 @@ ${text}`;
               </View>
             </View>
 
-            <ScrollView
-              ref={scrollRef}
-              style={{ flex: 1 }}
-              contentContainerStyle={styles.messages}
-            >
+            <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={styles.messages}>
               {messages.map((msg) => (
                 <View key={msg.id} style={styles.messageContainer}>
-                  {msg.role === "assistant" ? (
+                  {msg.role === 'assistant' ? (
                     <View style={styles.assistantMessageRow}>
                       <View style={styles.profileCircle}>
                         <Image
-                          source={require("@/assets/images/face-3.png")}
+                          source={require('@/assets/images/face-3.png')}
                           style={styles.profileImage}
                           resizeMode="contain"
                         />
                       </View>
                       <View style={styles.assistantContentColumn}>
-                        <ThemedText style={styles.nickname}>
-                          AI Docent
-                        </ThemedText>
+                        <ThemedText style={styles.nickname}>AI Docent</ThemedText>
                         <View style={styles.bubbleWithTime}>
                           <View style={styles.assistantBubble}>
                             {msg.text && (
-                              <ThemedText style={styles.assistantBubbleText}>
-                                {msg.text}
-                              </ThemedText>
+                              <ThemedText style={styles.assistantBubbleText}>{msg.text}</ThemedText>
                             )}
                             {msg.imageUrl && (
                               <Image
@@ -793,11 +749,7 @@ ${text}`;
                         {formatTimestamp(msg.timestamp)}
                       </ThemedText>
                       <View style={styles.userBubble}>
-                        {msg.text && (
-                          <ThemedText style={styles.userText}>
-                            {msg.text}
-                          </ThemedText>
-                        )}
+                        {msg.text && <ThemedText style={styles.userText}>{msg.text}</ThemedText>}
                         {msg.imageUrl && (
                           <Image
                             source={{ uri: msg.imageUrl }}
@@ -827,7 +779,7 @@ ${text}`;
                   style={styles.removeImageButton}
                   onPress={() => {
                     setSelectedImage(null);
-                    setInput("");
+                    setInput('');
                   }}
                 >
                   <Ionicons name="close-circle" size={24} color="#fff" />
@@ -837,7 +789,7 @@ ${text}`;
                     style={styles.cancelPreviewButton}
                     onPress={() => {
                       setSelectedImage(null);
-                      setInput("");
+                      setInput('');
                     }}
                   >
                     <ThemedText style={styles.cancelPreviewText}>Cancel</ThemedText>
@@ -845,7 +797,7 @@ ${text}`;
                   <Pressable
                     style={[
                       styles.sendPreviewButton,
-                      isLoading && styles.sendPreviewButtonDisabled
+                      isLoading && styles.sendPreviewButtonDisabled,
                     ]}
                     onPress={sendMessage}
                     disabled={isLoading}
@@ -870,9 +822,9 @@ ${text}`;
                   <Pressable
                     style={[
                       styles.categoryTab,
-                      selectedCategory === "Quest" && styles.categoryTabActive,
+                      selectedCategory === 'Quest' && styles.categoryTabActive,
                     ]}
-                    onPress={() => setSelectedCategory("Quest")}
+                    onPress={() => setSelectedCategory('Quest')}
                   >
                     <Svg width="16" height="10" viewBox="0 0 16 10" fill="none">
                       <Path
@@ -881,24 +833,19 @@ ${text}`;
                         stroke="white"
                       />
                     </Svg>
-                    <ThemedText style={styles.categoryTabText}>
-                      Quest
-                    </ThemedText>
+                    <ThemedText style={styles.categoryTabText}>Quest</ThemedText>
                   </Pressable>
 
-                  {["Fun Facts", "History", "Tips!"].map((category) => (
+                  {['Fun Facts', 'History', 'Tips!'].map((category) => (
                     <Pressable
                       key={category}
                       style={[
                         styles.categoryTab,
-                        selectedCategory === category &&
-                        styles.categoryTabActive,
+                        selectedCategory === category && styles.categoryTabActive,
                       ]}
                       onPress={() => setSelectedCategory(category)}
                     >
-                      <ThemedText style={styles.categoryTabText}>
-                        {category}
-                      </ThemedText>
+                      <ThemedText style={styles.categoryTabText}>{category}</ThemedText>
                     </Pressable>
                   ))}
                 </ScrollView>
@@ -944,12 +891,7 @@ ${text}`;
                       {isLoading ? (
                         <ActivityIndicator color="#FF7F50" size="small" />
                       ) : (
-                        <Svg
-                          width="15"
-                          height="15"
-                          viewBox="0 0 15 15"
-                          fill="none"
-                        >
+                        <Svg width="15" height="15" viewBox="0 0 15 15" fill="none">
                           <G clipPath="url(#clip0_417_8458)">
                             <Path
                               fillRule="evenodd"
@@ -968,16 +910,8 @@ ${text}`;
                       )}
                     </Pressable>
                   ) : (
-                    <Pressable
-                      style={styles.actionButton}
-                      onPress={() => setShowVoiceMode(true)}
-                    >
-                      <Svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 30 30"
-                        fill="none"
-                      >
+                    <Pressable style={styles.actionButton} onPress={() => setShowVoiceMode(true)}>
+                      <Svg width="30" height="30" viewBox="0 0 30 30" fill="none">
                         <Defs>
                           <Mask
                             id="mask0_410_8325"
@@ -1023,19 +957,11 @@ ${text}`;
                     <Ionicons name="camera" size={20} color="#111" />
                     <ThemedText style={styles.modalText}>Take a photo</ThemedText>
                   </Pressable>
-                  <Pressable
-                    style={styles.modalItem}
-                    onPress={pickImageFromLibrary}
-                  >
+                  <Pressable style={styles.modalItem} onPress={pickImageFromLibrary}>
                     <Ionicons name="image" size={20} color="#111" />
-                    <ThemedText style={styles.modalText}>
-                      Select from album
-                    </ThemedText>
+                    <ThemedText style={styles.modalText}>Select from album</ThemedText>
                   </Pressable>
-                  <Pressable
-                    style={styles.modalCancel}
-                    onPress={() => setShowImageModal(false)}
-                  >
+                  <Pressable style={styles.modalCancel} onPress={() => setShowImageModal(false)}>
                     <ThemedText style={styles.modalCancelText}>Cancel</ThemedText>
                   </Pressable>
                 </View>
@@ -1047,20 +973,13 @@ ${text}`;
                 onClose={async () => {
                   setIsLoading(false);
 
-                  if (currentSoundRef.current) {
-                    try {
-                      await currentSoundRef.current.stopAsync();
-                      await currentSoundRef.current.unloadAsync();
-                    } catch (err) {
-                      // Ignore
-                    }
-                    currentSoundRef.current = null;
+                  if (player.playing) {
+                    player.pause();
                   }
 
-                  if (isRecording && recordRef.current) {
+                  if (recorder.isRecording) {
                     try {
-                      await recordRef.current.stopAndUnloadAsync();
-                      recordRef.current = null;
+                      await recorder.stop();
                     } catch (err) {
                       // Ignore
                     }
@@ -1080,7 +999,7 @@ ${text}`;
                           if (chat.user_message) {
                             messages.push({
                               id: makeId(),
-                              role: "user",
+                              role: 'user',
                               text: chat.user_message,
                               timestamp: new Date(chat.created_at),
                             });
@@ -1088,7 +1007,7 @@ ${text}`;
                           if (chat.ai_response) {
                             messages.push({
                               id: makeId(),
-                              role: "assistant",
+                              role: 'assistant',
                               text: chat.ai_response,
                               timestamp: new Date(chat.created_at),
                             });
@@ -1106,8 +1025,9 @@ ${text}`;
                 onStartRecording={startRecording}
                 onStopRecording={async () => {
                   await runSTTandTTS();
-                  recordRef.current = null;
                 }}
+                isCaptionOn={isCaptionOn}
+                onToggleCaption={() => setIsCaptionOn((prev) => !prev)}
               />
             )}
           </View>
@@ -1122,6 +1042,8 @@ type VoiceModeOverlayProps = {
   isRecording: boolean;
   onStartRecording: () => void;
   onStopRecording: () => void;
+  isCaptionOn: boolean;
+  onToggleCaption: () => void;
 };
 
 function VoiceModeOverlay({
@@ -1129,101 +1051,324 @@ function VoiceModeOverlay({
   isRecording,
   onStartRecording,
   onStopRecording,
+  isCaptionOn,
+  onToggleCaption,
 }: VoiceModeOverlayProps) {
   return (
     <View style={overlayStyles.overlay}>
-      <View
-        style={[
-          overlayStyles.circle,
-          isRecording && overlayStyles.circleRecording,
-        ]}
+      <Image
+        source={
+          isRecording ? require('@/assets/images/exist.png') : require('@/assets/images/zero.png')
+        }
+        style={overlayStyles.backgroundImage}
+        resizeMode="cover"
       />
+      <View style={overlayStyles.topHeader}>
+        <Svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+          <Defs>
+            <Mask
+              id="mask0_voice_header"
+              maskUnits="userSpaceOnUse"
+              x="1"
+              y="1"
+              width="28"
+              height="28"
+            >
+              <Path
+                d="M15 27.5C21.9037 27.5 27.5 21.9037 27.5 15C27.5 8.09625 21.9037 2.5 15 2.5C8.09625 2.5 2.5 8.09625 2.5 15C2.5 21.9037 8.09625 27.5 15 27.5Z"
+                fill="white"
+                stroke="white"
+                strokeWidth="2.5"
+              />
+              <Path
+                d="M18.75 11.25V18.75M22.5 13.75V16.25M11.25 11.25V18.75M7.5 13.75V16.25M15 8.75V21.25"
+                stroke="black"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+            </Mask>
+          </Defs>
+          <G mask="url(#mask0_voice_header)">
+            <Path d="M0 0H30V30H0V0Z" fill="#FF7F50" />
+          </G>
+        </Svg>
+        <ThemedText style={overlayStyles.voiceChatText}>Voice Chat</ThemedText>
+      </View>
       <View style={overlayStyles.bottomMenu}>
-        <Pressable style={overlayStyles.menuButton}>
-          <Ionicons name="videocam-outline" size={30} color="#aaa" />
+        {/* 왼쪽 버튼 - CC ON/OFF */}
+        <Pressable style={overlayStyles.circleButton} onPress={onToggleCaption}>
+          <Svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <Defs>
+              <RadialGradient
+                id="paint0_left"
+                cx="0"
+                cy="0"
+                r="1"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform="translate(40 40) rotate(90) scale(40)"
+              >
+                <Stop stopColor="white" />
+                <Stop offset="1" stopColor="white" stopOpacity="0.8" />
+              </RadialGradient>
+            </Defs>
+            <Circle cx="40" cy="40" r="39.5" fill="url(#paint0_left)" stroke="white" />
+          </Svg>
+          <View style={overlayStyles.circleButtonIconContainer}>
+            {isCaptionOn ? (
+              <Svg width="35" height="35" viewBox="0 0 35 35" fill="none">
+                <Rect
+                  x="2"
+                  y="7"
+                  width="31"
+                  height="21"
+                  rx="3"
+                  stroke="#34495E"
+                  strokeWidth="2.5"
+                />
+                <Path
+                  d="M13.5 14C13.5 13.1716 12.8284 12.5 12 12.5H9C8.17157 12.5 7.5 13.1716 7.5 14V21C7.5 21.8284 8.17157 22.5 9 22.5H12C12.8284 22.5 13.5 21.8284 13.5 21"
+                  stroke="#34495E"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <Path
+                  d="M27.5 14C27.5 13.1716 26.8284 12.5 26 12.5H23C22.1716 12.5 21.5 13.1716 21.5 14V21C21.5 21.8284 22.1716 22.5 23 22.5H26C26.8284 22.5 27.5 21.8284 27.5 21"
+                  stroke="#34495E"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+              </Svg>
+            ) : (
+              <Svg width="35" height="35" viewBox="0 0 35 35" fill="none">
+                <Rect
+                  x="2"
+                  y="7"
+                  width="31"
+                  height="21"
+                  rx="3"
+                  stroke="#FF7F50"
+                  strokeWidth="2.5"
+                />
+                <Path
+                  d="M13.5 14C13.5 13.1716 12.8284 12.5 12 12.5H9C8.17157 12.5 7.5 13.1716 7.5 14V21C7.5 21.8284 8.17157 22.5 9 22.5H12C12.8284 22.5 13.5 21.8284 13.5 21"
+                  stroke="#FF7F50"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <Path
+                  d="M27.5 14C27.5 13.1716 26.8284 12.5 26 12.5H23C22.1716 12.5 21.5 13.1716 21.5 14V21C21.5 21.8284 22.1716 22.5 23 22.5H26C26.8284 22.5 27.5 21.8284 27.5 21"
+                  stroke="#FF7F50"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <Path d="M5 29L30 6" stroke="#FF7F50" strokeWidth="2.5" strokeLinecap="round" />
+              </Svg>
+            )}
+          </View>
         </Pressable>
+
+        {/* 중앙 버튼 - 녹음 버튼 */}
         <Pressable
-          style={[
-            overlayStyles.menuButton,
-            isRecording && overlayStyles.menuButtonRecording,
-          ]}
-          onPress={async () => {
-            if (!isRecording) {
-              await onStartRecording();
-            } else {
-              await onStopRecording();
-            }
-          }}
+          style={overlayStyles.recordButtonWrapper}
+          onPress={isRecording ? onStopRecording : onStartRecording}
         >
-          <Ionicons name="mic" size={30} color="#fff" />
+          <View style={overlayStyles.recordButtonBorder}>
+            <View style={overlayStyles.recordButtonInner}>
+              {isRecording ? (
+                <View style={overlayStyles.stopIcon} />
+              ) : (
+                <View style={overlayStyles.micIcon}>
+                  <Svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+                    <Path
+                      d="M15 18.75C17.0711 18.75 18.75 17.0711 18.75 15V8.75C18.75 6.67893 17.0711 5 15 5C12.9289 5 11.25 6.67893 11.25 8.75V15C11.25 17.0711 12.9289 18.75 15 18.75Z"
+                      fill="white"
+                    />
+                    <Path
+                      d="M23.75 15C23.75 19.8325 19.8325 23.75 15 23.75C10.1675 23.75 6.25 19.8325 6.25 15"
+                      stroke="white"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                    />
+                    <Path
+                      d="M15 23.75V27.5M11.25 27.5H18.75"
+                      stroke="white"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                    />
+                  </Svg>
+                </View>
+              )}
+            </View>
+          </View>
         </Pressable>
-        <Pressable style={overlayStyles.menuButton}>
-          <Ionicons name="ellipsis-horizontal" size={30} color="#aaa" />
-        </Pressable>
-        <Pressable style={overlayStyles.menuButton} onPress={onClose}>
-          <Ionicons name="close" size={34} color="#fff" />
+
+        {/* 오른쪽 버튼 - 나가기 버튼 */}
+        <Pressable style={overlayStyles.circleButton} onPress={onClose}>
+          <Svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <Defs>
+              <RadialGradient
+                id="paint0_right"
+                cx="0"
+                cy="0"
+                r="1"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform="translate(40 40) rotate(90) scale(40)"
+              >
+                <Stop stopColor="white" />
+                <Stop offset="1" stopColor="white" stopOpacity="0.8" />
+              </RadialGradient>
+            </Defs>
+            <Circle cx="40" cy="40" r="39.5" fill="url(#paint0_right)" stroke="white" />
+          </Svg>
+          <View style={overlayStyles.circleButtonIconContainer}>
+            <Svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+              <Path
+                d="M22.5 7.5L7.5 22.5"
+                stroke="#34495E"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+              <Path
+                d="M7.5 7.5L22.5 22.5"
+                stroke="#34495E"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+            </Svg>
+          </View>
         </Pressable>
       </View>
+
+      {/* 캡션 영역 */}
+      {isCaptionOn && (
+        <View style={overlayStyles.captionContainer}>
+          <ThemedText style={overlayStyles.captionText} adjustsFontSizeToFit>
+            {isRecording ? 'Listening...' : 'Tap the mic to speak'}
+          </ThemedText>
+        </View>
+      )}
     </View>
   );
 }
 
 const overlayStyles = StyleSheet.create({
   overlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "#000",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 999,
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
   },
-  circle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "#fff",
-    marginBottom: 200,
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
   },
-  circleRecording: {
-    backgroundColor: "#FF4444",
+  topHeader: {
+    position: 'absolute',
+    top: 60,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  voiceChatText: {
+    color: '#FF7F50',
+    fontSize: 20,
+    fontWeight: '600',
   },
   bottomMenu: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 50,
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 20,
+  },
+  circleButton: {
+    width: 80,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  circleButtonIconContainer: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  recordButtonWrapper: {
+    width: 100,
+    height: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20, // 살짝 위로
+  },
+  recordButtonBorder: {
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  recordButtonInner: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#FF7F50',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#FF7F50',
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  micIcon: {
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stopIcon: {
+    width: 24,
+    height: 24,
+    backgroundColor: 'white',
+    borderRadius: 4,
+  },
+  captionContainer: {
+    position: 'absolute',
+    bottom: 160,
     paddingHorizontal: 20,
+    alignItems: 'center',
+    width: '100%',
   },
-  menuButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "#222",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  menuButtonRecording: {
-    backgroundColor: "#FF4444",
+  captionText: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: '500',
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
 });
 
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
   backgroundImageStyle: {
-    resizeMode: "cover",
+    resizeMode: 'cover',
   },
   backgroundGradient: {
     flex: 1,
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
   container: {
     flex: 1,
@@ -1239,43 +1384,43 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   headerContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
   },
   headerButton: {
     width: 40,
     height: 40,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
-    fontFamily: "Inter",
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
-    color: "#FFFFFF",
+    fontWeight: '700',
+    color: '#FFFFFF',
     flex: 1,
-    textAlign: "center",
+    textAlign: 'center',
     marginHorizontal: 10,
   },
   messageContainer: {
     marginBottom: 10,
-    width: "100%",
+    width: '100%',
   },
   assistantMessageRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     gap: 8,
   },
   profileCircle: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#FEF5E7",
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
+    backgroundColor: '#FEF5E7',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
   profileImage: {
     width: 32,
@@ -1286,10 +1431,10 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   nickname: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
@@ -1297,18 +1442,18 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 4,
   },
   closeButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.15)",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   messages: {
     paddingVertical: 20,
@@ -1316,87 +1461,87 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   bubble: {
-    maxWidth: "80%",
+    maxWidth: '80%',
     padding: 12,
     borderRadius: 14,
     marginBottom: 10,
   },
   assistantBubble: {
-    alignSelf: "flex-start",
-    backgroundColor: "#FFF",
+    alignSelf: 'flex-start',
+    backgroundColor: '#FFF',
     padding: 12,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
     borderBottomLeftRadius: 10,
-    maxWidth: "80%",
+    maxWidth: '80%',
   },
   assistantBubbleText: {
-    color: "#34495E",
-    fontFamily: "Pretendard",
+    color: '#34495E',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   bubbleWithTime: {
-    flexDirection: "row",
-    alignItems: "flex-end",
+    flexDirection: 'row',
+    alignItems: 'flex-end',
     gap: 6,
   },
   userBubbleContainer: {
-    alignSelf: "flex-end",
-    flexDirection: "row",
-    alignItems: "flex-end",
+    alignSelf: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
     gap: 6,
   },
   userBubble: {
-    alignSelf: "flex-end",
-    backgroundColor: "#9DFFE0",
+    alignSelf: 'flex-end',
+    backgroundColor: '#9DFFE0',
     padding: 12,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 0,
     borderBottomRightRadius: 10,
     borderBottomLeftRadius: 10,
-    maxWidth: "80%",
+    maxWidth: '80%',
   },
   userText: {
-    color: "#34495E",
-    fontFamily: "Pretendard",
+    color: '#34495E',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   timestamp: {
-    color: "#FFFFFF",
-    fontFamily: "Pretendard",
+    color: '#FFFFFF',
+    fontFamily: 'Pretendard',
     fontSize: 10,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 12,
     marginBottom: 2,
   },
   bottomSection: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
   },
   categoryContainer: {
-    width: "100%",
+    width: '100%',
     height: 70,
     maxHeight: 267,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    backgroundColor: "#162028",
+    backgroundColor: '#162028',
   },
   categoryScrollContent: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 5,
     paddingVertical: 5,
   },
@@ -1404,30 +1549,30 @@ const styles = StyleSheet.create({
     height: 40,
     paddingHorizontal: 10,
     paddingVertical: 10,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 5,
     borderRadius: 39,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
   },
   categoryTabActive: {
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
   },
   categoryTabText: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 20,
   },
   bottomBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     height: 80,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
     paddingHorizontal: 20,
     gap: 10,
   },
@@ -1435,15 +1580,15 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#659DF2",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#659DF2',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   inputContainer: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFF",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF',
     borderRadius: 30,
     paddingHorizontal: 16,
     height: 40,
@@ -1452,33 +1597,33 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     fontSize: 14,
-    color: "#000",
+    color: '#000',
   },
   actionButton: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: "#FF7F50",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#FF7F50',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
   },
   photoButton: {
     width: 46,
     height: 46,
     borderRadius: 14,
-    backgroundColor: "#64748B",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#64748B',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   input: {
     flex: 1,
     borderRadius: 14,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: '#E2E8F0',
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
@@ -1486,50 +1631,50 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 14,
-    backgroundColor: "#5B7DFF",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#5B7DFF',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   voiceButton: {
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: "#64748B",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#64748B',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   imagePreviewContainer: {
-    position: "relative",
+    position: 'relative',
     marginBottom: 10,
     padding: 10,
-    backgroundColor: "#1E293B",
+    backgroundColor: '#1E293B',
     borderRadius: 12,
   },
   imagePreview: {
-    width: "100%",
+    width: '100%',
     height: 150,
     borderRadius: 8,
     marginBottom: 8,
   },
   removeImageButton: {
-    position: "absolute",
+    position: 'absolute',
     top: 15,
     right: 15,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: 'rgba(0,0,0,0.5)',
     borderRadius: 12,
   },
   imagePreviewText: {
     fontSize: 12,
-    color: "#94A3B8",
-    textAlign: "center",
+    color: '#94A3B8',
+    textAlign: 'center',
   },
   previewActions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     gap: 10,
     marginTop: 8,
   },
@@ -1538,56 +1683,56 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: "#64748B",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#64748B',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cancelPreviewText: {
-    color: "#FFF",
+    color: '#FFF',
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   sendPreviewButton: {
     flex: 1,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: "#FF7F50",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#FF7F50',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sendPreviewButtonDisabled: {
     opacity: 0.6,
   },
   sendPreviewText: {
-    color: "#FFF",
+    color: '#FFF',
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.45)',
   },
   modalBox: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     padding: 20,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     gap: 18,
   },
   modalItem: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   modalText: {
     marginLeft: 8,
   },
   modalCancel: {
-    alignItems: "center",
+    alignItems: 'center',
     marginTop: 8,
   },
   modalCancelText: {
-    color: "#777",
+    color: '#777',
   },
 });

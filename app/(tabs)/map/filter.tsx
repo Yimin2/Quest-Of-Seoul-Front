@@ -1,27 +1,34 @@
-import { questApi } from "@/services/api";
-import * as Location from "expo-location";
-import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import Svg, { Path } from "react-native-svg";
+import { questApi } from '@shared/api';
+import * as Location from 'expo-location';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
-type SortByType = "nearest" | "rewarded" | "newest";
+type SortByType = 'nearest' | 'rewarded' | 'newest';
 
 export default function MapFilterScreen() {
   const params = useLocalSearchParams();
 
   // Initialize with params from search page if available
-  const initialSort = (params.selectedSort as SortByType) || "nearest";
-  const searchQuery = (params.searchQuery as string) || ""; // 검색어 받기
+  const initialSort = (params.selectedSort as SortByType) || 'nearest';
+  const searchQuery = (params.searchQuery as string) || ''; // 검색어 받기
 
   // Parse selectedThemes and selectedDistricts from params
   const initialThemes = params.selectedThemes
-    ? (params.selectedThemes as string).split(",")
-    : ["All Themes"];
+    ? (params.selectedThemes as string).split(',')
+    : ['All Themes'];
   const initialDistricts = params.selectedDistricts
-    ? (params.selectedDistricts as string).split(",")
-    : ["All Districts"];
-
+    ? (params.selectedDistricts as string).split(',')
+    : ['All Districts'];
 
   const [selectedThemes, setSelectedThemes] = useState<string[]>(initialThemes);
   const [selectedSort, setSelectedSort] = useState<SortByType>(initialSort);
@@ -36,7 +43,7 @@ export default function MapFilterScreen() {
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
+      if (status !== 'granted') {
         return;
       }
 
@@ -49,13 +56,13 @@ export default function MapFilterScreen() {
   }, []);
 
   const toggleTheme = (theme: string) => {
-    if (theme === "All Themes") {
-      setSelectedThemes(["All Themes"]);
+    if (theme === 'All Themes') {
+      setSelectedThemes(['All Themes']);
     } else {
-      const newThemes = selectedThemes.filter((t) => t !== "All Themes");
+      const newThemes = selectedThemes.filter((t) => t !== 'All Themes');
       if (newThemes.includes(theme)) {
         const filtered = newThemes.filter((t) => t !== theme);
-        setSelectedThemes(filtered.length === 0 ? ["All Themes"] : filtered);
+        setSelectedThemes(filtered.length === 0 ? ['All Themes'] : filtered);
       } else {
         setSelectedThemes([...newThemes, theme]);
       }
@@ -63,17 +70,13 @@ export default function MapFilterScreen() {
   };
 
   const toggleDistrict = (district: string) => {
-    if (district === "All Districts") {
-      setSelectedDistricts(["All Districts"]);
+    if (district === 'All Districts') {
+      setSelectedDistricts(['All Districts']);
     } else {
-      const newDistricts = selectedDistricts.filter(
-        (d) => d !== "All Districts"
-      );
+      const newDistricts = selectedDistricts.filter((d) => d !== 'All Districts');
       if (newDistricts.includes(district)) {
         const filtered = newDistricts.filter((d) => d !== district);
-        setSelectedDistricts(
-          filtered.length === 0 ? ["All Districts"] : filtered
-        );
+        setSelectedDistricts(filtered.length === 0 ? ['All Districts'] : filtered);
       } else {
         setSelectedDistricts([...newDistricts, district]);
       }
@@ -81,20 +84,20 @@ export default function MapFilterScreen() {
   };
 
   const handleRefresh = () => {
-    setSelectedThemes(["All Themes"]);
-    setSelectedSort("nearest");
-    setSelectedDistricts(["All Districts"]);
+    setSelectedThemes(['All Themes']);
+    setSelectedSort('nearest');
+    setSelectedDistricts(['All Districts']);
   };
 
   // Map UI district values to API values
   const mapDistrictToApi = (district: string): string => {
     // Convert "Yongsan-district" to "Yongsan-gu"
-    return district.replace("-district", "-gu");
+    return district.replace('-district', '-gu');
   };
 
   const handleApplyFilters = async () => {
     if (!userLocation) {
-      Alert.alert("Location Required", "Please enable location services to use filters.");
+      Alert.alert('Location Required', 'Please enable location services to use filters.');
       return;
     }
 
@@ -106,12 +109,10 @@ export default function MapFilterScreen() {
         radius_km: 50.0,
         limit: 100,
         sort_by: selectedSort,
-        categories: selectedThemes.includes("All Themes")
+        categories: selectedThemes.includes('All Themes')
           ? []
-          : selectedThemes.map(theme =>
-              theme === "Attractions" ? "Attraction" : theme
-            ),
-        districts: selectedDistricts.includes("All Districts")
+          : selectedThemes.map((theme) => (theme === 'Attractions' ? 'Attraction' : theme)),
+        districts: selectedDistricts.includes('All Districts')
           ? []
           : selectedDistricts.map(mapDistrictToApi),
       };
@@ -122,19 +123,19 @@ export default function MapFilterScreen() {
 
       // Navigate back to search page with filtered results and filter settings
       router.push({
-        pathname: "/(tabs)/map/search",
+        pathname: '/(tabs)/map/search',
         params: {
           filteredQuests: JSON.stringify(quests),
           filterCount: count.toString(),
-          selectedThemes: selectedThemes.join(","),
-          selectedDistricts: selectedDistricts.join(","),
+          selectedThemes: selectedThemes.join(','),
+          selectedDistricts: selectedDistricts.join(','),
           selectedSort: selectedSort,
           searchQuery: searchQuery, // 검색어 다시 전달
-          fromFilter: "true",
+          fromFilter: 'true',
         },
       });
     } catch (error) {
-      Alert.alert("Error", "Failed to apply filters. Please try again.");
+      Alert.alert('Error', 'Failed to apply filters. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -145,10 +146,7 @@ export default function MapFilterScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Filter</Text>
-        <Pressable
-          onPress={() => router.push("/(tabs)/map/search")}
-          style={styles.closeButton}
-        >
+        <Pressable onPress={() => router.push('/(tabs)/map/search')} style={styles.closeButton}>
           <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <Path
               fillRule="evenodd"
@@ -165,24 +163,18 @@ export default function MapFilterScreen() {
         {/* Section Header */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Themes</Text>
-          <Text style={styles.sectionSubtitle}>
-            Multiple selections allowed
-          </Text>
+          <Text style={styles.sectionSubtitle}>Multiple selections allowed</Text>
         </View>
 
         {/* Categories */}
         <View style={styles.categoriesContainer}>
           <Pressable
-            style={
-              selectedThemes.includes("All Themes")
-                ? styles.categoryActive
-                : styles.category
-            }
-            onPress={() => toggleTheme("All Themes")}
+            style={selectedThemes.includes('All Themes') ? styles.categoryActive : styles.category}
+            onPress={() => toggleTheme('All Themes')}
           >
             <Text
               style={
-                selectedThemes.includes("All Themes")
+                selectedThemes.includes('All Themes')
                   ? styles.categoryActiveText
                   : styles.categoryText
               }
@@ -191,16 +183,12 @@ export default function MapFilterScreen() {
             </Text>
           </Pressable>
           <Pressable
-            style={
-              selectedThemes.includes("Attractions")
-                ? styles.categoryActive
-                : styles.category
-            }
-            onPress={() => toggleTheme("Attractions")}
+            style={selectedThemes.includes('Attractions') ? styles.categoryActive : styles.category}
+            onPress={() => toggleTheme('Attractions')}
           >
             <Text
               style={
-                selectedThemes.includes("Attractions")
+                selectedThemes.includes('Attractions')
                   ? styles.categoryActiveText
                   : styles.categoryText
               }
@@ -209,106 +197,72 @@ export default function MapFilterScreen() {
             </Text>
           </Pressable>
           <Pressable
-            style={
-              selectedThemes.includes("History")
-                ? styles.categoryActive
-                : styles.category
-            }
-            onPress={() => toggleTheme("History")}
+            style={selectedThemes.includes('History') ? styles.categoryActive : styles.category}
+            onPress={() => toggleTheme('History')}
           >
             <Text
               style={
-                selectedThemes.includes("History")
-                  ? styles.categoryActiveText
-                  : styles.categoryText
+                selectedThemes.includes('History') ? styles.categoryActiveText : styles.categoryText
               }
             >
               History
             </Text>
           </Pressable>
           <Pressable
-            style={
-              selectedThemes.includes("Culture")
-                ? styles.categoryActive
-                : styles.category
-            }
-            onPress={() => toggleTheme("Culture")}
+            style={selectedThemes.includes('Culture') ? styles.categoryActive : styles.category}
+            onPress={() => toggleTheme('Culture')}
           >
             <Text
               style={
-                selectedThemes.includes("Culture")
-                  ? styles.categoryActiveText
-                  : styles.categoryText
+                selectedThemes.includes('Culture') ? styles.categoryActiveText : styles.categoryText
               }
             >
               Culture
             </Text>
           </Pressable>
           <Pressable
-            style={
-              selectedThemes.includes("Nature")
-                ? styles.categoryActive
-                : styles.category
-            }
-            onPress={() => toggleTheme("Nature")}
+            style={selectedThemes.includes('Nature') ? styles.categoryActive : styles.category}
+            onPress={() => toggleTheme('Nature')}
           >
             <Text
               style={
-                selectedThemes.includes("Nature")
-                  ? styles.categoryActiveText
-                  : styles.categoryText
+                selectedThemes.includes('Nature') ? styles.categoryActiveText : styles.categoryText
               }
             >
               Nature
             </Text>
           </Pressable>
           <Pressable
-            style={
-              selectedThemes.includes("Food")
-                ? styles.categoryActive
-                : styles.category
-            }
-            onPress={() => toggleTheme("Food")}
+            style={selectedThemes.includes('Food') ? styles.categoryActive : styles.category}
+            onPress={() => toggleTheme('Food')}
           >
             <Text
               style={
-                selectedThemes.includes("Food")
-                  ? styles.categoryActiveText
-                  : styles.categoryText
+                selectedThemes.includes('Food') ? styles.categoryActiveText : styles.categoryText
               }
             >
               Food
             </Text>
           </Pressable>
           <Pressable
-            style={
-              selectedThemes.includes("Drinks")
-                ? styles.categoryActive
-                : styles.category
-            }
-            onPress={() => toggleTheme("Drinks")}
+            style={selectedThemes.includes('Drinks') ? styles.categoryActive : styles.category}
+            onPress={() => toggleTheme('Drinks')}
           >
             <Text
               style={
-                selectedThemes.includes("Drinks")
-                  ? styles.categoryActiveText
-                  : styles.categoryText
+                selectedThemes.includes('Drinks') ? styles.categoryActiveText : styles.categoryText
               }
             >
               Drinks
             </Text>
           </Pressable>
           <Pressable
-            style={
-              selectedThemes.includes("Shopping")
-                ? styles.categoryActive
-                : styles.category
-            }
-            onPress={() => toggleTheme("Shopping")}
+            style={selectedThemes.includes('Shopping') ? styles.categoryActive : styles.category}
+            onPress={() => toggleTheme('Shopping')}
           >
             <Text
               style={
-                selectedThemes.includes("Shopping")
+                selectedThemes.includes('Shopping')
                   ? styles.categoryActiveText
                   : styles.categoryText
               }
@@ -317,16 +271,12 @@ export default function MapFilterScreen() {
             </Text>
           </Pressable>
           <Pressable
-            style={
-              selectedThemes.includes("Activities")
-                ? styles.categoryActive
-                : styles.category
-            }
-            onPress={() => toggleTheme("Activities")}
+            style={selectedThemes.includes('Activities') ? styles.categoryActive : styles.category}
+            onPress={() => toggleTheme('Activities')}
           >
             <Text
               style={
-                selectedThemes.includes("Activities")
+                selectedThemes.includes('Activities')
                   ? styles.categoryActiveText
                   : styles.categoryText
               }
@@ -335,18 +285,12 @@ export default function MapFilterScreen() {
             </Text>
           </Pressable>
           <Pressable
-            style={
-              selectedThemes.includes("Events")
-                ? styles.categoryActive
-                : styles.category
-            }
-            onPress={() => toggleTheme("Events")}
+            style={selectedThemes.includes('Events') ? styles.categoryActive : styles.category}
+            onPress={() => toggleTheme('Events')}
           >
             <Text
               style={
-                selectedThemes.includes("Events")
-                  ? styles.categoryActiveText
-                  : styles.categoryText
+                selectedThemes.includes('Events') ? styles.categoryActiveText : styles.categoryText
               }
             >
               Events
@@ -360,41 +304,30 @@ export default function MapFilterScreen() {
         {/* Sort By Section */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Sort By</Text>
-          <Text style={styles.sectionSubtitle}>
-            Multiple selections allowed
-          </Text>
+          <Text style={styles.sectionSubtitle}>Multiple selections allowed</Text>
         </View>
 
         {/* Sort By Categories */}
         <View style={styles.sortContainer}>
           <Pressable
-            style={[
-              styles.sortButton,
-              selectedSort === "nearest" && styles.sortActiveNearest,
-            ]}
-            onPress={() => setSelectedSort("nearest")}
+            style={[styles.sortButton, selectedSort === 'nearest' && styles.sortActiveNearest]}
+            onPress={() => setSelectedSort('nearest')}
           >
             <Svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <Path
                 d="M0.702404 4.91659L10.515 0.198826C11.8218 -0.304898 12.2965 0.157875 11.8177 1.48066L7.27664 11.2848C7.19557 11.5085 7.0441 11.6992 6.84541 11.8277C6.64672 11.9563 6.41175 12.0156 6.1765 11.9965C5.94125 11.9775 5.7187 11.8811 5.54286 11.7223C5.36702 11.5634 5.24762 11.3508 5.20293 11.1169C4.88639 9.47878 2.79239 7.36153 1.14478 7.05438L0.876926 7.00114C0.645723 6.95733 0.435121 6.8382 0.277417 6.66205C0.119713 6.4859 0.0236217 6.26241 0.00381896 6.02586C-0.0159837 5.7893 0.041604 5.55272 0.16779 5.35237C0.293975 5.15201 0.481761 4.99892 0.702404 4.91659Z"
-                fill={selectedSort === "nearest" ? "#659DF2" : "white"}
+                fill={selectedSort === 'nearest' ? '#659DF2' : 'white'}
               />
             </Svg>
             <Text
-              style={[
-                styles.sortText,
-                selectedSort === "nearest" && styles.sortActiveTextNearest,
-              ]}
+              style={[styles.sortText, selectedSort === 'nearest' && styles.sortActiveTextNearest]}
             >
               Nearest Trip
             </Text>
           </Pressable>
           <Pressable
-            style={[
-              styles.sortButton,
-              selectedSort === "rewarded" && styles.sortActiveRewarded,
-            ]}
-            onPress={() => setSelectedSort("rewarded")}
+            style={[styles.sortButton, selectedSort === 'rewarded' && styles.sortActiveRewarded]}
+            onPress={() => setSelectedSort('rewarded')}
           >
             <Svg width="20" height="12" viewBox="0 0 20 12" fill="none">
               <Path
@@ -405,11 +338,8 @@ export default function MapFilterScreen() {
             <Text style={styles.sortText}>Most Rewarded</Text>
           </Pressable>
           <Pressable
-            style={[
-              styles.sortButton,
-              selectedSort === "newest" && styles.sortActiveNewest,
-            ]}
-            onPress={() => setSelectedSort("newest")}
+            style={[styles.sortButton, selectedSort === 'newest' && styles.sortActiveNewest]}
+            onPress={() => setSelectedSort('newest')}
           >
             <Svg width="18" height="15" viewBox="0 0 18 15" fill="none">
               <Path
@@ -431,15 +361,12 @@ export default function MapFilterScreen() {
         {/* Districts Section */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Districts</Text>
-          <Text style={styles.sectionSubtitle}>
-            Multiple selections allowed
-          </Text>
+          <Text style={styles.sectionSubtitle}>Multiple selections allowed</Text>
         </View>
 
         {/* Districts Description */}
         <Text style={styles.districtDescription}>
-          Seoul is divided{"\n"}into 25 autonomous districts{"\n"}called
-          &quot;gu&quot;
+          Seoul is divided{'\n'}into 25 autonomous districts{'\n'}called &quot;gu&quot;
         </Text>
 
         {/* Districts Categories */}
@@ -447,15 +374,13 @@ export default function MapFilterScreen() {
         <View style={styles.categoriesContainer}>
           <Pressable
             style={
-              selectedDistricts.includes("All Districts")
-                ? styles.districtActive
-                : styles.category
+              selectedDistricts.includes('All Districts') ? styles.districtActive : styles.category
             }
-            onPress={() => toggleDistrict("All Districts")}
+            onPress={() => toggleDistrict('All Districts')}
           >
             <Text
               style={
-                selectedDistricts.includes("All Districts")
+                selectedDistricts.includes('All Districts')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -466,15 +391,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Dobong-district")
+              selectedDistricts.includes('Dobong-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Dobong-district")}
+            onPress={() => toggleDistrict('Dobong-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Dobong-district")
+                selectedDistricts.includes('Dobong-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -485,15 +410,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Dongdaemun-district")
+              selectedDistricts.includes('Dongdaemun-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Dongdaemun-district")}
+            onPress={() => toggleDistrict('Dongdaemun-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Dongdaemun-district")
+                selectedDistricts.includes('Dongdaemun-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -504,15 +429,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Dongjak-district")
+              selectedDistricts.includes('Dongjak-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Dongjak-district")}
+            onPress={() => toggleDistrict('Dongjak-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Dongjak-district")
+                selectedDistricts.includes('Dongjak-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -523,15 +448,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Eunpyeong-district")
+              selectedDistricts.includes('Eunpyeong-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Eunpyeong-district")}
+            onPress={() => toggleDistrict('Eunpyeong-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Eunpyeong-district")
+                selectedDistricts.includes('Eunpyeong-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -542,15 +467,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Gangbuk-district")
+              selectedDistricts.includes('Gangbuk-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Gangbuk-district")}
+            onPress={() => toggleDistrict('Gangbuk-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Gangbuk-district")
+                selectedDistricts.includes('Gangbuk-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -561,15 +486,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Gangdong-district")
+              selectedDistricts.includes('Gangdong-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Gangdong-district")}
+            onPress={() => toggleDistrict('Gangdong-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Gangdong-district")
+                selectedDistricts.includes('Gangdong-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -580,15 +505,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Gangnam-district")
+              selectedDistricts.includes('Gangnam-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Gangnam-district")}
+            onPress={() => toggleDistrict('Gangnam-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Gangnam-district")
+                selectedDistricts.includes('Gangnam-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -599,15 +524,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Gangseo-district")
+              selectedDistricts.includes('Gangseo-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Gangseo-district")}
+            onPress={() => toggleDistrict('Gangseo-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Gangseo-district")
+                selectedDistricts.includes('Gangseo-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -618,15 +543,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Geumcheon-district")
+              selectedDistricts.includes('Geumcheon-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Geumcheon-district")}
+            onPress={() => toggleDistrict('Geumcheon-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Geumcheon-district")
+                selectedDistricts.includes('Geumcheon-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -637,15 +562,13 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Guro-district")
-                ? styles.districtActive
-                : styles.category
+              selectedDistricts.includes('Guro-district') ? styles.districtActive : styles.category
             }
-            onPress={() => toggleDistrict("Guro-district")}
+            onPress={() => toggleDistrict('Guro-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Guro-district")
+                selectedDistricts.includes('Guro-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -656,15 +579,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Gwanak-district")
+              selectedDistricts.includes('Gwanak-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Gwanak-district")}
+            onPress={() => toggleDistrict('Gwanak-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Gwanak-district")
+                selectedDistricts.includes('Gwanak-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -675,15 +598,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Gwangjin-district")
+              selectedDistricts.includes('Gwangjin-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Gwangjin-district")}
+            onPress={() => toggleDistrict('Gwangjin-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Gwangjin-district")
+                selectedDistricts.includes('Gwangjin-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -694,15 +617,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Jongno-district")
+              selectedDistricts.includes('Jongno-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Jongno-district")}
+            onPress={() => toggleDistrict('Jongno-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Jongno-district")
+                selectedDistricts.includes('Jongno-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -713,15 +636,13 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Jung-district")
-                ? styles.districtActive
-                : styles.category
+              selectedDistricts.includes('Jung-district') ? styles.districtActive : styles.category
             }
-            onPress={() => toggleDistrict("Jung-district")}
+            onPress={() => toggleDistrict('Jung-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Jung-district")
+                selectedDistricts.includes('Jung-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -732,15 +653,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Jungnang-district")
+              selectedDistricts.includes('Jungnang-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Jungnang-district")}
+            onPress={() => toggleDistrict('Jungnang-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Jungnang-district")
+                selectedDistricts.includes('Jungnang-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -751,15 +672,13 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Mapo-district")
-                ? styles.districtActive
-                : styles.category
+              selectedDistricts.includes('Mapo-district') ? styles.districtActive : styles.category
             }
-            onPress={() => toggleDistrict("Mapo-district")}
+            onPress={() => toggleDistrict('Mapo-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Mapo-district")
+                selectedDistricts.includes('Mapo-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -770,15 +689,13 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Nowon-district")
-                ? styles.districtActive
-                : styles.category
+              selectedDistricts.includes('Nowon-district') ? styles.districtActive : styles.category
             }
-            onPress={() => toggleDistrict("Nowon-district")}
+            onPress={() => toggleDistrict('Nowon-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Nowon-district")
+                selectedDistricts.includes('Nowon-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -789,15 +706,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Seocho-district")
+              selectedDistricts.includes('Seocho-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Seocho-district")}
+            onPress={() => toggleDistrict('Seocho-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Seocho-district")
+                selectedDistricts.includes('Seocho-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -808,15 +725,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Seodaemun-district")
+              selectedDistricts.includes('Seodaemun-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Seodaemun-district")}
+            onPress={() => toggleDistrict('Seodaemun-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Seodaemun-district")
+                selectedDistricts.includes('Seodaemun-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -827,15 +744,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Seongbuk-district")
+              selectedDistricts.includes('Seongbuk-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Seongbuk-district")}
+            onPress={() => toggleDistrict('Seongbuk-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Seongbuk-district")
+                selectedDistricts.includes('Seongbuk-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -846,15 +763,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Seongdong-district")
+              selectedDistricts.includes('Seongdong-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Seongdong-district")}
+            onPress={() => toggleDistrict('Seongdong-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Seongdong-district")
+                selectedDistricts.includes('Seongdong-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -865,15 +782,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Songpa-district")
+              selectedDistricts.includes('Songpa-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Songpa-district")}
+            onPress={() => toggleDistrict('Songpa-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Songpa-district")
+                selectedDistricts.includes('Songpa-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -884,15 +801,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Yangcheon-district")
+              selectedDistricts.includes('Yangcheon-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Yangcheon-district")}
+            onPress={() => toggleDistrict('Yangcheon-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Yangcheon-district")
+                selectedDistricts.includes('Yangcheon-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -903,15 +820,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Yeongdeungpo-district")
+              selectedDistricts.includes('Yeongdeungpo-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Yeongdeungpo-district")}
+            onPress={() => toggleDistrict('Yeongdeungpo-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Yeongdeungpo-district")
+                selectedDistricts.includes('Yeongdeungpo-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -922,15 +839,15 @@ export default function MapFilterScreen() {
 
           <Pressable
             style={
-              selectedDistricts.includes("Yongsan-district")
+              selectedDistricts.includes('Yongsan-district')
                 ? styles.districtActive
                 : styles.category
             }
-            onPress={() => toggleDistrict("Yongsan-district")}
+            onPress={() => toggleDistrict('Yongsan-district')}
           >
             <Text
               style={
-                selectedDistricts.includes("Yongsan-district")
+                selectedDistricts.includes('Yongsan-district')
                   ? styles.districtActiveText
                   : styles.categoryText
               }
@@ -952,11 +869,7 @@ export default function MapFilterScreen() {
           </Svg>
         </Pressable>
 
-        <Pressable
-          style={styles.applyButton}
-          onPress={handleApplyFilters}
-          disabled={loading}
-        >
+        <Pressable style={styles.applyButton} onPress={handleApplyFilters} disabled={loading}>
           {loading ? (
             <ActivityIndicator color="#FFF" />
           ) : (
@@ -971,25 +884,25 @@ export default function MapFilterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#659DF2",
+    backgroundColor: '#659DF2',
   },
   header: {
-    width: "100%",
+    width: '100%',
     height: 105,
     flexShrink: 0,
-    backgroundColor: "#659DF2",
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
+    backgroundColor: '#659DF2',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
     paddingTop: 72,
     paddingHorizontal: 25,
   },
   headerTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontStyle: "normal",
-    fontWeight: "700",
+    fontStyle: 'normal',
+    fontWeight: '700',
     lineHeight: 22,
     letterSpacing: -0.18,
   },
@@ -1002,158 +915,158 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
   },
   sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginTop: 28,
   },
   sectionTitle: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 24,
-    fontStyle: "normal",
-    fontWeight: "700",
+    fontStyle: 'normal',
+    fontWeight: '700',
     lineHeight: 32,
     letterSpacing: 0,
   },
   sectionSubtitle: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontStyle: "normal",
-    fontWeight: "400",
+    fontStyle: 'normal',
+    fontWeight: '400',
     lineHeight: 16,
     letterSpacing: 0,
   },
   categoriesContainer: {
     marginTop: 20,
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   categoryActive: {
-    display: "flex",
+    display: 'flex',
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 42,
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
   },
   categoryActiveText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 13,
-    fontStyle: "normal",
-    fontWeight: "700",
+    fontStyle: 'normal',
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   category: {
-    display: "flex",
+    display: 'flex',
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 42,
     borderWidth: 1,
-    borderColor: "#FFF",
+    borderColor: '#FFF',
   },
   categoryText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 13,
-    fontStyle: "normal",
-    fontWeight: "700",
+    fontStyle: 'normal',
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   divider: {
     height: 1,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     marginTop: 30,
     marginBottom: 30,
   },
   sortContainer: {
     marginTop: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    alignContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignContent: 'center',
     gap: 5,
-    flexWrap: "wrap",
+    flexWrap: 'wrap',
   },
   sortButton: {
-    display: "flex",
+    display: 'flex',
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 42,
     borderWidth: 1,
-    borderColor: "#FFF",
-    flexDirection: "row",
+    borderColor: '#FFF',
+    flexDirection: 'row',
   },
   sortActiveNearest: {
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     borderWidth: 0,
   },
   sortActiveRewarded: {
-    backgroundColor: "#76C7AD",
+    backgroundColor: '#76C7AD',
     borderWidth: 0,
   },
   sortActiveNewest: {
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
     borderWidth: 0,
   },
   sortActiveTextNearest: {
-    color: "#659DF2",
+    color: '#659DF2',
   },
   sortText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 13,
-    fontStyle: "normal",
-    fontWeight: "700",
+    fontStyle: 'normal',
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   districtDescription: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 16,
-    fontStyle: "normal",
-    fontWeight: "400",
+    fontStyle: 'normal',
+    fontWeight: '400',
     lineHeight: 24,
     letterSpacing: 0,
     marginTop: 16,
   },
   districtActive: {
-    display: "flex",
+    display: 'flex',
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 42,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
   districtActiveText: {
-    color: "#659DF2",
-    fontFamily: "Pretendard",
+    color: '#659DF2',
+    fontFamily: 'Pretendard',
     fontSize: 13,
-    fontStyle: "normal",
-    fontWeight: "700",
+    fontStyle: 'normal',
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   bottomBar: {
-    width: "100%",
+    width: '100%',
     height: 80,
     flexShrink: 0,
-    backgroundColor: "#659DF2",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    backgroundColor: '#659DF2',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 25,
   },
   refreshButton: {
@@ -1161,23 +1074,23 @@ const styles = StyleSheet.create({
     height: 20,
   },
   applyButton: {
-    display: "flex",
+    display: 'flex',
     width: 269,
     height: 50,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     flexShrink: 0,
     borderRadius: 35,
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
   },
   applyButtonText: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontStyle: "normal",
-    fontWeight: "700",
+    fontStyle: 'normal',
+    fontWeight: '700',
     lineHeight: 16,
   },
 });

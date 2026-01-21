@@ -1,11 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { CameraView, useCameraPermissions } from 'expo-camera';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { ThemedText, ThemedView } from '@shared/ui';
 
 export default function CameraModeScreen() {
   const router = useRouter();
@@ -106,4 +105,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

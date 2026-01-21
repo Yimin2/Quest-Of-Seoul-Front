@@ -1,21 +1,14 @@
-import { ThemedText } from "@/components/themed-text";
-import { ClaimedReward, pointsApi, rewardApi } from "@/services/api";
-import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
-import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  Image,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ClaimedReward, pointsApi, rewardApi } from '@shared/api';
+import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { ThemedText } from '@shared/ui';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Alert, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function MyCouponScreen() {
   const router = useRouter();
-  const [tab, setTab] = useState<"available" | "used">("available");
+  const [tab, setTab] = useState<'available' | 'used'>('available');
   const [userMint, setUserMint] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [coupons, setCoupons] = useState<ClaimedReward[]>([]);
@@ -24,8 +17,7 @@ export default function MyCouponScreen() {
     try {
       const data = await pointsApi.getPoints();
       setUserMint(data.total_points);
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   const fetchCoupons = async () => {
@@ -34,36 +26,32 @@ export default function MyCouponScreen() {
       const res = await rewardApi.getClaimedRewards();
       setCoupons(res.claimed_rewards || []);
     } catch (e) {
-      Alert.alert("Error", "Failed to load coupon list.");
+      Alert.alert('Error', 'Failed to load coupon list.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleUseCoupon = async (id: number, name: string) => {
-    Alert.alert(
-      "Use Coupon",
-      `Would you like to use ${name}?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Use",
-          onPress: async () => {
-            try {
-              const res = await rewardApi.useReward(id);
-              if (res.status === "success") {
-                Alert.alert("Used ✅", "Coupon has been successfully used!");
-                fetchCoupons();
-              } else {
-                Alert.alert("Error", "This coupon has already been used.");
-              }
-            } catch (e: any) {
-              Alert.alert("Error", e.message || "An error occurred while using the coupon.");
+    Alert.alert('Use Coupon', `Would you like to use ${name}?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Use',
+        onPress: async () => {
+          try {
+            const res = await rewardApi.useReward(id);
+            if (res.status === 'success') {
+              Alert.alert('Used ✅', 'Coupon has been successfully used!');
+              fetchCoupons();
+            } else {
+              Alert.alert('Error', 'This coupon has already been used.');
             }
-          },
+          } catch (e: any) {
+            Alert.alert('Error', e.message || 'An error occurred while using the coupon.');
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   useEffect(() => {
@@ -76,12 +64,12 @@ export default function MyCouponScreen() {
     React.useCallback(() => {
       fetchUserPoints();
       fetchCoupons();
-    }, [])
+    }, []),
   );
 
   // Filter coupons
-  const availableCoupons = coupons.filter(c => !c.used_at);
-  const usedCoupons = coupons.filter(c => c.used_at);
+  const availableCoupons = coupons.filter((c) => !c.used_at);
+  const usedCoupons = coupons.filter((c) => c.used_at);
 
   return (
     <ScrollView style={styles.container}>
@@ -155,7 +143,7 @@ export default function MyCouponScreen() {
 function CouponItem({
   item,
   used = false,
-  onUse
+  onUse,
 }: {
   item: ClaimedReward;
   used?: boolean;
@@ -171,21 +159,19 @@ function CouponItem({
             resizeMode="cover"
           />
         ) : (
-          <Ionicons name="gift" size={30} color={used ? "#666" : "#7DFFA4"} />
+          <Ionicons name="gift" size={30} color={used ? '#666' : '#7DFFA4'} />
         )}
       </View>
 
       <View style={{ flex: 1 }}>
         <ThemedText style={styles.couponTitle}>{item.rewards.name}</ThemedText>
-        <ThemedText style={styles.couponBrand}>
-          {item.rewards.description || "Reward"}
-        </ThemedText>
+        <ThemedText style={styles.couponBrand}>{item.rewards.description || 'Reward'}</ThemedText>
         <ThemedText style={styles.dateText}>
-          Acquired: {new Date(item.claimed_at).toLocaleDateString("en-US")}
+          Acquired: {new Date(item.claimed_at).toLocaleDateString('en-US')}
         </ThemedText>
         {used && item.used_at && (
           <ThemedText style={styles.usedTag}>
-            Used: {new Date(item.used_at).toLocaleDateString("en-US")}
+            Used: {new Date(item.used_at).toLocaleDateString('en-US')}
           </ThemedText>
         )}
       </View>
@@ -211,112 +197,112 @@ function CouponItem({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0F1A2A",
+    backgroundColor: '#0F1A2A',
     padding: 16,
     paddingTop: 60,
   },
 
   /** Header */
   headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 20,
   },
   headerTitle: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   /** Mint Card */
   mintCard: {
-    backgroundColor: "#1A2D48",
+    backgroundColor: '#1A2D48',
     borderRadius: 16,
     padding: 20,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 16,
   },
   cloudIcon: {
     marginRight: 14,
   },
   mintTitle: {
-    color: "#A8B7D8",
+    color: '#A8B7D8',
     fontSize: 14,
   },
   mintAmount: {
-    color: "#7DFFA4",
+    color: '#7DFFA4',
     fontSize: 26,
-    fontWeight: "800",
+    fontWeight: '800',
   },
 
   /** Tabs */
   tabRow: {
-    flexDirection: "row",
+    flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: "#32425A",
+    borderBottomColor: '#32425A',
   },
   tabItem: {
     flex: 1,
     paddingVertical: 14,
-    alignItems: "center",
+    alignItems: 'center',
   },
   activeTab: {
     borderBottomWidth: 3,
-    borderBottomColor: "#7DFFA4",
+    borderBottomColor: '#7DFFA4',
   },
   tabText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 
   /** Stats */
   statsRow: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 12,
     marginTop: 16,
   },
   statBox: {
     flex: 1,
-    backgroundColor: "#1A2D48",
+    backgroundColor: '#1A2D48',
     padding: 16,
     borderRadius: 12,
-    alignItems: "center",
+    alignItems: 'center',
   },
   statNumber: {
     fontSize: 24,
-    fontWeight: "800",
-    color: "#7DFFA4",
+    fontWeight: '800',
+    color: '#7DFFA4',
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: "#A8B7D8",
+    color: '#A8B7D8',
   },
 
   /** Section */
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#fff",
+    fontWeight: '700',
+    color: '#fff',
     marginBottom: 12,
   },
   emptyText: {
-    textAlign: "center",
-    color: "#888",
+    textAlign: 'center',
+    color: '#888',
     marginTop: 20,
     marginBottom: 20,
   },
 
   /** Coupon Item */
   couponCard: {
-    flexDirection: "row",
-    backgroundColor: "#1A2D48",
+    flexDirection: 'row',
+    backgroundColor: '#1A2D48',
     borderRadius: 14,
     padding: 14,
-    alignItems: "center",
+    alignItems: 'center',
     marginBottom: 12,
     gap: 12,
   },
@@ -327,56 +313,55 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 12,
-    backgroundColor: "#0F1A2A",
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
+    backgroundColor: '#0F1A2A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
   couponImage: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
   couponTitle: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
-    fontWeight: "700",
+    fontWeight: '700',
     marginBottom: 4,
   },
   couponBrand: {
-    color: "#A3B4CF",
+    color: '#A3B4CF',
     fontSize: 12,
     marginBottom: 4,
   },
   dateText: {
     fontSize: 11,
-    color: "#8899bb",
+    color: '#8899bb',
   },
   usedTag: {
     marginTop: 4,
     fontSize: 11,
-    color: "#FF6B6B",
+    color: '#FF6B6B',
   },
 
   /** Actions */
   actions: {
-    alignItems: "center",
+    alignItems: 'center',
     gap: 8,
   },
   qrButton: {
-    backgroundColor: "#394B70",
+    backgroundColor: '#394B70',
     padding: 10,
     borderRadius: 10,
   },
   useButton: {
-    backgroundColor: "#1FC58E",
+    backgroundColor: '#1FC58E',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 10,
   },
   useText: {
-    color: "#fff",
-    fontWeight: "700",
+    color: '#fff',
+    fontWeight: '700',
     fontSize: 13,
   },
 });
-

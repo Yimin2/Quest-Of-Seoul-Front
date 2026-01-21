@@ -1,11 +1,11 @@
-import { Tabs } from "expo-router";
-import React from "react";
-import { Text } from "react-native";
-import MaskedView from "@react-native-masked-view/masked-view";
-import { LinearGradient } from "expo-linear-gradient";
+import { Tabs } from 'expo-router';
+import React from 'react';
+import { Text } from 'react-native';
+import MaskedView from '@react-native-masked-view/masked-view';
+import { LinearGradient } from 'expo-linear-gradient';
 
-import { HapticTab } from "@/components/haptic-tab";
-import { MapIcon, FindIcon, AIStationIcon, ShopIcon, MyIcon } from "@/components/tab-icons";
+import { HapticTab } from '@shared/ui';
+import { MapIcon, FindIcon, AIStationIcon, ShopIcon, MyIcon } from '@shared/ui';
 
 export default function TabLayout() {
   return (
@@ -39,22 +39,22 @@ export default function TabLayout() {
       <Tabs.Screen
         name="map"
         options={{
-          title: "Map",
-          tabBarIcon: ({ color }) => (
-            <MapIcon color={color} size={28} />
-          ),
+          title: 'Map',
+          tabBarIcon: ({ color }) => <MapIcon color={color} size={28} />,
           tabBarLabel: ({ focused }) => {
             if (!focused) {
               return (
-                <Text style={{
-                  fontSize: 10,
-                  fontWeight: '600',
-                  lineHeight: 12,
-                  letterSpacing: 0,
-                  textAlign: 'center',
-                  marginTop: 4,
-                  color: 'rgba(255, 255, 255, 0.85)',
-                }}>
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: '600',
+                    lineHeight: 12,
+                    letterSpacing: 0,
+                    textAlign: 'center',
+                    marginTop: 4,
+                    color: 'rgba(255, 255, 255, 0.85)',
+                  }}
+                >
                   Map
                 </Text>
               );
@@ -64,14 +64,16 @@ export default function TabLayout() {
               <MaskedView
                 style={{ marginTop: 4, height: 12 }}
                 maskElement={
-                  <Text style={{
-                    fontSize: 10,
-                    fontWeight: '600',
-                    lineHeight: 12,
-                    letterSpacing: 0,
-                    textAlign: 'center',
-                    backgroundColor: 'transparent',
-                  }}>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      fontWeight: '600',
+                      lineHeight: 12,
+                      letterSpacing: 0,
+                      textAlign: 'center',
+                      backgroundColor: 'transparent',
+                    }}
+                  >
                     Map
                   </Text>
                 }
@@ -90,22 +92,22 @@ export default function TabLayout() {
       <Tabs.Screen
         name="find"
         options={{
-          title: "Find",
-          tabBarIcon: ({ color }) => (
-            <FindIcon color={color} size={28} />
-          ),
+          title: 'Find',
+          tabBarIcon: ({ color }) => <FindIcon color={color} size={28} />,
           tabBarLabel: ({ focused }) => {
             if (!focused) {
               return (
-                <Text style={{
-                  fontSize: 10,
-                  fontWeight: '600',
-                  lineHeight: 12,
-                  letterSpacing: 0,
-                  textAlign: 'center',
-                  marginTop: 4,
-                  color: 'rgba(255, 255, 255, 0.85)',
-                }}>
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: '600',
+                    lineHeight: 12,
+                    letterSpacing: 0,
+                    textAlign: 'center',
+                    marginTop: 4,
+                    color: 'rgba(255, 255, 255, 0.85)',
+                  }}
+                >
                   Find
                 </Text>
               );
@@ -115,14 +117,16 @@ export default function TabLayout() {
               <MaskedView
                 style={{ marginTop: 4, height: 12 }}
                 maskElement={
-                  <Text style={{
-                    fontSize: 10,
-                    fontWeight: '600',
-                    lineHeight: 12,
-                    letterSpacing: 0,
-                    textAlign: 'center',
-                    backgroundColor: 'transparent',
-                  }}>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      fontWeight: '600',
+                      lineHeight: 12,
+                      letterSpacing: 0,
+                      textAlign: 'center',
+                      backgroundColor: 'transparent',
+                    }}
+                  >
                     Find
                   </Text>
                 }
@@ -141,22 +145,22 @@ export default function TabLayout() {
       <Tabs.Screen
         name="ai-station"
         options={{
-          title: "AI Station",
-          tabBarIcon: ({ color }) => (
-            <AIStationIcon color={color} size={28} />
-          ),
+          title: 'AI Station',
+          tabBarIcon: ({ color }) => <AIStationIcon color={color} size={28} />,
           tabBarLabel: ({ focused }) => {
             if (!focused) {
               return (
-                <Text style={{
-                  fontSize: 10,
-                  fontWeight: '600',
-                  lineHeight: 12,
-                  letterSpacing: 0,
-                  textAlign: 'center',
-                  marginTop: 4,
-                  color: 'rgba(255, 255, 255, 0.85)',
-                }}>
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: '600',
+                    lineHeight: 12,
+                    letterSpacing: 0,
+                    textAlign: 'center',
+                    marginTop: 4,
+                    color: 'rgba(255, 255, 255, 0.85)',
+                  }}
+                >
                   AI Station
                 </Text>
               );
@@ -166,14 +170,16 @@ export default function TabLayout() {
               <MaskedView
                 style={{ marginTop: 4, height: 12 }}
                 maskElement={
-                  <Text style={{
-                    fontSize: 10,
-                    fontWeight: '600',
-                    lineHeight: 12,
-                    letterSpacing: 0,
-                    textAlign: 'center',
-                    backgroundColor: 'transparent',
-                  }}>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      fontWeight: '600',
+                      lineHeight: 12,
+                      letterSpacing: 0,
+                      textAlign: 'center',
+                      backgroundColor: 'transparent',
+                    }}
+                  >
                     AI Station
                   </Text>
                 }
@@ -192,22 +198,22 @@ export default function TabLayout() {
       <Tabs.Screen
         name="shop"
         options={{
-          title: "Shop",
-          tabBarIcon: ({ color }) => (
-            <ShopIcon color={color} size={28} />
-          ),
+          title: 'Shop',
+          tabBarIcon: ({ color }) => <ShopIcon color={color} size={28} />,
           tabBarLabel: ({ focused }) => {
             if (!focused) {
               return (
-                <Text style={{
-                  fontSize: 10,
-                  fontWeight: '600',
-                  lineHeight: 12,
-                  letterSpacing: 0,
-                  textAlign: 'center',
-                  marginTop: 4,
-                  color: 'rgba(255, 255, 255, 0.85)',
-                }}>
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: '600',
+                    lineHeight: 12,
+                    letterSpacing: 0,
+                    textAlign: 'center',
+                    marginTop: 4,
+                    color: 'rgba(255, 255, 255, 0.85)',
+                  }}
+                >
                   Shop
                 </Text>
               );
@@ -217,14 +223,16 @@ export default function TabLayout() {
               <MaskedView
                 style={{ marginTop: 4, height: 12 }}
                 maskElement={
-                  <Text style={{
-                    fontSize: 10,
-                    fontWeight: '600',
-                    lineHeight: 12,
-                    letterSpacing: 0,
-                    textAlign: 'center',
-                    backgroundColor: 'transparent',
-                  }}>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      fontWeight: '600',
+                      lineHeight: 12,
+                      letterSpacing: 0,
+                      textAlign: 'center',
+                      backgroundColor: 'transparent',
+                    }}
+                  >
                     Shop
                   </Text>
                 }
@@ -243,22 +251,22 @@ export default function TabLayout() {
       <Tabs.Screen
         name="my"
         options={{
-          title: "My",
-          tabBarIcon: ({ color }) => (
-            <MyIcon color={color} size={28} />
-          ),
+          title: 'My',
+          tabBarIcon: ({ color }) => <MyIcon color={color} size={28} />,
           tabBarLabel: ({ focused }) => {
             if (!focused) {
               return (
-                <Text style={{
-                  fontSize: 10,
-                  fontWeight: '600',
-                  lineHeight: 12,
-                  letterSpacing: 0,
-                  textAlign: 'center',
-                  marginTop: 4,
-                  color: 'rgba(255, 255, 255, 0.85)',
-                }}>
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: '600',
+                    lineHeight: 12,
+                    letterSpacing: 0,
+                    textAlign: 'center',
+                    marginTop: 4,
+                    color: 'rgba(255, 255, 255, 0.85)',
+                  }}
+                >
                   My
                 </Text>
               );
@@ -268,14 +276,16 @@ export default function TabLayout() {
               <MaskedView
                 style={{ marginTop: 4, height: 12 }}
                 maskElement={
-                  <Text style={{
-                    fontSize: 10,
-                    fontWeight: '600',
-                    lineHeight: 12,
-                    letterSpacing: 0,
-                    textAlign: 'center',
-                    backgroundColor: 'transparent',
-                  }}>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      fontWeight: '600',
+                      lineHeight: 12,
+                      letterSpacing: 0,
+                      textAlign: 'center',
+                      backgroundColor: 'transparent',
+                    }}
+                  >
                     My
                   </Text>
                 }

@@ -1,20 +1,22 @@
-import { Ionicons } from "@expo/vector-icons";
-import * as FileSystem from "expo-file-system/legacy";
-import * as ImagePicker from "expo-image-picker";
-import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { Ionicons } from '@expo/vector-icons';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   Image,
   ImageBackground,
   Keyboard,
-  KeyboardAvoidingView, Modal, Platform,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
   Pressable,
   StyleSheet,
   TextInput,
-  View
-} from "react-native";
+  View,
+} from 'react-native';
 import Svg, {
   Defs,
   G,
@@ -22,10 +24,10 @@ import Svg, {
   Path,
   Stop,
   LinearGradient as SvgLinearGradient,
-} from "react-native-svg";
+} from 'react-native-svg';
 
-import { ThemedText } from "@/components/themed-text";
-import { useQuestStore } from "@/store/useQuestStore";
+import { useQuestStore } from '@entities/quest';
+import { ThemedText } from '@shared/ui';
 
 // Hamburger Menu Icon
 function HamburgerIcon() {
@@ -73,8 +75,8 @@ function ImageFindIcon() {
       style={{
         width: 35,
         height: 35,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
       {/* Background gradient from gradi.svg with filter - 40x40, positioned slightly down */}
@@ -83,7 +85,7 @@ function ImageFindIcon() {
         height={40}
         viewBox="0 0 43 43"
         fill="none"
-        style={{ position: "absolute", top: 1 }}
+        style={{ position: 'absolute', top: 1 }}
       >
         <Defs>
           <SvgLinearGradient
@@ -108,13 +110,13 @@ function ImageFindIcon() {
       {/* Icon on top - perfectly centered */}
       <View
         style={{
-          position: "absolute",
+          position: 'absolute',
           top: 1,
           left: 2,
           right: 0,
           bottom: 0,
-          justifyContent: "center",
-          alignItems: "center",
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         <Svg width={22.75} height={22.569} viewBox="0 0 24 24" fill="none">
@@ -148,13 +150,13 @@ function QuestImageFindIcon() {
       style={{
         width: 35,
         height: 35,
-        justifyContent: "center",
-        alignItems: "center",
-        position: "relative",
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
       }}
     >
       {/* Small AI Chat icon - top right diagonal */}
-      <View style={{ position: "absolute", top: 0, right: 0 }}>
+      <View style={{ position: 'absolute', top: 0, right: 0 }}>
         <Svg
           width={23.899}
           height={20.97}
@@ -173,7 +175,7 @@ function QuestImageFindIcon() {
         </Svg>
       </View>
       {/* Image icon - bottom left diagonal */}
-      <View style={{ position: "absolute", bottom: 0, left: 0 }}>
+      <View style={{ position: 'absolute', bottom: 0, left: 0 }}>
         <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
           <Path
             d="M13.4142 5.96214C13.4142 6.35744 13.2571 6.73655 12.9776 7.01606C12.6981 7.29558 12.319 7.45261 11.9237 7.45261C11.5284 7.45261 11.1493 7.29558 10.8698 7.01606C10.5903 6.73655 10.4332 6.35744 10.4332 5.96214C10.4332 5.56685 10.5903 5.18774 10.8698 4.90823C11.1493 4.62871 11.5284 4.47168 11.9237 4.47168C12.319 4.47168 12.6981 4.62871 12.9776 4.90823C13.2571 5.18774 13.4142 5.56685 13.4142 5.96214Z"
@@ -247,62 +249,61 @@ export default function AIStationScreen() {
   const router = useRouter();
   const activeQuest = useQuestStore((state) => state.activeQuest);
   const endQuest = useQuestStore((state) => state.endQuest);
-  const [mode, setMode] = useState<"explore" | "quest">("explore");
-  const [input, setInput] = useState("");
+  const [mode, setMode] = useState<'explore' | 'quest'>('explore');
+  const [input, setInput] = useState('');
   const [showImageModal, setShowImageModal] = useState(false);
 
-  useEffect(() => {
-  }, [activeQuest]);
+  useEffect(() => {}, [activeQuest]);
 
   // navigation handlers
   const openImageFind = () =>
     router.push({
-      pathname: "/(tabs)/find/quest-recommendation",
-      params: { from: "ai-station" },
+      pathname: '/(tabs)/find/quest-recommendation',
+      params: { from: 'ai-station' },
     });
-  const openAIChat = () => router.push("/general-chat");
-  const openPlanChat = () => router.push("/travel-plan");
-  const openAIPlusChat = () => router.push("/quest-chat");
+  const openAIChat = () => router.push('/general-chat');
+  const openPlanChat = () => router.push('/travel-plan');
+  const openAIPlusChat = () => router.push('/quest-chat');
   const openQuest = () => {
     if (activeQuest) {
       router.push({
-        pathname: "/quiz-screen",
+        pathname: '/quiz-screen',
         params: {
           questId: activeQuest.quest_id.toString(),
           questName: activeQuest.quest.name,
           rewardPoint: activeQuest.quest.reward_point.toString(),
-          quizScoreMax: "100",
-          perQuestionScore: "20",
-          hintPenaltyScore: "10",
+          quizScoreMax: '100',
+          perQuestionScore: '20',
+          hintPenaltyScore: '10',
         },
       });
     } else {
-      router.push("/quiz-screen");
+      router.push('/quiz-screen');
     }
   };
-  const openStampQuest = () => router.push("/stamp/stamp-quest" as any);
+  const openStampQuest = () => router.push('/stamp/stamp-quest' as any);
   const openPhotoZone = () => {
     if (activeQuest) {
       router.push({
-        pathname: "/photo-zone-qr",
+        pathname: '/photo-zone-qr',
         params: {
           questId: activeQuest.quest_id.toString(),
-          questImageUrl: activeQuest.quest.place_image_url || "",
+          questImageUrl: activeQuest.quest.place_image_url || '',
           questName: activeQuest.quest.name,
         },
       });
     } else {
-      router.push("/photo-zone-qr" as any);
+      router.push('/photo-zone-qr' as any);
     }
   };
 
   const submitFromStation = () => {
     if (!input.trim()) return;
     router.push({
-      pathname: "/general-chat",
+      pathname: '/general-chat',
       params: { init: input.trim() },
     });
-    setInput("");
+    setInput('');
   };
 
   // 이미지 선택 함수들
@@ -326,7 +327,7 @@ export default function AIStationScreen() {
       if (!result.canceled && result.assets?.[0]?.base64) {
         // 이미지가 선택되면 quest-chat으로 이동하면서 이미지 전달
         router.push({
-          pathname: "/quest-chat",
+          pathname: '/quest-chat',
           params: { imageBase64: result.assets[0].base64 },
         });
       }
@@ -358,7 +359,7 @@ export default function AIStationScreen() {
           });
           // 이미지가 선택되면 quest-chat으로 이동하면서 이미지 전달
           router.push({
-            pathname: "/quest-chat",
+            pathname: '/quest-chat',
             params: { imageBase64: base64 },
           });
         } catch (convertError) {
@@ -372,7 +373,7 @@ export default function AIStationScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1 }}
     >
       <View style={{ flex: 1 }}>
@@ -380,12 +381,12 @@ export default function AIStationScreen() {
         <View style={styles.backgroundContainer}>
           <View style={styles.solidBackground} />
           <ImageBackground
-            source={require("@/assets/images/explore-mode.png")}
+            source={require('@/assets/images/explore-mode.png')}
             style={styles.backgroundImage}
-            imageStyle={{ resizeMode: "cover" }}
+            imageStyle={{ resizeMode: 'cover' }}
           >
             <LinearGradient
-              colors={["rgba(101, 157, 242, 0)", "#659DF2"]}
+              colors={['rgba(101, 157, 242, 0)', '#659DF2']}
               start={{ x: 0.5, y: 1 }}
               end={{ x: 0.5, y: 0 }}
               style={styles.gradientOverlay}
@@ -396,17 +397,12 @@ export default function AIStationScreen() {
         {/* Content Layer - On top of background */}
         <View style={styles.contentLayer}>
           {/* Header Container */}
-          <View
-            style={[
-              styles.headerContainer,
-              mode === "quest" && styles.headerContainerQuest,
-            ]}
-          >
+          <View style={[styles.headerContainer, mode === 'quest' && styles.headerContainerQuest]}>
             <View style={styles.headerContent}>
               <Pressable
                 onPress={() => {
                   Keyboard.dismiss();
-                  router.push("/chat-history");
+                  router.push('/chat-history');
                 }}
               >
                 <HamburgerIcon />
@@ -414,38 +410,32 @@ export default function AIStationScreen() {
               <ThemedText style={styles.headerTitle}>AI Station</ThemedText>
               <View style={styles.modeToggleButtons}>
                 <Pressable
-                  style={[
-                    styles.modeButton,
-                    mode === "explore" && styles.modeButtonActive,
-                  ]}
+                  style={[styles.modeButton, mode === 'explore' && styles.modeButtonActive]}
                   onPress={() => {
                     Keyboard.dismiss();
-                    setMode("explore");
+                    setMode('explore');
                   }}
                 >
                   <ThemedText
                     style={[
                       styles.modeButtonText,
-                      mode === "explore" && styles.modeButtonTextActive,
+                      mode === 'explore' && styles.modeButtonTextActive,
                     ]}
                   >
                     Explore Mode
                   </ThemedText>
                 </Pressable>
                 <Pressable
-                  style={[
-                    styles.modeButton,
-                    mode === "quest" && styles.modeButtonActive,
-                  ]}
+                  style={[styles.modeButton, mode === 'quest' && styles.modeButtonActive]}
                   onPress={() => {
                     Keyboard.dismiss();
-                    setMode("quest");
+                    setMode('quest');
                   }}
                 >
                   <ThemedText
                     style={[
                       styles.modeButtonText,
-                      mode === "quest" && styles.modeButtonTextQuestActive,
+                      mode === 'quest' && styles.modeButtonTextQuestActive,
                     ]}
                   >
                     Quest Mode
@@ -459,7 +449,7 @@ export default function AIStationScreen() {
           <View style={styles.buttonsArea}>
             <View style={styles.buttonWrapper}>
               {/* Explore Mode Buttons */}
-              {mode === "explore" && (
+              {mode === 'explore' && (
                 <>
                   <Pressable
                     style={styles.actionButton}
@@ -473,25 +463,17 @@ export default function AIStationScreen() {
                     </View>
                     <View style={styles.buttonRightContent}>
                       <View style={styles.buttonTopRow}>
-                        <ThemedText style={styles.buttonTitle}>
-                          AI Chat
-                        </ThemedText>
+                        <ThemedText style={styles.buttonTitle}>AI Chat</ThemedText>
                         <View style={styles.badgesRow}>
                           <View style={styles.badge}>
-                            <ThemedText style={styles.badgeText}>
-                              Text
-                            </ThemedText>
+                            <ThemedText style={styles.badgeText}>Text</ThemedText>
                           </View>
                           <View style={styles.badge}>
-                            <ThemedText style={styles.badgeText}>
-                              Voice
-                            </ThemedText>
+                            <ThemedText style={styles.badgeText}>Voice</ThemedText>
                           </View>
                         </View>
                       </View>
-                      <ThemedText style={styles.buttonSubtitle}>
-                        Ask me about Seoul
-                      </ThemedText>
+                      <ThemedText style={styles.buttonSubtitle}>Ask me about Seoul</ThemedText>
                     </View>
                   </Pressable>
                   <Pressable
@@ -506,14 +488,10 @@ export default function AIStationScreen() {
                     </View>
                     <View style={styles.buttonRightContent}>
                       <View style={styles.buttonTopRow}>
-                        <ThemedText style={styles.buttonTitle}>
-                          Plan Chat
-                        </ThemedText>
+                        <ThemedText style={styles.buttonTitle}>Plan Chat</ThemedText>
                         <View style={styles.badgesRow}>
                           <View style={styles.badge}>
-                            <ThemedText style={styles.badgeText}>
-                              Choice
-                            </ThemedText>
+                            <ThemedText style={styles.badgeText}>Choice</ThemedText>
                           </View>
                         </View>
                       </View>
@@ -534,14 +512,10 @@ export default function AIStationScreen() {
                     </View>
                     <View style={styles.buttonRightContent}>
                       <View style={styles.buttonTopRow}>
-                        <ThemedText style={styles.buttonTitle}>
-                          Image Find
-                        </ThemedText>
+                        <ThemedText style={styles.buttonTitle}>Image Find</ThemedText>
                         <View style={styles.badgesRow}>
                           <View style={styles.badge}>
-                            <ThemedText style={styles.badgeText}>
-                              Image
-                            </ThemedText>
+                            <ThemedText style={styles.badgeText}>Image</ThemedText>
                           </View>
                         </View>
                       </View>
@@ -554,7 +528,7 @@ export default function AIStationScreen() {
               )}
 
               {/* Quest Mode Buttons */}
-              {mode === "quest" && (
+              {mode === 'quest' && (
                 <>
                   <Pressable
                     style={styles.actionButton}
@@ -568,30 +542,20 @@ export default function AIStationScreen() {
                     </View>
                     <View style={styles.buttonRightContent}>
                       <View style={styles.buttonTopRow}>
-                        <ThemedText style={styles.buttonTitle}>
-                          AI Plus Chat
-                        </ThemedText>
+                        <ThemedText style={styles.buttonTitle}>AI Plus Chat</ThemedText>
                         <View style={styles.badgesRow}>
                           <View style={styles.badge}>
-                            <ThemedText style={styles.badgeText}>
-                              Text
-                            </ThemedText>
+                            <ThemedText style={styles.badgeText}>Text</ThemedText>
                           </View>
                           <View style={styles.badge}>
-                            <ThemedText style={styles.badgeText}>
-                              Voice
-                            </ThemedText>
+                            <ThemedText style={styles.badgeText}>Voice</ThemedText>
                           </View>
                           <View style={styles.badge}>
-                            <ThemedText style={styles.badgeText}>
-                              Image
-                            </ThemedText>
+                            <ThemedText style={styles.badgeText}>Image</ThemedText>
                           </View>
                         </View>
                       </View>
-                      <ThemedText style={styles.buttonSubtitle}>
-                        Ask me about Seoul
-                      </ThemedText>
+                      <ThemedText style={styles.buttonSubtitle}>Ask me about Seoul</ThemedText>
                     </View>
                   </Pressable>
                   <Pressable
@@ -601,7 +565,7 @@ export default function AIStationScreen() {
                     }}
                   >
                     <LinearGradient
-                      colors={["#FF7F50", "#76C7AD"]}
+                      colors={['#FF7F50', '#76C7AD']}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                       style={styles.gradientActionButton}
@@ -611,14 +575,10 @@ export default function AIStationScreen() {
                       </View>
                       <View style={styles.buttonRightContent}>
                         <View style={styles.buttonTopRow}>
-                          <ThemedText style={styles.buttonTitle}>
-                            Quiz Time
-                          </ThemedText>
+                          <ThemedText style={styles.buttonTitle}>Quiz Time</ThemedText>
                           <View style={styles.badgesRow}>
                             <View style={styles.mintBadge}>
-                              <ThemedText style={styles.mintBadgeText}>
-                                +MINT
-                              </ThemedText>
+                              <ThemedText style={styles.mintBadgeText}>+MINT</ThemedText>
                             </View>
                           </View>
                         </View>
@@ -635,7 +595,7 @@ export default function AIStationScreen() {
                     }}
                   >
                     <LinearGradient
-                      colors={["#FF7F50", "#76C7AD"]}
+                      colors={['#FF7F50', '#76C7AD']}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                       style={styles.gradientActionButton}
@@ -645,14 +605,10 @@ export default function AIStationScreen() {
                       </View>
                       <View style={styles.buttonRightContent}>
                         <View style={styles.buttonTopRow}>
-                          <ThemedText style={styles.buttonTitle}>
-                            Treasure Hunt
-                          </ThemedText>
+                          <ThemedText style={styles.buttonTitle}>Treasure Hunt</ThemedText>
                           <View style={styles.badgesRow}>
                             <View style={styles.mintBadge}>
-                              <ThemedText style={styles.mintBadgeText}>
-                                +MINT
-                              </ThemedText>
+                              <ThemedText style={styles.mintBadgeText}>+MINT</ThemedText>
                             </View>
                           </View>
                         </View>
@@ -670,7 +626,7 @@ export default function AIStationScreen() {
                     }}
                   >
                     <LinearGradient
-                      colors={["#FF7F50", "#76C7AD"]}
+                      colors={['#FF7F50', '#76C7AD']}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                       style={styles.gradientActionButton}
@@ -679,9 +635,7 @@ export default function AIStationScreen() {
                         <PhotoZoneIcon />
                       </View>
                       <View style={styles.buttonRightContent}>
-                        <ThemedText style={styles.buttonTitle}>
-                          Photo Zone
-                        </ThemedText>
+                        <ThemedText style={styles.buttonTitle}>Photo Zone</ThemedText>
                         <ThemedText style={styles.gradientButtonSubtitle}>
                           Take magnificent photo from photo zone
                         </ThemedText>
@@ -696,7 +650,7 @@ export default function AIStationScreen() {
       </View>
 
       {/* Quest Banner with Quit Button - Only show in Quest Mode with active quest */}
-      {mode === "quest" && activeQuest && (
+      {mode === 'quest' && activeQuest && (
         <View style={styles.questBannerWrapper}>
           {/* Top Card - Quest Info */}
           <View style={styles.questBannerContainer}>
@@ -716,10 +670,10 @@ export default function AIStationScreen() {
               {/* Category with Reward Badge */}
               <View style={styles.questHeaderRow}>
                 <ThemedText style={styles.questCategory}>
-                  {activeQuest.quest.category || "History"}
+                  {activeQuest.quest.category || 'History'}
                 </ThemedText>
                 <LinearGradient
-                  colors={["#76C7AD", "#3A6154"]}
+                  colors={['#76C7AD', '#3A6154']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.rewardBadge}
@@ -737,13 +691,11 @@ export default function AIStationScreen() {
               </View>
 
               {/* Quest Name */}
-              <ThemedText style={styles.questName}>
-                {activeQuest.quest.name}
-              </ThemedText>
+              <ThemedText style={styles.questName}>{activeQuest.quest.name}</ThemedText>
 
               {/* District */}
               <ThemedText style={styles.questDistrict}>
-                {activeQuest.quest.district || "Jongno-gu"}
+                {activeQuest.quest.district || 'Jongno-gu'}
               </ThemedText>
             </View>
           </View>
@@ -780,11 +732,8 @@ export default function AIStationScreen() {
 
       {/* Bottom Chat Input */}
       <View style={styles.bottomInputRow}>
-        {mode === "quest" && (
-          <Pressable
-            style={styles.imageButton}
-            onPress={() => setShowImageModal(true)}
-          >
+        {mode === 'quest' && (
+          <Pressable style={styles.imageButton} onPress={() => setShowImageModal(true)}>
             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <Path
                 d="M18 8C18 8.53043 17.7893 9.03914 17.4142 9.41421C17.0391 9.78929 16.5304 10 16 10C15.4696 10 14.9609 9.78929 14.5858 9.41421C14.2107 9.03914 14 8.53043 14 8C14 7.46957 14.2107 6.96086 14.5858 6.58579C14.9609 6.21071 15.4696 6 16 6C16.5304 6 17.0391 6.21071 17.4142 6.58579C17.7893 6.96086 18 7.46957 18 8Z"
@@ -853,14 +802,9 @@ export default function AIStationScreen() {
               <Ionicons name="camera" size={20} color="#111" />
               <ThemedText style={imageModalStyles.modalText}>Take a photo</ThemedText>
             </Pressable>
-            <Pressable
-              style={imageModalStyles.modalItem}
-              onPress={pickImageFromLibrary}
-            >
+            <Pressable style={imageModalStyles.modalItem} onPress={pickImageFromLibrary}>
               <Ionicons name="image" size={20} color="#111" />
-              <ThemedText style={imageModalStyles.modalText}>
-                Select from album
-              </ThemedText>
+              <ThemedText style={imageModalStyles.modalText}>Select from album</ThemedText>
             </Pressable>
             <Pressable
               style={imageModalStyles.modalCancel}
@@ -878,74 +822,74 @@ export default function AIStationScreen() {
 const imageModalStyles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.45)',
   },
   modalBox: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     padding: 20,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     gap: 18,
   },
   modalItem: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   modalText: {
     marginLeft: 8,
   },
   modalCancel: {
-    alignItems: "center",
+    alignItems: 'center',
     marginTop: 8,
   },
   modalCancelText: {
-    color: "#777",
+    color: '#777',
   },
 });
 
 const styles = StyleSheet.create({
   backgroundContainer: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
   },
   solidBackground: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "#659DF2",
+    backgroundColor: '#659DF2',
   },
   backgroundImage: {
-    width: "100%",
+    width: '100%',
     height: 309,
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
   },
   gradientOverlay: {
     flex: 1,
-    width: "100%",
+    width: '100%',
   },
   contentLayer: {
     flex: 1,
-    position: "relative",
+    position: 'relative',
     zIndex: 1,
   },
   headerContainer: {
-    width: "100%",
+    width: '100%',
     height: 121,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     paddingTop: 60,
     paddingHorizontal: 20,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -954,260 +898,260 @@ const styles = StyleSheet.create({
   },
   headerContainerQuest: {
     borderBottomWidth: 4,
-    borderBottomColor: "#FF7F50",
+    borderBottomColor: '#FF7F50',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
   },
   headerContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 12,
     marginTop: 12,
   },
   headerTitle: {
-    fontFamily: "Inter",
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
-    color: "#FFFFFF",
-    position: "absolute",
+    fontWeight: '700',
+    color: '#FFFFFF',
+    position: 'absolute',
     left: 40,
   },
   modeToggleButtons: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 8,
-    marginLeft: "auto",
+    marginLeft: 'auto',
   },
   modeButton: {
     paddingVertical: 7,
     paddingHorizontal: 10,
     borderRadius: 42,
     borderWidth: 1,
-    borderColor: "#FFFFFF",
-    backgroundColor: "transparent",
-    justifyContent: "center",
-    alignItems: "center",
+    borderColor: '#FFFFFF',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modeButtonActive: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
   },
   modeButtonText: {
-    fontFamily: "Inter",
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "700",
-    color: "#FFFFFF",
-    textAlign: "center",
+    fontWeight: '700',
+    color: '#FFFFFF',
+    textAlign: 'center',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   modeButtonTextActive: {
-    color: "#659DF2",
+    color: '#659DF2',
   },
   modeButtonTextQuestActive: {
-    color: "#FF7F50",
+    color: '#FF7F50',
   },
   gradientCard: {
     width: 320,
     height: 92,
     marginTop: 0,
-    alignSelf: "center",
-    position: "relative",
+    alignSelf: 'center',
+    position: 'relative',
   },
   gradientCardBg: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
   },
   cardDivider: {
-    position: "absolute",
+    position: 'absolute',
     left: 160,
     top: 7,
     width: 1,
     height: 78,
-    backgroundColor: "rgba(255, 255, 255, 0.6)",
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
   },
   cardTextContainer: {
-    position: "absolute",
+    position: 'absolute',
     left: 160,
     right: 0,
     top: 0,
     bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   cardText: {
-    fontFamily: "Pretendard",
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "400",
-    color: "#FFFFFF",
-    textAlign: "center",
+    fontWeight: '400',
+    color: '#FFFFFF',
+    textAlign: 'center',
   },
   buttonsArea: {
-    position: "absolute",
+    position: 'absolute',
     top: 141,
     left: 0,
     right: 0,
     bottom: 80,
   },
   buttonWrapper: {
-    width: "100%",
+    width: '100%',
     gap: 10,
     paddingHorizontal: 20,
     paddingTop: 0,
     paddingBottom: 20,
   },
   actionButton: {
-    backgroundColor: "rgba(34, 45, 57, 0.85)",
+    backgroundColor: 'rgba(34, 45, 57, 0.85)',
     padding: 10,
     borderRadius: 10,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
-    width: "100%",
+    width: '100%',
   },
   gradientActionButton: {
     padding: 10,
     borderRadius: 10,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
-    width: "100%",
-    overflow: "hidden",
+    width: '100%',
+    overflow: 'hidden',
   },
   iconContainer: {
     width: 35,
     height: 35,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonRightContent: {
-    flexDirection: "column",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: 5,
     flex: 1,
   },
   buttonTopRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    alignSelf: "stretch",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    alignSelf: 'stretch',
   },
   buttonTitle: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 14,
     letterSpacing: -0.16,
   },
   badgesRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     gap: 3,
   },
   badge: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingVertical: 1,
     paddingHorizontal: 5,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 16,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
   badgeText: {
-    color: "#659DF2",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#659DF2',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 12,
     letterSpacing: -0.16,
   },
   mintBadge: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingVertical: 1,
     paddingHorizontal: 5,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 16,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
   mintBadgeText: {
-    color: "#76C7AD",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#76C7AD',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 12,
     letterSpacing: -0.16,
   },
   buttonSubtitle: {
-    color: "rgba(255, 255, 255, 0.50)",
-    fontFamily: "Pretendard",
+    color: 'rgba(255, 255, 255, 0.50)',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
   gradientButtonSubtitle: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
   buttonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   activeQuestBanner: {
-    backgroundColor: "#E8F5E9",
+    backgroundColor: '#E8F5E9',
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderRadius: 14,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: "#4CAF50",
+    borderColor: '#4CAF50',
   },
   activeQuestTitle: {
-    color: "#2E7D32",
+    color: '#2E7D32',
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   activeQuestName: {
-    color: "#1B5E20",
+    color: '#1B5E20',
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: '700',
     marginTop: 2,
   },
   quitButton: {
-    flexDirection: "row",
-    width: "100%",
+    flexDirection: 'row',
+    width: '100%',
     height: 50,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 35,
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
     marginTop: 10,
   },
   quitText: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 22,
     letterSpacing: -0.18,
   },
   questBannerWrapper: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 100,
     left: 20,
     right: 20,
@@ -1215,28 +1159,28 @@ const styles = StyleSheet.create({
     elevation: 10, // Android
   },
   questBannerContainer: {
-    width: "100%",
+    width: '100%',
     height: 110,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     borderWidth: 1,
-    borderColor: "#FFF",
-    backgroundColor: "#FFF",
-    flexDirection: "row",
-    alignItems: "center",
+    borderColor: '#FFF',
+    backgroundColor: '#FFF',
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 5,
     gap: 10,
   },
   quitButtonAttached: {
-    flexDirection: "row",
-    width: "100%",
+    flexDirection: 'row',
+    width: '100%',
     minHeight: 50,
     padding: 15,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     zIndex: 10,
@@ -1245,169 +1189,169 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 10,
-    backgroundColor: "#D9D9D9",
+    backgroundColor: '#D9D9D9',
   },
   questBannerImagePlaceholder: {
     width: 100,
     height: 100,
     borderRadius: 10,
-    backgroundColor: "#D9D9D9",
+    backgroundColor: '#D9D9D9',
   },
   questInfoColumn: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: 5,
   },
   questHeaderRow: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   questCategory: {
-    color: "#34495E",
-    fontFamily: "Pretendard",
+    color: '#34495E',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   rewardBadge: {
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 16,
     paddingHorizontal: 5,
-    justifyContent: "flex-end",
-    alignItems: "center",
+    justifyContent: 'flex-end',
+    alignItems: 'center',
     gap: 5,
     borderRadius: 14,
   },
   rewardText: {
-    color: "#FFF",
-    textAlign: "right",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    textAlign: 'right',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   questName: {
-    color: "#34495E",
-    fontFamily: "Pretendard",
+    color: '#34495E',
+    fontFamily: 'Pretendard',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 22,
     letterSpacing: -0.18,
-    alignSelf: "flex-start",
+    alignSelf: 'flex-start',
   },
   questDistrict: {
-    color: "#34495E",
-    fontFamily: "Pretendard",
+    color: '#34495E',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 16,
     letterSpacing: -0.12,
-    alignSelf: "flex-start",
+    alignSelf: 'flex-start',
   },
   questCardContainer: {
-    width: "100%",
+    width: '100%',
     marginTop: 10,
   },
   questCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
-    overflow: "hidden",
-    flexDirection: "row",
+    overflow: 'hidden',
+    flexDirection: 'row',
     height: 120,
   },
   questCardImage: {
     width: 100,
-    height: "100%",
+    height: '100%',
   },
   questCardImagePlaceholder: {
     width: 100,
-    height: "100%",
-    backgroundColor: "#E0E0E0",
+    height: '100%',
+    backgroundColor: '#E0E0E0',
   },
   questCardContent: {
     flex: 1,
     padding: 12,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   questCardBadge: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   questCardCategory: {
-    color: "#76C7AD",
-    fontFamily: "Inter",
+    color: '#76C7AD',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   questCardPointBadge: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 4,
   },
   questCardPoints: {
-    color: "#76C7AD",
-    fontFamily: "Inter",
+    color: '#76C7AD',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   questCardName: {
-    color: "#000",
-    fontFamily: "Inter",
+    color: '#000',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     marginTop: 8,
   },
   questCardLocation: {
-    color: "#666",
-    fontFamily: "Inter",
+    color: '#666',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     marginTop: 4,
   },
   bottomInputRow: {
-    width: "100%",
+    width: '100%',
     height: 80,
-    backgroundColor: "#34495E",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#34495E',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 10,
     gap: 10,
   },
   imageButton: {
     width: 40,
     height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#659DF2",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#659DF2',
     borderRadius: 20,
   },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
     height: 40,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     paddingHorizontal: 16,
   },
   bottomInput: {
     flex: 1,
-    fontFamily: "Inter",
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "400",
-    color: "#000000",
+    fontWeight: '400',
+    color: '#000000',
   },
   bottomSend: {
     width: 30,
     height: 30,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

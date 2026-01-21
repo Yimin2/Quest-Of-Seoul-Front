@@ -1,11 +1,11 @@
-import { useQuestStore } from "@/store/useQuestStore";
-import { LinearGradient } from "expo-linear-gradient";
-import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import Svg, { Path } from "react-native-svg";
-import * as Location from "expo-location";
-import { mapApi } from "@/services/api";
+import { useQuestStore } from '@entities/quest';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
+import * as Location from 'expo-location';
+import { mapApi } from '@shared/api';
 
 interface Quest {
   id: number;
@@ -18,7 +18,7 @@ interface Quest {
   longitude: number;
   reward_point: number;
   points: number;
-  difficulty: "easy" | "medium" | "hard";
+  difficulty: 'easy' | 'medium' | 'hard';
   is_active: boolean;
   completion_count: number;
   created_at: string;
@@ -49,7 +49,7 @@ export default function QuestDetailScreen() {
     const calculateDistance = async () => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
+        if (status !== 'granted') {
           return;
         }
 
@@ -58,11 +58,10 @@ export default function QuestDetailScreen() {
           location.coords.latitude,
           location.coords.longitude,
           quest.latitude,
-          quest.longitude
+          quest.longitude,
         );
         setCalculatedDistance(distance);
-      } catch (error) {
-      }
+      } catch (error) {}
     };
 
     calculateDistance();
@@ -99,10 +98,7 @@ export default function QuestDetailScreen() {
       {/* Back button */}
       <Pressable style={styles.backButton} onPress={handleBack}>
         <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <Path
-            d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z"
-            fill="#FFF"
-          />
+          <Path d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z" fill="#FFF" />
         </Svg>
       </Pressable>
 
@@ -116,33 +112,24 @@ export default function QuestDetailScreen() {
         </Svg>
       </Pressable>
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <Image
           source={{
-            uri: quest.place_image_url || "https://picsum.photos/300/300",
+            uri: quest.place_image_url || 'https://picsum.photos/300/300',
           }}
           style={styles.image}
         />
         <View style={styles.content}>
           {/* 제목과 버튼을 가로로 배치 */}
           <View style={styles.titleRow}>
-            <Text style={styles.title}>
-              {quest.category || "Quest"}
-            </Text>
+            <Text style={styles.title}>{quest.category || 'Quest'}</Text>
             <Pressable style={styles.relatedBtn}>
-              <Text style={styles.relatedBtnText}>
-                See Related Places
-              </Text>
+              <Text style={styles.relatedBtnText}>See Related Places</Text>
             </Pressable>
           </View>
           <View style={styles.nameAddressGroup}>
             <Text style={styles.name}>{quest.name}</Text>
-            <Text style={styles.address}>
-              {quest.district || "Seoul"}
-            </Text>
+            <Text style={styles.address}>{quest.district || 'Seoul'}</Text>
           </View>
           <View style={styles.buttonRow}>
             <View style={styles.button}>
@@ -157,13 +144,13 @@ export default function QuestDetailScreen() {
                 <Text style={styles.buttonDistanceText}>
                   {displayDistance !== null && displayDistance !== undefined
                     ? `${displayDistance.toFixed(1)}km`
-                    : "Calculating..."}
+                    : 'Calculating...'}
                 </Text>
               </View>
               <Text style={styles.buttonSubText}>
                 {displayDistance !== null && displayDistance !== undefined
                   ? `${displayDistance.toFixed(1)}km far from your place`
-                  : "Getting your location..."}
+                  : 'Getting your location...'}
               </Text>
             </View>
             <View style={styles.buttonRight}>
@@ -175,13 +162,9 @@ export default function QuestDetailScreen() {
                     stroke="white"
                   />
                 </Svg>
-                <Text style={styles.buttonMintText}>
-                  {quest.points}
-                </Text>
+                <Text style={styles.buttonMintText}>{quest.points}</Text>
               </View>
-              <Text style={styles.buttonRightSubText}>
-                {quest.points} is on this Quest
-              </Text>
+              <Text style={styles.buttonRightSubText}>{quest.points} is on this Quest</Text>
             </View>
           </View>
           <Pressable style={styles.navigationButton}>
@@ -197,9 +180,7 @@ export default function QuestDetailScreen() {
                 fill="white"
               />
             </Svg>
-            <Text style={styles.navigationText}>
-              Do you need navigation?
-            </Text>
+            <Text style={styles.navigationText}>Do you need navigation?</Text>
             <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <Path
                 d="M9.39421 16.9279C9.31903 17.0075 9.26025 17.1011 9.22124 17.2034C9.18223 17.3056 9.16374 17.4146 9.16683 17.524C9.16993 17.6334 9.19455 17.7412 9.23928 17.8411C9.28401 17.941 9.34798 18.0311 9.42754 18.1063C9.5071 18.1815 9.60069 18.2402 9.70296 18.2792C9.80524 18.3183 9.91419 18.3367 10.0236 18.3337C10.133 18.3306 10.2408 18.3059 10.3407 18.2612C10.4406 18.2165 10.5307 18.1525 10.6059 18.0729L17.6892 10.5729C17.8355 10.4182 17.917 10.2134 17.917 10.0004C17.917 9.78752 17.8355 9.58267 17.6892 9.42795L10.6059 1.92711C10.5312 1.84581 10.4411 1.78016 10.3408 1.73397C10.2405 1.68779 10.1321 1.66198 10.0218 1.65806C9.91144 1.65414 9.80143 1.67219 9.69814 1.71114C9.59484 1.75009 9.50031 1.80918 9.42004 1.88498C9.33978 1.96078 9.27537 2.05176 9.23057 2.15266C9.18576 2.25356 9.16145 2.36235 9.15905 2.47273C9.15664 2.5831 9.17619 2.69285 9.21656 2.7956C9.25693 2.89835 9.31732 2.99206 9.39421 3.07128L15.9375 10.0004L9.39421 16.9279Z"
@@ -208,9 +189,7 @@ export default function QuestDetailScreen() {
             </Svg>
           </Pressable>
           <Text style={styles.overviewTitle}>OverView</Text>
-          <Text style={styles.overviewDescription}>
-            {quest.description}
-          </Text>
+          <Text style={styles.overviewDescription}>{quest.description}</Text>
           <View style={styles.spacer} />
         </View>
       </ScrollView>
@@ -218,7 +197,7 @@ export default function QuestDetailScreen() {
       {/* Bottom Route Selection Bar */}
       <View style={styles.routeContainer} pointerEvents="box-none">
         <LinearGradient
-          colors={["#FF7F50", "#994C30"]}
+          colors={['#FF7F50', '#994C30']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.routeBar}
@@ -235,7 +214,7 @@ export default function QuestDetailScreen() {
                   {selectedQuest ? (
                     <Image
                       source={{
-                        uri: selectedQuest.place_image_url || "https://picsum.photos/58/60",
+                        uri: selectedQuest.place_image_url || 'https://picsum.photos/58/60',
                       }}
                       style={styles.slotQuestImage}
                     />
@@ -248,10 +227,7 @@ export default function QuestDetailScreen() {
           </View>
 
           <Pressable
-            style={[
-              styles.startButton,
-              selectedQuests.length > 0 && styles.startButtonActive,
-            ]}
+            style={[styles.startButton, selectedQuests.length > 0 && styles.startButtonActive]}
             onPress={() => {
               if (selectedQuests.length > 0) {
                 // Navigate back to map to start quest
@@ -278,33 +254,33 @@ export default function QuestDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
   },
 
   backButton: {
-    position: "absolute",
+    position: 'absolute',
     top: 60,
     left: 20,
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 1000,
   },
 
   plusButton: {
-    position: "absolute",
+    position: 'absolute',
     top: 60,
     right: 20,
     width: 38,
     height: 38,
     padding: 11,
     borderRadius: 10,
-    backgroundColor: "rgba(255, 127, 80, 0.85)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(255, 127, 80, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 1000,
   },
 
@@ -313,7 +289,7 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: "100%",
+    width: '100%',
     height: 268,
     flexShrink: 0,
   },
@@ -326,10 +302,10 @@ const styles = StyleSheet.create({
   },
 
   titleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
   },
 
   relatedBtn: {
@@ -337,23 +313,23 @@ const styles = StyleSheet.create({
     height: 38,
     flexShrink: 0,
     borderRadius: 10,
-    backgroundColor: "#4D647C",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#4D647C',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   relatedBtnText: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
   },
 
   title: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   nameAddressGroup: {
@@ -361,124 +337,124 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   address: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
   },
 
   buttonRow: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 5,
-    width: "100%",
+    width: '100%',
   },
 
   button: {
     flex: 1,
     height: 60,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 8,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.85)",
-    backgroundColor: "#FFF",
+    borderColor: 'rgba(255, 255, 255, 0.85)',
+    backgroundColor: '#FFF',
   },
 
   buttonDistanceBadge: {
     height: 16,
     paddingHorizontal: 5,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 5,
     flexShrink: 0,
     borderRadius: 14,
-    backgroundColor: "rgba(52, 73, 94, 0.50)",
+    backgroundColor: 'rgba(52, 73, 94, 0.50)',
   },
 
   buttonDistanceText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   buttonSubText: {
-    color: "#34495E",
-    fontFamily: "Inter",
+    color: '#34495E',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 16,
     letterSpacing: 0,
-    textAlign: "center",
+    textAlign: 'center',
   },
 
   buttonRight: {
     flex: 1,
     height: 60,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 8,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#76C7AD",
-    backgroundColor: "#76C7AD",
+    borderColor: '#76C7AD',
+    backgroundColor: '#76C7AD',
   },
 
   buttonMintBadge: {
     height: 16,
     paddingHorizontal: 5,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 5,
     flexShrink: 0,
     borderRadius: 14,
-    backgroundColor: "rgba(52, 73, 94, 0.50)",
+    backgroundColor: 'rgba(52, 73, 94, 0.50)',
   },
 
   buttonMintText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   buttonRightSubText: {
-    color: "#34495E",
-    fontFamily: "Inter",
+    color: '#34495E',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 16,
     letterSpacing: 0,
-    textAlign: "center",
+    textAlign: 'center',
   },
 
   navigationButton: {
-    width: "100%",
+    width: '100%',
     height: 47,
     marginTop: -23,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#659DF2",
-    backgroundColor: "#659DF2",
-    flexDirection: "row",
-    alignItems: "center",
+    borderColor: '#659DF2',
+    backgroundColor: '#659DF2',
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 12,
-    justifyContent: "space-between",
-    shadowColor: "#000",
+    justifyContent: 'space-between',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
@@ -494,26 +470,26 @@ const styles = StyleSheet.create({
   },
 
   navigationText: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     marginLeft: 8,
   },
 
   overviewTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
     marginTop: -5,
   },
 
   overviewDescription: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     marginTop: -15,
   },
 
@@ -523,11 +499,11 @@ const styles = StyleSheet.create({
 
   /* Bottom Route Selection Bar */
   routeContainer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 30,
     left: 0,
     right: 0,
-    alignItems: "center",
+    alignItems: 'center',
     zIndex: 1600,
     elevation: 1600,
   },
@@ -538,10 +514,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 8.68,
     paddingVertical: 6.5,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 4.82,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
@@ -549,23 +525,23 @@ const styles = StyleSheet.create({
   },
 
   questSlotsContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 4.82,
   },
 
   questSlot: {
     width: 58,
     height: 60,
-    backgroundColor: "#EF6A39",
+    backgroundColor: '#EF6A39',
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 2,
     elevation: 4,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
 
   slotQuestImage: {
@@ -576,11 +552,11 @@ const styles = StyleSheet.create({
 
   slotPlusIcon: {
     fontSize: 32,
-    fontWeight: "300",
-    color: "#fff",
-    textAlign: "center",
+    fontWeight: '300',
+    color: '#fff',
+    textAlign: 'center',
     lineHeight: 32,
-    textShadowColor: "rgba(0, 0, 0, 0.25)",
+    textShadowColor: 'rgba(0, 0, 0, 0.25)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 1,
   },
@@ -588,11 +564,11 @@ const styles = StyleSheet.create({
   startButton: {
     width: 58,
     height: 60,
-    backgroundColor: "#EF6A39",
+    backgroundColor: '#EF6A39',
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 2,
@@ -600,23 +576,23 @@ const styles = StyleSheet.create({
   },
 
   startButtonActive: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
   },
 
   startButtonText: {
     fontSize: 14,
-    fontWeight: "500",
-    color: "rgba(154, 77, 49, 0.46)",
-    textAlign: "center",
+    fontWeight: '500',
+    color: 'rgba(154, 77, 49, 0.46)',
+    textAlign: 'center',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
 
   startButtonTextActive: {
-    color: "#EF6A39",
-    fontFamily: "Inter",
+    color: '#EF6A39',
+    fontFamily: 'Inter',
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 20,
     letterSpacing: -0.16,
   },

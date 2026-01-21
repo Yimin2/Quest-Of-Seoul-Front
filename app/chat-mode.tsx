@@ -1,10 +1,9 @@
-import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Images } from '@/constants/images';
+import { Images } from '@shared/config';
+import { ThemedText, ThemedView } from '@shared/ui';
 
 export default function ChatModeScreen() {
   const router = useRouter();
@@ -120,4 +119,3 @@ const styles = StyleSheet.create({
     bottom: 30,
   },
 });
-

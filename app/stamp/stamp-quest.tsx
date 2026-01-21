@@ -1,18 +1,10 @@
-import { Ionicons } from "@expo/vector-icons";
-import { CameraView, useCameraPermissions } from "expo-camera";
-import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
-import Svg, {
-  ClipPath,
-  Defs,
-  G,
-  Path,
-  RadialGradient,
-  Rect,
-  Stop,
-} from "react-native-svg";
+import { Ionicons } from '@expo/vector-icons';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import Svg, { ClipPath, Defs, G, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 export default function StampQuestScreen() {
   const router = useRouter();
@@ -44,9 +36,9 @@ export default function StampQuestScreen() {
   const isComplete = keys.every((k) => k === true);
 
   const validQRCodes = [
-    "QUEST-STAMP-001", // → key1
-    "QUEST-STAMP-002", // → key2
-    "QUEST-STAMP-003", // → key3
+    'QUEST-STAMP-001', // → key1
+    'QUEST-STAMP-002', // → key2
+    'QUEST-STAMP-003', // → key3
   ];
 
   useEffect(() => {
@@ -76,8 +68,8 @@ export default function StampQuestScreen() {
     let clean = data
       .trim()
       .toUpperCase()
-      .replace(/^HTTPS?:\/\//i, "")
-      .replace(/^WWW\./i, "");
+      .replace(/^HTTPS?:\/\//i, '')
+      .replace(/^WWW\./i, '');
 
     if (scannedCodes.includes(clean)) {
       setScanning(false);
@@ -93,7 +85,7 @@ export default function StampQuestScreen() {
       setShowKeyHunted(true);
     } else {
       alert(
-        `잘못된 QR 코드입니다.\n\n원본: "${data}"\n정제: "${clean}"\n\n올바른 형식:\nQUEST-STAMP-001\nQUEST-STAMP-002\nQUEST-STAMP-003`
+        `잘못된 QR 코드입니다.\n\n원본: "${data}"\n정제: "${clean}"\n\n올바른 형식:\nQUEST-STAMP-001\nQUEST-STAMP-002\nQUEST-STAMP-003`,
       );
     }
 
@@ -125,25 +117,25 @@ export default function StampQuestScreen() {
       <View style={styles.keyHuntedContainer}>
         {/* Background Image */}
         <Image
-          source={require("@/assets/images/layer.png")}
+          source={require('@/assets/images/layer.png')}
           style={styles.keyHuntedBackgroundImage}
           resizeMode="cover"
         />
 
         {/* Sparkle 배경 이미지 (배경보다 위, 버튼보다 아래) */}
         <Image
-          source={require("@/assets/images/sparkle.png")}
+          source={require('@/assets/images/sparkle.png')}
           style={styles.keyHuntedSparkle}
           resizeMode="cover"
         />
 
         {/* Content */}
         <View style={styles.keyHuntedContent}>
-          <Text style={styles.keyHuntedTitle}>Key{"\n"}Hunted!</Text>
+          <Text style={styles.keyHuntedTitle}>Key{'\n'}Hunted!</Text>
 
           {/* Key Image */}
           <Image
-            source={require("@/assets/images/key-2.png")}
+            source={require('@/assets/images/key-2.png')}
             style={styles.keyHuntedImage}
             resizeMode="contain"
           />
@@ -165,35 +157,35 @@ export default function StampQuestScreen() {
       <View style={styles.boxOpenedContainer}>
         {/* Background Image */}
         <Image
-          source={require("@/assets/images/boxopen.png")}
+          source={require('@/assets/images/boxopen.png')}
           style={styles.boxOpenedBackgroundImage}
           resizeMode="cover"
         />
 
         {/* Candy Image */}
         <Image
-          source={require("@/assets/images/candy.png")}
+          source={require('@/assets/images/candy.png')}
           style={styles.candyImage}
           resizeMode="contain"
         />
 
         {/* Candy3 Image */}
         <Image
-          source={require("@/assets/images/candy 3.png")}
+          source={require('@/assets/images/candy 3.png')}
           style={styles.candy3Image}
           resizeMode="contain"
         />
 
         {/* Candy4 Image */}
         <Image
-          source={require("@/assets/images/candy 4.png")}
+          source={require('@/assets/images/candy 4.png')}
           style={styles.candy4Image}
           resizeMode="contain"
         />
 
         {/* Content Overlay */}
         <View style={styles.boxOpenedContent}>
-          <Text style={styles.boxOpenedTitle}>Box{"\n"}Opened!</Text>
+          <Text style={styles.boxOpenedTitle}>Box{'\n'}Opened!</Text>
 
           {/* Done Button with Points */}
           <Pressable
@@ -228,14 +220,14 @@ export default function StampQuestScreen() {
       <View style={styles.startContainer}>
         {/* 하단 그라디언트 배경 (z-index 가장 낮음) */}
         <LinearGradient
-          colors={["#FEF5E7", "#34495E"]}
+          colors={['#FEF5E7', '#34495E']}
           locations={[0.426, 1]}
           style={styles.bottomGradient}
         />
 
         {/* Sparkle 배경 이미지 (그라데이션보다 위, 열쇠/버튼보다 아래) */}
         <Image
-          source={require("@/assets/images/sparkle.png")}
+          source={require('@/assets/images/sparkle.png')}
           style={styles.sparkleBackground}
           resizeMode="cover"
         />
@@ -264,13 +256,11 @@ export default function StampQuestScreen() {
         </View>
 
         {/* 타이틀 */}
-        <Text style={styles.mainTitle}>
-          Find QR Codes{"\n"}to open treasure box
-        </Text>
+        <Text style={styles.mainTitle}>Find QR Codes{'\n'}to open treasure box</Text>
 
         {/* 캐릭터 */}
         <Image
-          source={require("@/assets/images/treasurehunt.png")}
+          source={require('@/assets/images/treasurehunt.png')}
           style={styles.tiger}
           resizeMode="contain"
         />
@@ -278,7 +268,7 @@ export default function StampQuestScreen() {
         {/* 보물상자 */}
         <View style={styles.treasureBoxContainer}>
           <Image
-            source={require("@/assets/images/treasurebox.png")}
+            source={require('@/assets/images/treasurebox.png')}
             style={styles.treasureBox}
             resizeMode="contain"
           />
@@ -290,19 +280,11 @@ export default function StampQuestScreen() {
             <Pressable key={i} onPress={() => setShowHintModal(true)} style={styles.keyPressable}>
               <View style={styles.keyContainer}>
                 {/* 베이스 key.png 이미지 */}
-                <Image
-                  source={require("@/assets/images/key.png")}
-                  style={styles.keyIcon}
-                />
+                <Image source={require('@/assets/images/key.png')} style={styles.keyIcon} />
                 {/* 획득 시 황금 열쇠 SVG 오버레이 */}
                 {keys[i] && (
                   <View style={styles.goldenKeyOverlay}>
-                    <Svg
-                      width="60.749"
-                      height="60.749"
-                      viewBox="0 0 86 86"
-                      fill="none"
-                    >
+                    <Svg width="60.749" height="60.749" viewBox="0 0 86 86" fill="none">
                       <G clipPath="url(#clip0_6_23041)">
                         <Path
                           d="M32 18.8229C38.0525 12.7706 47.8427 12.7537 53.8657 18.7766C59.8905 24.8014 59.8721 34.5939 53.8195 40.6465C53.2716 41.1944 52.2987 42.0396 51.1851 42.7713C50.0588 43.5112 48.8516 44.0926 47.8215 44.1876L47.3685 44.229L47.3678 44.6841L47.3602 47.8336V47.835C47.3585 48.7592 47.4758 49.4237 47.8698 49.8237C48.0781 50.0351 48.3252 50.133 48.5583 50.1821C48.7764 50.2279 49.0142 50.2362 49.217 50.2442L49.2177 50.2449C49.5815 50.2612 49.9338 50.277 50.3253 50.4065L50.3619 50.4183L50.4013 50.4245H50.4027C50.4061 50.4251 50.4125 50.4262 50.4213 50.4279C50.4391 50.4314 50.4674 50.4378 50.5049 50.4466C50.5801 50.4641 50.6919 50.4929 50.8287 50.537C51.1039 50.6257 51.4755 50.7741 51.8597 51.01C52.6196 51.4766 53.4216 52.2783 53.6544 53.6679C53.7708 54.4969 53.6568 55.7415 52.9604 56.7636C52.2848 57.7552 51.0069 58.6174 48.6253 58.6225H48.1281L48.126 59.1204L48.1225 60.1693L48.1212 60.6347L48.5838 60.6692C48.5842 60.6693 48.5854 60.6698 48.5873 60.6699C48.5913 60.6703 48.5988 60.6709 48.6087 60.672C48.6286 60.6741 48.6601 60.6773 48.7012 60.683C48.7839 60.6946 48.9057 60.7146 49.0548 60.7479C49.3546 60.815 49.7565 60.9346 50.17 61.1409C50.9875 61.5487 51.8302 62.2824 52.06 63.6468C52.1729 64.4526 51.9944 65.5727 51.3784 66.4801C50.7795 67.3622 49.7506 68.0698 48.079 68.0738L47.5819 68.0752L47.5798 68.5731L47.5736 72.246C47.5712 73.3302 47.091 74.0214 46.4901 74.4675C45.8764 74.9231 45.1292 75.1233 44.634 75.1649L41.5017 75.1746C40.1945 75.1769 39.4277 74.6448 38.9709 74.0097C38.4957 73.3488 38.3329 72.5397 38.3335 72.0064L38.3909 44.7075L38.3915 44.3077L38.0021 44.2193L37.9966 44.2179C37.9916 44.2168 37.9837 44.2151 37.9731 44.2124C37.9508 44.2069 37.916 44.198 37.8702 44.1855C37.7784 44.1605 37.6413 44.1204 37.4669 44.064C37.118 43.951 36.6202 43.7707 36.0341 43.5026C34.8598 42.9653 33.3416 42.0806 31.9537 40.6928C25.9289 34.668 25.9473 24.8755 32 18.8229ZM38.627 25.4513C38.063 26.0135 37.6156 26.6814 37.3095 27.4166C37.0032 28.1523 36.8441 28.9412 36.8427 29.7381C36.8412 30.5351 36.9969 31.325 37.3005 32.0618C37.6041 32.7984 38.0501 33.4681 38.6125 34.0326L38.6139 34.034C39.7542 35.1691 41.2986 35.805 42.9076 35.8017C44.5167 35.7984 46.0588 35.1558 47.1945 34.016H47.1931C48.3323 32.8804 48.9748 31.3398 48.9781 29.7312C48.9814 28.1222 48.3455 26.5778 47.2104 25.4375L47.209 25.4361C46.6445 24.8737 45.9749 24.4277 45.2382 24.1241C44.5013 23.8205 43.7115 23.6648 42.9145 23.6663C42.1178 23.6677 41.3292 23.8262 40.5937 24.1324C39.858 24.4387 39.1895 24.8868 38.627 25.4513Z"
@@ -360,13 +342,8 @@ export default function StampQuestScreen() {
               />
             </Svg>
           )}
-          <Text
-            style={[
-              styles.scanButtonText,
-              isComplete && styles.completeButtonText,
-            ]}
-          >
-            {isComplete ? "See Result" : "QR Scan"}
+          <Text style={[styles.scanButtonText, isComplete && styles.completeButtonText]}>
+            {isComplete ? 'See Result' : 'QR Scan'}
           </Text>
         </Pressable>
 
@@ -384,14 +361,11 @@ export default function StampQuestScreen() {
                 It was the first and grandest palace of the Joseon era
               </Text>
               <Image
-                source={require("@/assets/images/basemap.png")}
+                source={require('@/assets/images/basemap.png')}
                 style={styles.hintImage}
                 resizeMode="contain"
               />
-              <Pressable
-                style={styles.hintCloseButton}
-                onPress={() => setShowHintModal(false)}
-              >
+              <Pressable style={styles.hintCloseButton} onPress={() => setShowHintModal(false)}>
                 <Svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                   <Path
                     d="M1 1L13 13M1 13L13 1"
@@ -415,7 +389,7 @@ export default function StampQuestScreen() {
   if (!permission?.granted) {
     return (
       <View style={styles.center}>
-        <Text style={{ color: "#fff" }}>카메라 권한이 필요합니다.</Text>
+        <Text style={{ color: '#fff' }}>카메라 권한이 필요합니다.</Text>
         <Pressable style={styles.scanButton} onPress={requestPermission}>
           <Text style={styles.scanButtonText}>권한 허용하기</Text>
         </Pressable>
@@ -460,7 +434,7 @@ export default function StampQuestScreen() {
         <CameraView
           style={{ flex: 1 }}
           facing="back"
-          barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+          barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
           onBarcodeScanned={onBarcodeScanned}
         />
       </View>
@@ -483,9 +457,7 @@ export default function StampQuestScreen() {
       </Pressable>
 
       {/* Scan instruction text */}
-      <Text style={styles.scanInstructionText}>
-        Scan QR Code to find a key.
-      </Text>
+      <Text style={styles.scanInstructionText}>Scan QR Code to find a key.</Text>
     </View>
   );
 }
@@ -499,13 +471,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   keyHuntedBackgroundImage: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
     zIndex: 1,
   },
   keyHuntedSparkle: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
@@ -515,43 +487,43 @@ const styles = StyleSheet.create({
   },
   keyHuntedContent: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     paddingHorizontal: 24,
     zIndex: 10,
   },
   keyHuntedTitle: {
     marginTop: 110,
     fontSize: 48,
-    fontFamily: "BagelFatOne-Regular",
-    fontWeight: "400",
-    color: "#FFF",
-    textAlign: "center",
+    fontFamily: 'BagelFatOne-Regular',
+    fontWeight: '400',
+    color: '#FFF',
+    textAlign: 'center',
     lineHeight: 48,
   },
   keyHuntedImage: {
-    position: "absolute",
-    top: "50%",
+    position: 'absolute',
+    top: '50%',
     marginTop: -119,
     width: 255,
     height: 238,
     aspectRatio: 15 / 14,
   },
   saveKeyButton: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 40,
     width: 320,
     height: 50,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 35,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
   saveKeyText: {
-    color: "#659DF2",
-    fontFamily: "Pretendard",
+    color: '#659DF2',
+    fontFamily: 'Pretendard',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   /* Box Opened 팝업 화면 */
@@ -559,92 +531,92 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   boxOpenedBackgroundImage: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
   },
   candyImage: {
-    position: "absolute",
+    position: 'absolute',
     top: 179,
     right: 10,
     zIndex: 9999,
   },
   candy3Image: {
-    position: "absolute",
+    position: 'absolute',
     top: 237,
     left: 10,
     zIndex: 9999,
   },
   candy4Image: {
-    position: "absolute",
+    position: 'absolute',
     top: 75,
     left: 60,
     zIndex: 9999,
   },
   boxOpenedContent: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     paddingHorizontal: 24,
   },
   boxOpenedTitle: {
     marginTop: 110,
     fontSize: 48,
-    fontFamily: "BagelFatOne-Regular",
-    fontWeight: "400",
-    color: "#FFF",
-    textAlign: "center",
+    fontFamily: 'BagelFatOne-Regular',
+    fontWeight: '400',
+    color: '#FFF',
+    textAlign: 'center',
     lineHeight: 48,
   },
   boxOpenedButton: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 40,
-    flexDirection: "row",
+    flexDirection: 'row',
     width: 320,
     height: 50,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 35,
-    backgroundColor: "#76C7AD",
+    backgroundColor: '#76C7AD',
   },
   boxOpenedButtonText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   pointsBadge: {
-    flexDirection: "row",
+    flexDirection: 'row',
     padding: 3,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 2,
   },
   pointsPlus: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Inter",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   pointsValue: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Inter",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   /* 첫 화면 */
   startContainer: {
     flex: 1,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
     paddingTop: 60,
     paddingHorizontal: 24,
   },
   bottomGradient: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 91,
     left: 0,
     right: 0,
@@ -654,42 +626,42 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   sparkleBackground: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: -24,
     right: -24,
-    width: "auto",
+    width: 'auto',
     height: 350,
     zIndex: 3,
     opacity: 0.6,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
   },
   placeName: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   mainTitle: {
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 18,
-    fontWeight: "400",
-    color: "#FFF",
+    fontWeight: '400',
+    color: '#FFF',
     marginTop: 53,
     marginBottom: 8,
   },
   tiger: {
-    position: "absolute",
+    position: 'absolute',
     left: 24,
     bottom: 300,
     width: 247,
@@ -698,7 +670,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   treasureBoxContainer: {
-    position: "absolute",
+    position: 'absolute',
     left: 205,
     bottom: 260,
     zIndex: 1000,
@@ -709,12 +681,12 @@ const styles = StyleSheet.create({
     aspectRatio: 135 / 113,
   },
   keyRow: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 174,
     left: 0,
     right: 0,
-    flexDirection: "row",
-    justifyContent: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
     gap: 48,
     zIndex: 999,
   },
@@ -722,7 +694,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   keyContainer: {
-    position: "relative",
+    position: 'relative',
     width: 60,
     height: 60,
   },
@@ -731,178 +703,178 @@ const styles = StyleSheet.create({
     height: 60,
   },
   goldenKeyOverlay: {
-    position: "absolute",
+    position: 'absolute',
     top: -25,
     left: 0,
     width: 60.749,
     height: 60.749,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scanButton: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 40,
-    alignSelf: "center",
-    flexDirection: "row",
+    alignSelf: 'center',
+    flexDirection: 'row',
     width: 320,
     height: 50,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 35,
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
     zIndex: 9999,
   },
   completeButton: {
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
   scanButtonText: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   completeButtonText: {
-    color: "#659DF2",
-    fontFamily: "Inter",
+    color: '#659DF2',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   /* 카메라 화면 */
   cameraContainer: {
     flex: 1,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
     paddingTop: 70,
     paddingHorizontal: 20,
   },
   headerScan: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   headerScanLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
   },
   headerScanTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   headerTitle: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   progressText: {
-    color: "#94A3B8",
+    color: '#94A3B8',
     fontSize: 16,
-    textAlign: "center",
+    textAlign: 'center',
     marginTop: 16,
   },
   debugBox: {
     marginTop: 16,
     padding: 12,
-    backgroundColor: "#1E293B",
+    backgroundColor: '#1E293B',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#334155",
+    borderColor: '#334155',
   },
   debugTitle: {
-    color: "#94A3B8",
+    color: '#94A3B8',
     fontSize: 12,
     marginBottom: 4,
   },
   debugText: {
-    color: "#FFA500",
+    color: '#FFA500',
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
     marginBottom: 4,
   },
   debugHint: {
-    color: "#64748B",
+    color: '#64748B',
     fontSize: 11,
   },
   cameraBox: {
     marginTop: 20,
     height: 300,
     borderRadius: 16,
-    overflow: "hidden",
-    backgroundColor: "#000",
+    overflow: 'hidden',
+    backgroundColor: '#000',
   },
   scanInstructionText: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 18,
-    fontWeight: "400",
+    fontWeight: '400',
     marginTop: 47,
   },
   cameraRollButton: {
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 40,
     paddingVertical: 10,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     marginTop: 20,
     borderRadius: 39,
-    backgroundColor: "#162028",
-    alignSelf: "center",
+    backgroundColor: '#162028',
+    alignSelf: 'center',
   },
   cameraRollText: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
   },
 
   center: {
     flex: 1,
-    backgroundColor: "#0F172A",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#0F172A',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   /* Hint 모달 */
   hintModalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 10,
   },
   hintModalContainer: {
-    width: "100%",
+    width: '100%',
     padding: 20,
     paddingTop: 40,
     paddingBottom: 20,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 20,
     borderRadius: 10,
-    backgroundColor: "#FEF5E7",
+    backgroundColor: '#FEF5E7',
   },
   hintTitle: {
-    color: "#4A90E2",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#4A90E2',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 24,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   hintDescription: {
-    color: "#4A90E2",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#4A90E2',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 16,
-    fontWeight: "400",
+    fontWeight: '400',
   },
   hintImage: {
     width: 320,
@@ -913,8 +885,8 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 41,
-    backgroundColor: "#659DF2",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#659DF2',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
