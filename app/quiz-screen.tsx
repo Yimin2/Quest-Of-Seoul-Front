@@ -1,19 +1,12 @@
-import { Images } from "@/constants/images";
-import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter, useFocusEffect } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  Modal,
-  Pressable,
-  StyleSheet,
-  View,
-} from "react-native";
-import Svg, { Defs, Path, RadialGradient, Stop } from "react-native-svg";
+import { Images } from '@/constants/images';
+import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Image, Modal, Pressable, StyleSheet, View } from 'react-native';
+import Svg, { Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 
-import { ThemedText } from "@/components/themed-text";
-import { questApi, quizApi, QuizItem } from "@/services/api";
+import { questApi, quizApi, QuizItem } from '@/services/api';
+import { ThemedText } from '@shared/ui';
 
 export default function QuizScreen() {
   const router = useRouter();
@@ -25,7 +18,7 @@ export default function QuizScreen() {
   }>();
 
   const questId = params.questId ? parseInt(params.questId) : null;
-  const questName = params.questName || params.landmark || "Unknown Place";
+  const questName = params.questName || params.landmark || 'Unknown Place';
   const rewardPoint = params.rewardPoint ? parseInt(params.rewardPoint) : 300;
   const isQuestMode = !!questId;
 
@@ -50,7 +43,7 @@ export default function QuizScreen() {
   const [allAnswered, setAllAnswered] = useState(false);
   const [isReviewMode, setIsReviewMode] = useState(false); // 이미 완료된 퀘스트를 다시 보는 모드
   const [isRetryMode, setIsRetryMode] = useState(false); // 힌트 사용 후 두 번째 시도인지 여부
-  const [questionResults, setQuestionResults] = useState<("pending" | "correct" | "wrong")[]>([]); // 각 문항별 결과
+  const [questionResults, setQuestionResults] = useState<('pending' | 'correct' | 'wrong')[]>([]); // 각 문항별 결과
 
   // 화면이 포커스를 얻을 때마다 항상 "처음 상태"로 리셋 (항상 새 게임처럼)
   useFocusEffect(
@@ -68,10 +61,8 @@ export default function QuizScreen() {
       setAllAnswered(false);
       setIsReviewMode(false);
       setIsRetryMode(false);
-      setQuestionResults((prev) =>
-        prev.length > 0 ? Array(prev.length).fill("pending") : []
-      );
-    }, [isQuestMode])
+      setQuestionResults((prev) => (prev.length > 0 ? Array(prev.length).fill('pending') : []));
+    }, [isQuestMode]),
   );
   useEffect(() => {
     const loadQuizzes = async () => {
@@ -83,7 +74,7 @@ export default function QuizScreen() {
           // Quest mode: check if quest is already completed
           try {
             const questDetail = await questApi.getQuestDetail(questId);
-            if (questDetail.user_status?.status === "completed") {
+            if (questDetail.user_status?.status === 'completed') {
               setQuestAlreadyCompleted(true);
             }
           } catch (err) {
@@ -93,18 +84,18 @@ export default function QuizScreen() {
           const questQuizData = await quizApi.getQuestQuizzes(questId);
           const quizItems = quizApi.convertQuestQuizzesToItems(questQuizData);
           setQuizzes(quizItems);
-          setQuestionResults(Array(quizItems.length).fill("pending"));
+          setQuestionResults(Array(quizItems.length).fill('pending'));
         } else {
           const data = await quizApi.getMultipleQuizzes(
-            params.landmark || "Gyeongbokgung Palace",
+            params.landmark || 'Gyeongbokgung Palace',
             5,
-            "en"
+            'en',
           );
           setQuizzes(data);
-          setQuestionResults(Array(data.length).fill("pending"));
+          setQuestionResults(Array(data.length).fill('pending'));
         }
       } catch (err) {
-        setError("Failed to load quizzes. Please try again.");
+        setError('Failed to load quizzes. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -133,23 +124,14 @@ export default function QuizScreen() {
       setSubmitting(true);
       try {
         const isLastQuiz = step === quizzes.length - 1;
-        const result = await quizApi.submitQuestQuiz(
-          questId,
-          quiz.id,
-          choiceIndex,
-          isLastQuiz
-        );
+        const result = await quizApi.submitQuestQuiz(questId, quiz.id, choiceIndex, isLastQuiz);
         const correct = result.is_correct;
 
         setSelected(choice);
         setIsCorrect(correct);
 
         // 프론트에서 이번 문제 획득 점수 계산 (0 / 10 / 20)
-        const earned = correct
-          ? hintUsed || isRetryMode
-            ? 10
-            : 20
-          : 0;
+        const earned = correct ? (hintUsed || isRetryMode ? 10 : 20) : 0;
 
         // 화면에 보이는 퀴즈 포인트는 항상 0에서 시작해서
         // 각 문제마다 +10 / +20 / +0씩만 누적
@@ -166,27 +148,27 @@ export default function QuizScreen() {
           next[step] = earned;
           return next;
         });
-        setProgress((prev) => [...prev, correct ? "correct" : "wrong"]);
+        setProgress((prev) => [...prev, correct ? 'correct' : 'wrong']);
 
         // 현재 문항의 최종 결과 기록 (correct / wrong)
         setQuestionResults((prev) => {
           const next = [...prev];
-          next[step] = correct ? "correct" : "wrong";
+          next[step] = correct ? 'correct' : 'wrong';
           return next;
         });
 
         // 🔥 B 로직: 첫 번째 시도에서 오답이고, 아직 힌트를 쓰지 않았다면
         // → 힌트 모달 강제 오픈, 결과 카드(showResult)는 띄우지 않음
         if (!correct && !hintUsed && !isRetryMode) {
-          setHintUsed(true);      // 힌트 사용 확정
-          setIsRetryMode(true);   // 이제 두 번째 시도 모드
-          setShowHint(true);      // 힌트 모달 표시
+          setHintUsed(true); // 힌트 사용 확정
+          setIsRetryMode(true); // 이제 두 번째 시도 모드
+          setShowHint(true); // 힌트 모달 표시
 
           // ❗ 두 번째 선택을 위해 상태 초기화 (다시 선택 가능하도록)
           setSelected(null);
           setIsCorrect(null);
 
-          return;                 // 결과 카드는 표시하지 않음
+          return; // 결과 카드는 표시하지 않음
         }
 
         // 두 번째 시도이거나(재시도 모드) / 첫 시도에 정답인 경우 → 결과 카드 표시
@@ -198,7 +180,7 @@ export default function QuizScreen() {
           }
         }
       } catch (err) {
-        setError("Failed to submit answer. Please try again.");
+        setError('Failed to submit answer. Please try again.');
       } finally {
         setSubmitting(false);
       }
@@ -211,10 +193,10 @@ export default function QuizScreen() {
       const earned = correct ? 60 : 5;
       setTotalScore((prev) => prev + earned);
       setScoreList((prev) => [...prev, earned]);
-      setProgress((prev) => [...prev, correct ? "correct" : "wrong"]);
+      setProgress((prev) => [...prev, correct ? 'correct' : 'wrong']);
       setQuestionResults((prev) => {
         const next = [...prev];
-        next[step] = correct ? "correct" : "wrong";
+        next[step] = correct ? 'correct' : 'wrong';
         return next;
       });
 
@@ -282,16 +264,16 @@ export default function QuizScreen() {
   const goToResults = () => {
     // 먼저 quiz-complete 중간 화면으로 이동
     router.replace({
-      pathname: "/quiz-complete",
+      pathname: '/quiz-complete',
       params: {
         score: totalScore.toString(),
         detail: JSON.stringify(scoreList),
         quizCount: quizzes.length.toString(),
-        isQuestMode: isQuestMode ? "true" : "false",
+        isQuestMode: isQuestMode ? 'true' : 'false',
         questName: questName,
-        questCompleted: "true",
+        questCompleted: 'true',
         rewardPoint: totalScore.toString(),
-        alreadyCompleted: questAlreadyCompleted ? "true" : "false",
+        alreadyCompleted: questAlreadyCompleted ? 'true' : 'false',
       },
     });
   };
@@ -301,11 +283,9 @@ export default function QuizScreen() {
   if (loading) {
     return (
       <View style={styles.background}>
-        <View style={[styles.container, { justifyContent: "center" }]}>
+        <View style={[styles.container, { justifyContent: 'center' }]}>
           <ActivityIndicator size="large" color="#FFA46F" />
-          <ThemedText style={{ color: "#fff", marginTop: 20 }}>
-            Loading quizzes...
-          </ThemedText>
+          <ThemedText style={{ color: '#fff', marginTop: 20 }}>Loading quizzes...</ThemedText>
         </View>
       </View>
     );
@@ -314,11 +294,9 @@ export default function QuizScreen() {
   if (error || !quiz) {
     return (
       <View style={styles.background}>
-        <View style={[styles.container, { justifyContent: "center" }]}>
-          <ThemedText
-            style={{ color: "#fff", textAlign: "center", marginBottom: 20 }}
-          >
-            {error || "No quiz available"}
+        <View style={[styles.container, { justifyContent: 'center' }]}>
+          <ThemedText style={{ color: '#fff', textAlign: 'center', marginBottom: 20 }}>
+            {error || 'No quiz available'}
           </ThemedText>
           <Pressable style={styles.hintBtn} onPress={() => router.back()}>
             <ThemedText style={styles.hintBtnText}>Go Back</ThemedText>
@@ -335,13 +313,7 @@ export default function QuizScreen() {
 
       {/* Horang Image - bottom center (changes based on answer) */}
       <Image
-        source={
-          showResult
-            ? isCorrect
-              ? Images.horangHappy
-              : Images.horangSad
-            : Images.horang
-        }
+        source={showResult ? (isCorrect ? Images.horangHappy : Images.horangSad) : Images.horang}
         style={styles.horangImage}
         resizeMode="contain"
       />
@@ -376,11 +348,7 @@ export default function QuizScreen() {
                 fill="white"
               />
             </Svg>
-            <ThemedText
-              style={styles.headerTitle}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
+            <ThemedText style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
               {questName}
             </ThemedText>
           </View>
@@ -435,10 +403,10 @@ export default function QuizScreen() {
                 style={[
                   styles.progressDot,
                   // 이미 답한 문항은 정오에 따라 색상 표시
-                  questionResults[index] === "correct" && styles.progressDotCorrect,
-                  questionResults[index] === "wrong" && styles.progressDotWrong,
+                  questionResults[index] === 'correct' && styles.progressDotCorrect,
+                  questionResults[index] === 'wrong' && styles.progressDotWrong,
                   // 아직 풀지 않은 현재 문항은 하이라이트
-                  questionResults[index] === "pending" &&
+                  questionResults[index] === 'pending' &&
                     index === step &&
                     styles.progressDotCurrent,
                 ]}
@@ -447,8 +415,8 @@ export default function QuizScreen() {
           </View>
         </View>
 
-        {showResult && (
-          isCorrect ? (
+        {showResult &&
+          (isCorrect ? (
             <View style={styles.correctResultCard}>
               <ThemedText style={styles.correctResultText}>Correct !</ThemedText>
             </View>
@@ -456,8 +424,7 @@ export default function QuizScreen() {
             <View style={styles.wrongResultCard}>
               <ThemedText style={styles.wrongResultText}>OOPS !</ThemedText>
             </View>
-          )
-        )}
+          ))}
 
         {!showResult && (
           <View style={styles.questionCard}>
@@ -479,7 +446,13 @@ export default function QuizScreen() {
               return (
                 <View key={i} style={styles.wrongChoiceSelected}>
                   {/* X Icon */}
-                  <Svg width="19" height="19" viewBox="0 0 19 19" fill="none" style={styles.wrongChoiceIcon}>
+                  <Svg
+                    width="19"
+                    height="19"
+                    viewBox="0 0 19 19"
+                    fill="none"
+                    style={styles.wrongChoiceIcon}
+                  >
                     <Path
                       fillRule="evenodd"
                       clipRule="evenodd"
@@ -489,7 +462,7 @@ export default function QuizScreen() {
                   </Svg>
                   <ThemedText style={styles.choiceText}>{c}</ThemedText>
                   <ThemedText style={styles.wrongChoicePoint}>
-                    {isQuestMode ? "+0p" : "+5p"}
+                    {isQuestMode ? '+0p' : '+5p'}
                   </ThemedText>
                 </View>
               );
@@ -498,16 +471,20 @@ export default function QuizScreen() {
             // 정답 선택한 경우 별도 스타일 적용
             if (isCorrectSelected) {
               // 퀘스트 모드일 때: 힌트 사용 여부에 따라 20 / 10 점 표시
-              const perQuestionPoint = isQuestMode
-                ? (hintUsed || isRetryMode ? 10 : 20)
-                : 60;
+              const perQuestionPoint = isQuestMode ? (hintUsed || isRetryMode ? 10 : 20) : 60;
 
               return (
                 <View key={i} style={styles.correctChoiceSelected}>
                   {/* Left section: Icon + Text */}
                   <View style={styles.correctChoiceLeft}>
                     {/* Check Icon */}
-                    <Svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={styles.correctChoiceIcon}>
+                    <Svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      style={styles.correctChoiceIcon}
+                    >
                       <Path
                         fillRule="evenodd"
                         clipRule="evenodd"
@@ -522,9 +499,7 @@ export default function QuizScreen() {
                     <ThemedText style={styles.choiceText}>{c}</ThemedText>
                   </View>
                   {/* Right section: Points */}
-                  <ThemedText style={styles.correctChoicePoint}>
-                    +{perQuestionPoint}p
-                  </ThemedText>
+                  <ThemedText style={styles.correctChoicePoint}>+{perQuestionPoint}p</ThemedText>
                 </View>
               );
             }
@@ -565,7 +540,7 @@ export default function QuizScreen() {
 
             {/* Center Text */}
             <ThemedText style={styles.hintBtnText}>
-              {hintUsed ? "Unlocked Hint" : "Need Hint?"}
+              {hintUsed ? 'Unlocked Hint' : 'Need Hint?'}
             </ThemedText>
 
             {/* Right Section: -5 mint */}
@@ -584,41 +559,37 @@ export default function QuizScreen() {
           </Pressable>
         )}
 
-        {showResult && !allAnswered && !isReviewMode && (
-          isCorrect ? (
+        {showResult &&
+          !allAnswered &&
+          !isReviewMode &&
+          (isCorrect ? (
             <Pressable style={styles.correctContinueBtn} onPress={onContinue}>
               <ThemedText style={styles.hintBtnText}>
-                {isLastProblem ? "Done!" : "Continue"}
+                {isLastProblem ? 'Done!' : 'Continue'}
               </ThemedText>
               <View style={styles.hintCostSection}>
                 <ThemedText style={styles.hintCostText}>
-                  {isQuestMode ? (hintUsed || isRetryMode ? "+10p" : "+20p") : "+60p"}
+                  {isQuestMode ? (hintUsed || isRetryMode ? '+10p' : '+20p') : '+60p'}
                 </ThemedText>
               </View>
             </Pressable>
           ) : (
             <Pressable style={styles.wrongContinueBtn} onPress={onContinue}>
               <ThemedText style={styles.hintBtnText}>
-                {isLastProblem ? "Done!" : "Continue"}
+                {isLastProblem ? 'Done!' : 'Continue'}
               </ThemedText>
               <View style={styles.hintCostSection}>
-                <ThemedText style={styles.hintCostText}>
-                  {isQuestMode ? "+0p" : "+5p"}
-                </ThemedText>
+                <ThemedText style={styles.hintCostText}>{isQuestMode ? '+0p' : '+5p'}</ThemedText>
               </View>
             </Pressable>
-          )
-        )}
+          ))}
 
         {/* Navigation buttons - 현재는 리뷰 모드만 사용 (플레이 모드에서는 숨김) */}
         {isReviewMode && (
           // 리뷰(솔브드) 모드: 하단 solved 바 + 양쪽 화살표만
           <View style={styles.solvedContainer}>
             <Pressable
-              style={[
-                styles.solvedArrowBtn,
-                step === 0 && styles.navBtnDisabled,
-              ]}
+              style={[styles.solvedArrowBtn, step === 0 && styles.navBtnDisabled]}
               onPress={onPrevious}
               disabled={step === 0}
             >
@@ -630,10 +601,7 @@ export default function QuizScreen() {
             </View>
 
             <Pressable
-              style={[
-                styles.solvedArrowBtn,
-                step === quizzes.length - 1 && styles.navBtnDisabled,
-              ]}
+              style={[styles.solvedArrowBtn, step === quizzes.length - 1 && styles.navBtnDisabled]}
               onPress={onNext}
               disabled={step === quizzes.length - 1}
             >
@@ -649,21 +617,21 @@ export default function QuizScreen() {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
   },
   sparkleBackground: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    width: "100%",
+    width: '100%',
     zIndex: 0,
-    mixBlendMode: "color-dodge",
+    mixBlendMode: 'color-dodge',
   },
   horangImage: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 15,
-    alignSelf: "center",
+    alignSelf: 'center',
     width: 141,
     height: 202,
     zIndex: 1,
@@ -672,112 +640,112 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 60,
     paddingHorizontal: 20,
-    alignItems: "center",
+    alignItems: 'center',
     zIndex: 2,
   },
 
   /* Header */
   header: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 17,
   },
   headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
   },
   headerTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     flexShrink: 1,
-    maxWidth: "75%",
+    maxWidth: '75%',
   },
 
   /* Point Container */
   pointContainer: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
     marginBottom: 20,
   },
   pointBox: {
-    flexDirection: "row",
+    flexDirection: 'row',
     width: 76,
     height: 47,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 10,
-    backgroundColor: "#76C7AD",
+    backgroundColor: '#76C7AD',
   },
   mintSection: {
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
     width: 26,
     gap: 2,
   },
   mintLabel: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Inter",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Inter',
     fontSize: 9,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 10,
   },
   pointValue: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Inter",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 16,
   },
 
   /* Progress Indicators */
   progressContainer: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 6,
   },
   progressDot: {
     width: 40,
     height: 10,
     borderRadius: 25,
-    backgroundColor: "#222D39",
+    backgroundColor: '#222D39',
   },
   // 정답인 경우
   progressDotCorrect: {
-    backgroundColor: "#76C7AD",
+    backgroundColor: '#76C7AD',
   },
   // 오답인 경우
   progressDotWrong: {
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
   },
   // 아직 풀지 않은 현재 문항
   progressDotCurrent: {
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
   questionCard: {
-    width: "100%",
+    width: '100%',
     padding: 20,
     paddingHorizontal: 10,
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#FFF",
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    shadowColor: "#000",
+    borderColor: '#FFF',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -785,20 +753,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   qIndex: {
-    color: "#34495E",
-    textAlign: "center",
-    fontFamily: "BagelFatOne-Regular",
+    color: '#34495E',
+    textAlign: 'center',
+    fontFamily: 'BagelFatOne-Regular',
     fontSize: 20,
-    fontWeight: "400",
+    fontWeight: '400',
   },
   question: {
-    color: "#34495E",
-    textAlign: "center",
+    color: '#34495E',
+    textAlign: 'center',
     fontSize: 16,
-    fontWeight: "400",
+    fontWeight: '400',
   },
   choiceWrapper: {
-    width: "100%",
+    width: '100%',
     gap: 12,
     marginTop: 10,
   },
@@ -806,60 +774,60 @@ const styles = StyleSheet.create({
     height: 47,
     paddingVertical: 8,
     paddingHorizontal: 10,
-    alignItems: "center",
+    alignItems: 'center',
     gap: 5,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#FFF",
-    flexDirection: "row",
+    borderColor: '#FFF',
+    flexDirection: 'row',
   },
   choiceText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   choicePoint: {
-    position: "absolute",
+    position: 'absolute',
     right: 14,
-    top: "50%",
+    top: '50%',
     marginTop: -10,
-    color: "#fff",
-    fontWeight: "700",
+    color: '#fff',
+    fontWeight: '700',
   },
   hintBtn: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 35,
     width: 320,
     height: 50,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 35,
-    backgroundColor: "#222D39",
-    flexDirection: "row",
+    backgroundColor: '#222D39',
+    flexDirection: 'row',
     zIndex: 3,
   },
   hintBtnText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   hintCostSection: {
-    flexDirection: "row",
+    flexDirection: 'row',
     padding: 3,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 2,
   },
   hintCostText: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Inter",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   continueBtn: {
     marginTop: 25,
@@ -868,81 +836,81 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   continueCorrect: {
-    backgroundColor: "#FFA46F",
+    backgroundColor: '#FFA46F',
   },
   continueWrong: {
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
   },
   continueText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   resultCard: {
-    width: "100%",
+    width: '100%',
     padding: 20,
     borderRadius: 18,
     marginBottom: 16,
-    backgroundColor: "#FDF2E9",
+    backgroundColor: '#FDF2E9',
   },
   resultTail: {
-    position: "absolute",
+    position: 'absolute',
     bottom: -10,
-    left: "50%",
+    left: '50%',
     marginLeft: -10,
     width: 20,
     height: 20,
-    backgroundColor: "#FDF2E9",
-    transform: [{ rotate: "45deg" }],
+    backgroundColor: '#FDF2E9',
+    transform: [{ rotate: '45deg' }],
   },
   resultTitle: {
     fontSize: 22,
-    fontWeight: "800",
+    fontWeight: '800',
     marginBottom: 8,
-    textAlign: "center",
-    color: "#000",
+    textAlign: 'center',
+    color: '#000',
   },
-  correctText: { color: "#FF6F41" },
-  wrongText: { color: "#58CC7B" },
+  correctText: { color: '#FF6F41' },
+  wrongText: { color: '#58CC7B' },
   resultDesc: {
     fontSize: 15,
     lineHeight: 22,
-    textAlign: "center",
-    color: "#000",
+    textAlign: 'center',
+    color: '#000',
   },
   hintOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   hintBox: {
     width: 320,
     paddingTop: 40,
     paddingBottom: 20,
     paddingHorizontal: 10,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 20,
     borderRadius: 10,
-    backgroundColor: "#FEF5E7",
+    backgroundColor: '#FEF5E7',
   },
   hintTitle: {
-    color: "#4A90E2",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#4A90E2',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 24,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 36,
     letterSpacing: -0.18,
   },
   hintText: {
-    color: "#4A90E2",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#4A90E2',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 16,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
@@ -950,25 +918,25 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 41,
-    backgroundColor: "#659DF2",
+    backgroundColor: '#659DF2',
   },
   navigationContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
     marginTop: 25,
     gap: 10,
   },
   // Solved(리뷰) 모드 하단 바
   solvedContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
     marginTop: 25,
     gap: 16,
   },
@@ -976,29 +944,29 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "#659DF2",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#659DF2',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   solvedPill: {
     flex: 1,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "rgba(255,255,255,0.9)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   solvedText: {
-    color: "#34495E",
-    fontFamily: "Inter",
+    color: '#34495E',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
-    textTransform: "lowercase",
+    fontWeight: '700',
+    textTransform: 'lowercase',
   },
   navBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.45)",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.45)',
     borderRadius: 30,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -1008,40 +976,40 @@ const styles = StyleSheet.create({
     opacity: 0.3,
   },
   navBtnText: {
-    color: "#fff",
-    fontWeight: "700",
+    color: '#fff',
+    fontWeight: '700',
     fontSize: 14,
   },
   resultsBtn: {
     flex: 1,
-    backgroundColor: "#FFA46F",
+    backgroundColor: '#FFA46F',
     borderRadius: 30,
     paddingVertical: 16,
     paddingHorizontal: 20,
-    alignItems: "center",
+    alignItems: 'center',
   },
   resultsBtnText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   wrongResultCard: {
-    width: "100%",
+    width: '100%',
     height: 70,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#FF7F50",
-    backgroundColor: "#FF7F50",
-    justifyContent: "center",
-    alignItems: "center",
+    borderColor: '#FF7F50',
+    backgroundColor: '#FF7F50',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 20,
   },
   wrongResultText: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "BagelFatOne-Regular",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'BagelFatOne-Regular',
     fontSize: 20,
-    fontWeight: "400",
+    fontWeight: '400',
   },
   wrongChoiceSelected: {
     height: 47,
@@ -1049,47 +1017,47 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#FFF",
-    backgroundColor: "rgba(255, 127, 80, 0.70)",
-    flexDirection: "row",
-    alignItems: "center",
+    borderColor: '#FFF',
+    backgroundColor: 'rgba(255, 127, 80, 0.70)',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   wrongChoiceIcon: {
     marginRight: 8,
   },
   wrongChoicePoint: {
-    marginLeft: "auto",
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    marginLeft: 'auto',
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   wrongContinueBtn: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 35,
     width: 320,
     height: 50,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 35,
-    backgroundColor: "#FF7F50",
-    flexDirection: "row",
+    backgroundColor: '#FF7F50',
+    flexDirection: 'row',
     zIndex: 3,
   },
   correctResultCard: {
-    width: "100%",
+    width: '100%',
     padding: 20,
     paddingHorizontal: 10,
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#76C7AD",
-    backgroundColor: "#76C7AD",
-    shadowColor: "#000",
+    borderColor: '#76C7AD',
+    backgroundColor: '#76C7AD',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -1097,28 +1065,28 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   correctResultText: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "BagelFatOne-Regular",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'BagelFatOne-Regular',
     fontSize: 20,
-    fontWeight: "400",
+    fontWeight: '400',
   },
   correctChoiceSelected: {
     height: 47,
     paddingVertical: 8,
     paddingHorizontal: 10,
-    justifyContent: "space-between",
-    alignItems: "center",
-    alignSelf: "stretch",
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    alignSelf: 'stretch',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#FFF",
-    backgroundColor: "rgba(118, 199, 173, 0.50)",
-    flexDirection: "row",
+    borderColor: '#FFF',
+    backgroundColor: 'rgba(118, 199, 173, 0.50)',
+    flexDirection: 'row',
   },
   correctChoiceLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
     flex: 1,
   },
@@ -1126,23 +1094,23 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   correctChoicePoint: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   correctContinueBtn: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 35,
     width: 320,
     height: 50,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 35,
-    backgroundColor: "#76C7AD",
-    flexDirection: "row",
+    backgroundColor: '#76C7AD',
+    flexDirection: 'row',
     zIndex: 3,
   },
 });

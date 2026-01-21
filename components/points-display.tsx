@@ -41,9 +41,7 @@ export function PointsDisplay({ showIcon = true, size = 'medium', style }: Point
       {showIcon && (
         <Ionicons name="cash-outline" size={iconSize} color="#fff" style={styles.icon} />
       )}
-      <ThemedText style={[styles.points, { fontSize }]}>
-        {totalPoints.toLocaleString()}
-      </ThemedText>
+      <ThemedText style={[styles.points, { fontSize }]}>{totalPoints.toLocaleString()}</ThemedText>
     </View>
   );
 }
@@ -61,4 +59,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

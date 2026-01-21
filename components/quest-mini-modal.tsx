@@ -1,5 +1,5 @@
-import { LinearGradient } from "expo-linear-gradient";
-import { useEffect, useRef, useState } from "react";
+import { LinearGradient } from 'expo-linear-gradient';
+import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -10,14 +10,14 @@ import {
   StyleSheet,
   Text,
   View,
-} from "react-native";
-import Svg, { Defs, LinearGradient as SvgLinearGradient, Path, Stop } from "react-native-svg";
-import { useQuestStore } from "@/store/useQuestStore";
-import { router } from "expo-router";
-import * as Location from "expo-location";
-import { mapApi } from "@/services/api";
+} from 'react-native';
+import Svg, { Defs, LinearGradient as SvgLinearGradient, Path, Stop } from 'react-native-svg';
+import { useQuestStore } from '@/store/useQuestStore';
+import { router } from 'expo-router';
+import * as Location from 'expo-location';
+import { mapApi } from '@/services/api';
 
-const SCREEN_HEIGHT = Dimensions.get("window").height;
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 const HEADER_HEIGHT = 50;
 const MIN_HEIGHT = 307; // 초기 모달 높이
 const MAX_HEIGHT = SCREEN_HEIGHT - HEADER_HEIGHT; // 헤더 바로 아래까지
@@ -33,7 +33,7 @@ interface Quest {
   longitude: number;
   reward_point: number;
   points: number;
-  difficulty: "easy" | "medium" | "hard";
+  difficulty: 'easy' | 'medium' | 'hard';
   is_active: boolean;
   completion_count: number;
   created_at: string;
@@ -47,10 +47,7 @@ interface QuestMiniModalProps {
   onClose: () => void;
 }
 
-export default function QuestMiniModal({
-  quest,
-  onClose,
-}: QuestMiniModalProps) {
+export default function QuestMiniModal({ quest, onClose }: QuestMiniModalProps) {
   // Zustand store
   const { addQuest, isQuestSelected } = useQuestStore();
   const isSelected = isQuestSelected(quest.id);
@@ -78,9 +75,9 @@ export default function QuestMiniModal({
       try {
         const distance = mapApi.calculateDistance(
           37.5665,
-          126.9780,
+          126.978,
           quest.latitude,
-          quest.longitude
+          quest.longitude,
         );
         setCalculatedDistance(distance);
       } catch (error) {
@@ -91,7 +88,8 @@ export default function QuestMiniModal({
     calculateDistance();
   }, [quest]);
 
-  const displayDistance = (quest.distance_km && quest.distance_km > 0) ? quest.distance_km : calculatedDistance;
+  const displayDistance =
+    quest.distance_km && quest.distance_km > 0 ? quest.distance_km : calculatedDistance;
 
   const handleAddQuest = () => {
     addQuest(quest);
@@ -146,7 +144,7 @@ export default function QuestMiniModal({
         // 전체 페이지로 네비게이트
         onClose();
         router.push({
-          pathname: "/(tabs)/map/quest-detail",
+          pathname: '/(tabs)/map/quest-detail',
           params: {
             quest: JSON.stringify(quest),
           },
@@ -217,27 +215,21 @@ export default function QuestMiniModal({
           >
             <Image
               source={{
-                uri: quest.place_image_url || "https://picsum.photos/300/300",
+                uri: quest.place_image_url || 'https://picsum.photos/300/300',
               }}
               style={styles.expandedImage}
             />
             <View style={styles.expandedContent}>
               {/* 제목과 버튼을 가로로 배치 */}
               <View style={styles.expandedTitleRow}>
-                <Text style={styles.expandedTitle}>
-                  {quest.category || "Quest"}
-                </Text>
+                <Text style={styles.expandedTitle}>{quest.category || 'Quest'}</Text>
                 <Pressable style={styles.expandedRelatedBtn}>
-                  <Text style={styles.expandedRelatedBtnText}>
-                    See Related Places
-                  </Text>
+                  <Text style={styles.expandedRelatedBtnText}>See Related Places</Text>
                 </Pressable>
               </View>
               <View style={styles.expandedNameAddressGroup}>
                 <Text style={styles.expandedName}>{quest.name}</Text>
-                <Text style={styles.expandedAddress}>
-                  {quest.district || "Seoul"}
-                </Text>
+                <Text style={styles.expandedAddress}>{quest.district || 'Seoul'}</Text>
               </View>
               <View style={styles.expandedButtonRow}>
                 <View style={styles.expandedButton}>
@@ -252,13 +244,13 @@ export default function QuestMiniModal({
                     <Text style={styles.expandedButtonDistanceText}>
                       {displayDistance !== null && displayDistance !== undefined
                         ? `${displayDistance.toFixed(1)}km`
-                        : "Calculating..."}
+                        : 'Calculating...'}
                     </Text>
                   </View>
                   <Text style={styles.expandedButtonSubText}>
                     {displayDistance !== null && displayDistance !== undefined
                       ? `${displayDistance.toFixed(1)}km far from your place`
-                      : "Getting your location..."}
+                      : 'Getting your location...'}
                   </Text>
                 </View>
                 <View style={styles.expandedButtonRight}>
@@ -270,9 +262,7 @@ export default function QuestMiniModal({
                         stroke="white"
                       />
                     </Svg>
-                    <Text style={styles.expandedButtonMintText}>
-                      {quest.points}
-                    </Text>
+                    <Text style={styles.expandedButtonMintText}>{quest.points}</Text>
                   </View>
                   <Text style={styles.expandedButtonRightSubText}>
                     {quest.points} is on this Quest
@@ -292,9 +282,7 @@ export default function QuestMiniModal({
                     fill="white"
                   />
                 </Svg>
-                <Text style={styles.navigationText}>
-                  Do you need navigation?
-                </Text>
+                <Text style={styles.navigationText}>Do you need navigation?</Text>
                 <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <Path
                     d="M9.39421 16.9279C9.31903 17.0075 9.26025 17.1011 9.22124 17.2034C9.18223 17.3056 9.16374 17.4146 9.16683 17.524C9.16993 17.6334 9.19455 17.7412 9.23928 17.8411C9.28401 17.941 9.34798 18.0311 9.42754 18.1063C9.5071 18.1815 9.60069 18.2402 9.70296 18.2792C9.80524 18.3183 9.91419 18.3367 10.0236 18.3337C10.133 18.3306 10.2408 18.3059 10.3407 18.2612C10.4406 18.2165 10.5307 18.1525 10.6059 18.0729L17.6892 10.5729C17.8355 10.4182 17.917 10.2134 17.917 10.0004C17.917 9.78752 17.8355 9.58267 17.6892 9.42795L10.6059 1.92711C10.5312 1.84581 10.4411 1.78016 10.3408 1.73397C10.2405 1.68779 10.1321 1.66198 10.0218 1.65806C9.91144 1.65414 9.80143 1.67219 9.69814 1.71114C9.59484 1.75009 9.50031 1.80918 9.42004 1.88498C9.33978 1.96078 9.27537 2.05176 9.23057 2.15266C9.18576 2.25356 9.16145 2.36235 9.15905 2.47273C9.15664 2.5831 9.17619 2.69285 9.21656 2.7956C9.25693 2.89835 9.31732 2.99206 9.39421 3.07128L15.9375 10.0004L9.39421 16.9279Z"
@@ -303,9 +291,7 @@ export default function QuestMiniModal({
                 </Svg>
               </Pressable>
               <Text style={styles.overviewTitle}>OverView</Text>
-              <Text style={styles.overviewDescription}>
-                {quest.description}
-              </Text>
+              <Text style={styles.overviewDescription}>{quest.description}</Text>
               <View style={styles.dividerLine} />
               <View style={styles.aiDocentRow}>
                 <View style={styles.aiDocentIconContainer}>
@@ -329,9 +315,7 @@ export default function QuestMiniModal({
                     />
                   </Svg>
                 </View>
-                <Text style={styles.aiDocentTitle}>
-                  AI Docent{"\n"}Recommendations
-                </Text>
+                <Text style={styles.aiDocentTitle}>AI Docent{'\n'}Recommendations</Text>
               </View>
             </View>
           </ScrollView>
@@ -342,14 +326,12 @@ export default function QuestMiniModal({
             <View style={styles.imageCardContainer}>
               <Image
                 source={{
-                  uri: quest.place_image_url || "https://picsum.photos/300/300",
+                  uri: quest.place_image_url || 'https://picsum.photos/300/300',
                 }}
                 style={styles.image}
               />
               {/* Category text - top left (no background badge) */}
-              <Text style={styles.placeCategoryText}>
-                {quest.category || "Quest"}
-              </Text>
+              <Text style={styles.placeCategoryText}>{quest.category || 'Quest'}</Text>
 
               {/* Plus button - top right */}
               <Pressable style={styles.plusButton} onPress={handleAddQuest}>
@@ -372,13 +354,13 @@ export default function QuestMiniModal({
                 <Text style={styles.distanceText}>
                   {displayDistance !== null && displayDistance !== undefined
                     ? `${displayDistance.toFixed(1)}km`
-                    : "..."}
+                    : '...'}
                 </Text>
               </View>
 
               {/* Mint badge - bottom right */}
               <LinearGradient
-                colors={["#76C7AD", "#3A6154"]}
+                colors={['#76C7AD', '#3A6154']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.mintBadge}
@@ -407,9 +389,7 @@ export default function QuestMiniModal({
               {/* 텍스트들 - 하단 정렬 */}
               <View style={styles.titleBox}>
                 <Text style={styles.title}>{quest.name}</Text>
-                <Text style={styles.districtText}>
-                  {quest.district || "Seoul"}
-                </Text>
+                <Text style={styles.districtText}>{quest.district || 'Seoul'}</Text>
               </View>
             </View>
           </View>
@@ -422,25 +402,25 @@ export default function QuestMiniModal({
 const styles = StyleSheet.create({
   /** 배경 오버레이 */
   backdrop: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     zIndex: 1500,
   },
 
   /** 전체 모달 */
   container: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
-    width: "100%",
-    backgroundColor: "#34495E",
+    width: '100%',
+    backgroundColor: '#34495E',
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     paddingTop: 20, // 드래그 핸들 공간
-    alignItems: "center",
+    alignItems: 'center',
     zIndex: 1501,
   },
 
@@ -448,20 +428,20 @@ const styles = StyleSheet.create({
   handleBar: {
     width: 40,
     height: 5,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
     borderRadius: 3,
     marginBottom: 15,
   },
 
   /** 확장된 레이아웃 */
   expandedLayout: {
-    width: "100%",
+    width: '100%',
     flex: 1,
   },
 
   /** 확장된 상태의 이미지 */
   expandedImage: {
-    width: "100%",
+    width: '100%',
     height: 268,
     flexShrink: 0,
   },
@@ -481,10 +461,10 @@ const styles = StyleSheet.create({
 
   /** 확장된 상태의 제목과 버튼 Row */
   expandedTitleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
   },
 
   /** 확장된 상태의 관련 장소 버튼 */
@@ -493,24 +473,24 @@ const styles = StyleSheet.create({
     height: 38,
     flexShrink: 0,
     borderRadius: 10,
-    backgroundColor: "#4D647C",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#4D647C',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   /** 확장된 상태의 관련 장소 버튼 텍스트 */
   expandedRelatedBtnText: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
   },
 
   /** 내용 전체 wrapper */
   contentWrapper: {
     width: 325,
     height: 156.931,
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 12,
   },
 
@@ -518,7 +498,7 @@ const styles = StyleSheet.create({
   imageCardContainer: {
     width: 156.931,
     height: 156.931,
-    position: "relative",
+    position: 'relative',
   },
 
   /** 왼쪽 이미지 */
@@ -530,61 +510,61 @@ const styles = StyleSheet.create({
 
   /** 카테고리 텍스트 (검색 페이지 스타일) */
   placeCategoryText: {
-    position: "absolute",
+    position: 'absolute',
     top: 10,
     left: 10,
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 
   /** 플러스 버튼 (검색 페이지 스타일) */
   plusButton: {
-    position: "absolute",
+    position: 'absolute',
     top: 5,
     right: 5,
     width: 38,
     height: 38,
     padding: 11,
     borderRadius: 10,
-    backgroundColor: "rgba(255, 127, 80, 0.85)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(255, 127, 80, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   /** 거리 배지 (검색 페이지 스타일) */
   distanceBadge: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 5,
     left: 5,
     height: 16,
     paddingHorizontal: 5,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 5,
     flexShrink: 0,
     borderRadius: 14,
-    backgroundColor: "rgba(52, 73, 94, 0.50)",
+    backgroundColor: 'rgba(52, 73, 94, 0.50)',
   },
 
   /** 거리 텍스트 (검색 페이지 스타일) */
   distanceText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 10,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 
   /** 민트 배지 (검색 페이지 스타일) */
   mintBadge: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 5,
     right: 5,
     height: 16,
     paddingHorizontal: 5,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 5,
     flexShrink: 0,
     borderRadius: 14,
@@ -592,17 +572,17 @@ const styles = StyleSheet.create({
 
   /** 민트 텍스트 (검색 페이지 스타일) */
   mintText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 10,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 
   /** 오른쪽 상·하 정렬 column */
   rightColumn: {
     flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
     gap: 10,
   },
 
@@ -612,17 +592,17 @@ const styles = StyleSheet.create({
     height: 40,
     padding: 10,
     borderRadius: 10,
-    backgroundColor: "#4D647C",
+    backgroundColor: '#4D647C',
 
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   relatedBtnText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     letterSpacing: -0.16,
     lineHeight: 20,
   },
@@ -630,27 +610,27 @@ const styles = StyleSheet.create({
   /** 제목/서브텍스트 wrapper */
   titleBox: {
     width: 142,
-    flexDirection: "column",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: 5,
   },
 
   /** 제목 */
   title: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 22,
     letterSpacing: -0.18,
   },
 
   /** 확장된 상태의 제목 */
   expandedTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   /** 확장된 상태의 name과 address 그룹 */
@@ -660,135 +640,135 @@ const styles = StyleSheet.create({
 
   /** 확장된 상태의 name */
   expandedName: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   /** 확장된 상태의 주소 */
   expandedAddress: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
   },
 
   /** 확장된 상태의 버튼 Row */
   expandedButtonRow: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 5,
-    width: "100%",
+    width: '100%',
   },
 
   /** 확장된 상태의 버튼 */
   expandedButton: {
     flex: 1,
     height: 60,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 8,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.85)",
-    backgroundColor: "#FFF",
+    borderColor: 'rgba(255, 255, 255, 0.85)',
+    backgroundColor: '#FFF',
   },
 
   /** 확장된 상태의 버튼 거리 배지 */
   expandedButtonDistanceBadge: {
     height: 16,
     paddingHorizontal: 5,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 5,
     flexShrink: 0,
     borderRadius: 14,
-    backgroundColor: "rgba(52, 73, 94, 0.50)",
+    backgroundColor: 'rgba(52, 73, 94, 0.50)',
   },
 
   /** 확장된 상태의 버튼 거리 텍스트 */
   expandedButtonDistanceText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   /** 확장된 상태의 버튼 서브 텍스트 */
   expandedButtonSubText: {
-    color: "#34495E",
-    fontFamily: "Inter",
+    color: '#34495E',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 16,
     letterSpacing: 0,
-    textAlign: "center",
+    textAlign: 'center',
   },
 
   /** 오른쪽 박스 */
   expandedButtonRight: {
     flex: 1,
     height: 60,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 8,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#76C7AD",
-    backgroundColor: "#76C7AD",
+    borderColor: '#76C7AD',
+    backgroundColor: '#76C7AD',
   },
 
   /** 오른쪽 박스 민트 배지 */
   expandedButtonMintBadge: {
     height: 16,
     paddingHorizontal: 5,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 5,
     flexShrink: 0,
     borderRadius: 14,
-    backgroundColor: "rgba(52, 73, 94, 0.50)",
+    backgroundColor: 'rgba(52, 73, 94, 0.50)',
   },
 
   /** 오른쪽 박스 민트 텍스트 */
   expandedButtonMintText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   /** 오른쪽 박스 서브 텍스트 */
   expandedButtonRightSubText: {
-    color: "#34495E",
-    fontFamily: "Inter",
+    color: '#34495E',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 16,
     letterSpacing: 0,
-    textAlign: "center",
+    textAlign: 'center',
   },
 
   /** 네비게이션 버튼 */
   navigationButton: {
-    width: "100%",
+    width: '100%',
     height: 47,
     marginTop: -23,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#659DF2",
-    backgroundColor: "#659DF2",
-    flexDirection: "row",
-    alignItems: "center",
+    borderColor: '#659DF2',
+    backgroundColor: '#659DF2',
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 12,
-    justifyContent: "space-between",
-    shadowColor: "#000",
+    justifyContent: 'space-between',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
@@ -806,43 +786,43 @@ const styles = StyleSheet.create({
 
   /** 네비게이션 텍스트 */
   navigationText: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     marginLeft: 8,
   },
 
   /** OverView 제목 */
   overviewTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
     marginTop: -5,
   },
 
   /** OverView 설명 */
   overviewDescription: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     marginTop: -15,
   },
 
   /** 구분선 */
   dividerLine: {
-    width: "100%",
+    width: '100%',
     height: 1,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     marginTop: 10,
   },
 
   /** AI Docent Row */
   aiDocentRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 25,
   },
 
@@ -860,29 +840,29 @@ const styles = StyleSheet.create({
 
   /** AI Docent 제목 */
   aiDocentTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
     marginLeft: 15,
   },
 
   /** 하단 장소 텍스트 */
   subTitle: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   /** 지역 텍스트 */
   districtText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 16,
     letterSpacing: -0.12,
     marginTop: 5,

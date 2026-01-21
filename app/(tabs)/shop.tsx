@@ -1,9 +1,9 @@
-import { ThemedText } from "@/components/themed-text";
-import { pointsApi, Reward, rewardApi } from "@/services/api";
-import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
-import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { pointsApi, Reward, rewardApi } from '@/services/api';
+import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { ThemedText } from '@shared/ui';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Dimensions,
@@ -14,18 +14,18 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from "react-native";
-import Svg, { Defs, Path, RadialGradient, Stop } from "react-native-svg";
+} from 'react-native';
+import Svg, { Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 
 const CATEGORIES = [
-  { key: "food", label: "Food" },
-  { key: "cafe", label: "Cafe" },
-  { key: "shopping", label: "Shopping" },
-  { key: "ticket", label: "Ticket" },
-  { key: "activity", label: "Activity" },
-  { key: "entertainment", label: "Entertainment" },
-  { key: "beauty", label: "Beauty" },
-  { key: "wellness", label: "Wellness" },
+  { key: 'food', label: 'Food' },
+  { key: 'cafe', label: 'Cafe' },
+  { key: 'shopping', label: 'Shopping' },
+  { key: 'ticket', label: 'Ticket' },
+  { key: 'activity', label: 'Activity' },
+  { key: 'entertainment', label: 'Entertainment' },
+  { key: 'beauty', label: 'Beauty' },
+  { key: 'wellness', label: 'Wellness' },
 ];
 
 // Custom SVG icon for chopsticks (food category)
@@ -40,8 +40,8 @@ const ChopsticksIcon = () => (
 
 export default function ShopScreen() {
   const router = useRouter();
-  const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("food");
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('food');
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [userMint, setUserMint] = useState<number>(0);
   const [loading, setLoading] = useState(false);
@@ -50,8 +50,7 @@ export default function ShopScreen() {
     try {
       const data = await pointsApi.getPoints();
       setUserMint(data.total_points);
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   const fetchRewards = async () => {
@@ -60,7 +59,7 @@ export default function ShopScreen() {
       const data = await rewardApi.getRewards(selectedCategory, search);
       setRewards(data.rewards);
     } catch (e) {
-      Alert.alert("Error", "Failed to load reward list.");
+      Alert.alert('Error', 'Failed to load reward list.');
     } finally {
       setLoading(false);
     }
@@ -76,13 +75,13 @@ export default function ShopScreen() {
     React.useCallback(() => {
       fetchUserPoints();
       fetchRewards();
-    }, [])
+    }, []),
   );
 
   const handleRewardClick = (item: Reward) => {
     // Navigate to coupon detail page
     router.push({
-      pathname: "/shop/coupon-detail",
+      pathname: '/shop/coupon-detail',
       params: {
         reward: JSON.stringify(item),
         category: CATEGORIES.find((c) => c.key === selectedCategory)?.label || selectedCategory,
@@ -94,10 +93,7 @@ export default function ShopScreen() {
     <View style={styles.container}>
       {/* Custom Header */}
       <View style={styles.header}>
-        <Pressable
-          onPress={() => router.push("/shop/my-purchase")}
-          style={styles.menuButton}
-        >
+        <Pressable onPress={() => router.push('/shop/my-purchase')} style={styles.menuButton}>
           <Svg width="15" height="10" viewBox="0 0 15 10" fill="none">
             <Path
               d="M0.833336 10C0.597225 10 0.399447 9.92 0.240003 9.76C0.0805585 9.6 0.000558429 9.40222 2.87356e-06 9.16667C-0.000552682 8.93111 0.0794474 8.73333 0.240003 8.57333C0.400559 8.41333 0.598336 8.33333 0.833336 8.33333H14.1667C14.4028 8.33333 14.6008 8.41333 14.7608 8.57333C14.9208 8.73333 15.0006 8.93111 15 9.16667C14.9994 9.40222 14.9194 9.60028 14.76 9.76083C14.6006 9.92139 14.4028 10.0011 14.1667 10H0.833336ZM0.833336 5.83333C0.597225 5.83333 0.399447 5.75333 0.240003 5.59333C0.0805585 5.43333 0.000558429 5.23556 2.87356e-06 5C-0.000552682 4.76444 0.0794474 4.56667 0.240003 4.40667C0.400559 4.24667 0.598336 4.16667 0.833336 4.16667H14.1667C14.4028 4.16667 14.6008 4.24667 14.7608 4.40667C14.9208 4.56667 15.0006 4.76444 15 5C14.9994 5.23556 14.9194 5.43361 14.76 5.59417C14.6006 5.75472 14.4028 5.83444 14.1667 5.83333H0.833336ZM0.833336 1.66667C0.597225 1.66667 0.399447 1.58667 0.240003 1.42667C0.0805585 1.26667 0.000558429 1.06889 2.87356e-06 0.833333C-0.000552682 0.597778 0.0794474 0.4 0.240003 0.24C0.400559 0.0800001 0.598336 0 0.833336 0H14.1667C14.4028 0 14.6008 0.0800001 14.7608 0.24C14.9208 0.4 15.0006 0.597778 15 0.833333C14.9994 1.06889 14.9194 1.26694 14.76 1.4275C14.6006 1.58806 14.4028 1.66778 14.1667 1.66667H0.833336Z"
@@ -154,19 +150,13 @@ export default function ShopScreen() {
         </View>
       </View>
 
-      <ScrollView
-        style={styles.scrollContent}
-        contentContainerStyle={styles.contentContainer}
-      >
+      <ScrollView style={styles.scrollContent} contentContainerStyle={styles.contentContainer}>
         {/* ====================== */}
         {/* ⭐ 상단 배너 추가       */}
         {/* ====================== */}
-        <Pressable
-          style={styles.bannerWrapper}
-          onPress={() => router.push("/shop/day-pass")}
-        >
+        <Pressable style={styles.bannerWrapper} onPress={() => router.push('/shop/day-pass')}>
           <Image
-            source={require("@/assets/images/store_pass.png")}
+            source={require('@/assets/images/store_pass.png')}
             style={styles.bannerImage}
             resizeMode="cover"
           />
@@ -174,18 +164,13 @@ export default function ShopScreen() {
           {/* 텍스트 오버레이 - 왼쪽 */}
           <View style={styles.bannerTextWrapper}>
             <ThemedText style={styles.bannerTitle}>
-              Your best choice {"\n"}for Seoul Tour
+              Your best choice {'\n'}for Seoul Tour
             </ThemedText>
           </View>
 
           {/* 텍스트 오버레이 - 오른쪽 */}
-          <Pressable
-            style={styles.bannerRightText}
-            onPress={() => router.push("/shop/day-pass")}
-          >
-            <ThemedText style={styles.bannerRightTextLabel}>
-              Day Pass Trials
-            </ThemedText>
+          <Pressable style={styles.bannerRightText} onPress={() => router.push('/shop/day-pass')}>
+            <ThemedText style={styles.bannerRightTextLabel}>Day Pass Trials</ThemedText>
             <Ionicons name="chevron-forward" size={20} color="#fff" />
           </Pressable>
         </Pressable>
@@ -210,24 +195,24 @@ export default function ShopScreen() {
                   selectedCategory === cat.key && styles.categoryPickIconSelected,
                 ]}
               >
-                {cat.key === "food" ? (
+                {cat.key === 'food' ? (
                   <ChopsticksIcon />
                 ) : (
                   <Ionicons
                     name={
-                      cat.key === "cafe"
-                        ? "cafe"
-                        : cat.key === "shopping"
-                        ? "bag"
-                        : cat.key === "ticket"
-                        ? "ticket"
-                        : cat.key === "activity"
-                        ? "star"
-                        : cat.key === "entertainment"
-                        ? "game-controller"
-                        : cat.key === "beauty"
-                        ? "cut"
-                        : "fitness"
+                      cat.key === 'cafe'
+                        ? 'cafe'
+                        : cat.key === 'shopping'
+                          ? 'bag'
+                          : cat.key === 'ticket'
+                            ? 'ticket'
+                            : cat.key === 'activity'
+                              ? 'star'
+                              : cat.key === 'entertainment'
+                                ? 'game-controller'
+                                : cat.key === 'beauty'
+                                  ? 'cut'
+                                  : 'fitness'
                     }
                     size={24}
                     color="#fff"
@@ -250,12 +235,9 @@ export default function ShopScreen() {
         {/* Reward list */}
         <View style={styles.sectionHeaderRow}>
           <ThemedText style={styles.sectionTitle}>
-            {CATEGORIES.find((c) => c.key === selectedCategory)?.label ||
-              "Rewards"}
+            {CATEGORIES.find((c) => c.key === selectedCategory)?.label || 'Rewards'}
           </ThemedText>
-          <ThemedText style={styles.countText}>
-            {rewards.length} Coupons
-          </ThemedText>
+          <ThemedText style={styles.countText}>{rewards.length} Coupons</ThemedText>
         </View>
 
         {loading ? (
@@ -291,11 +273,12 @@ export default function ShopScreen() {
                   </ThemedText>
                   <View style={styles.rewardPriceBadge}>
                     <Svg width="13" height="8" viewBox="0 0 13 8" fill="none">
-                      <Path d="M13 4.01234V4.2707C13 4.63629 12.7895 4.94705 12.4648 5.15666C12.8671 5.47107 13.0823 5.9366 12.96 6.37531L12.8883 6.61904C12.6907 7.31976 11.712 7.58787 10.8887 7.16865L10.1406 6.78965C9.9279 6.68324 9.74007 6.53022 9.5901 6.34118C9.46947 6.51509 9.3349 6.67816 9.18782 6.82864C8.79662 7.23454 8.3256 7.54833 7.80681 7.74864C7.28802 7.94896 6.73366 8.0311 6.18148 7.98947C5.62929 7.94784 5.09225 7.7834 4.60692 7.50738C4.12158 7.23136 3.69936 6.85023 3.369 6.38993C3.22607 6.5549 3.05348 6.68943 2.86087 6.78599L2.11279 7.16499C1.28943 7.58421 0.315504 7.3161 0.113192 6.61538L0.041429 6.37165C-0.0761944 5.93781 0.134361 5.47229 0.536633 5.153C0.211993 4.94339 0.00144104 4.62898 0.00144104 4.26704V4.01234C0.00662526 3.83973 0.0534857 3.67121 0.13773 3.52219C0.221975 3.37317 0.340914 3.24841 0.483694 3.15929C0.130824 2.87412 -0.0703029 2.45857 0.0226196 2.05032L0.0790765 1.79927C0.235516 1.11439 1.13768 0.781702 1.96928 1.10464L2.7456 1.40809C2.94094 1.48295 3.12149 1.59403 3.27843 1.7359C3.63475 1.19668 4.11346 0.756388 4.67248 0.453726C5.23149 0.151063 5.8537 -0.00470551 6.48442 0.000108273C7.11515 0.00492205 7.73507 0.170173 8.28972 0.481336C8.84437 0.792498 9.31677 1.24004 9.66538 1.78465C9.8338 1.61783 10.0342 1.48954 10.2535 1.40809L11.0286 1.10464C11.8614 0.781702 12.7624 1.11439 12.9188 1.79927L12.9753 2.05032C13.0682 2.45857 12.8706 2.87412 12.5142 3.15929C12.6577 3.24797 12.7773 3.37255 12.8622 3.5216C12.9471 3.67064 12.9944 3.83938 13 4.01234Z" fill="#F5F5F5"/>
+                      <Path
+                        d="M13 4.01234V4.2707C13 4.63629 12.7895 4.94705 12.4648 5.15666C12.8671 5.47107 13.0823 5.9366 12.96 6.37531L12.8883 6.61904C12.6907 7.31976 11.712 7.58787 10.8887 7.16865L10.1406 6.78965C9.9279 6.68324 9.74007 6.53022 9.5901 6.34118C9.46947 6.51509 9.3349 6.67816 9.18782 6.82864C8.79662 7.23454 8.3256 7.54833 7.80681 7.74864C7.28802 7.94896 6.73366 8.0311 6.18148 7.98947C5.62929 7.94784 5.09225 7.7834 4.60692 7.50738C4.12158 7.23136 3.69936 6.85023 3.369 6.38993C3.22607 6.5549 3.05348 6.68943 2.86087 6.78599L2.11279 7.16499C1.28943 7.58421 0.315504 7.3161 0.113192 6.61538L0.041429 6.37165C-0.0761944 5.93781 0.134361 5.47229 0.536633 5.153C0.211993 4.94339 0.00144104 4.62898 0.00144104 4.26704V4.01234C0.00662526 3.83973 0.0534857 3.67121 0.13773 3.52219C0.221975 3.37317 0.340914 3.24841 0.483694 3.15929C0.130824 2.87412 -0.0703029 2.45857 0.0226196 2.05032L0.0790765 1.79927C0.235516 1.11439 1.13768 0.781702 1.96928 1.10464L2.7456 1.40809C2.94094 1.48295 3.12149 1.59403 3.27843 1.7359C3.63475 1.19668 4.11346 0.756388 4.67248 0.453726C5.23149 0.151063 5.8537 -0.00470551 6.48442 0.000108273C7.11515 0.00492205 7.73507 0.170173 8.28972 0.481336C8.84437 0.792498 9.31677 1.24004 9.66538 1.78465C9.8338 1.61783 10.0342 1.48954 10.2535 1.40809L11.0286 1.10464C11.8614 0.781702 12.7624 1.11439 12.9188 1.79927L12.9753 2.05032C13.0682 2.45857 12.8706 2.87412 12.5142 3.15929C12.6577 3.24797 12.7773 3.37255 12.8622 3.5216C12.9471 3.67064 12.9944 3.83938 13 4.01234Z"
+                        fill="#F5F5F5"
+                      />
                     </Svg>
-                    <ThemedText style={styles.rewardPrice}>
-                      {item.point_cost}
-                    </ThemedText>
+                    <ThemedText style={styles.rewardPrice}>{item.point_cost}</ThemedText>
                   </View>
                 </View>
               </Pressable>
@@ -307,11 +290,10 @@ export default function ShopScreen() {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
   },
   scrollContent: {
     flex: 1,
@@ -324,14 +306,14 @@ const styles = StyleSheet.create({
 
   /** Custom Header */
   header: {
-    width: "100%",
+    width: '100%',
     height: 121,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     borderBottomWidth: 4,
-    borderBottomColor: "#76C7AD",
-    backgroundColor: "#34495E",
-    shadowColor: "#000",
+    borderBottomColor: '#76C7AD',
+    backgroundColor: '#34495E',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
@@ -339,8 +321,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 4,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 10,
     paddingTop: 50,
   },
@@ -351,8 +333,8 @@ const styles = StyleSheet.create({
   },
   headerRight: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingRight: 10,
   },
   searchBox: {
@@ -360,60 +342,60 @@ const styles = StyleSheet.create({
     height: 47,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
     borderRadius: 10,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     marginRight: 5,
   },
   searchInput: {
     flex: 1,
     fontSize: 14,
-    fontFamily: "Pretendard",
-    color: "#34495E",
+    fontFamily: 'Pretendard',
+    color: '#34495E',
   },
   mintBox: {
     width: 76,
     height: 47,
     paddingHorizontal: 8,
     paddingVertical: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
     borderRadius: 10,
-    backgroundColor: "#76C7AD",
+    backgroundColor: '#76C7AD',
     flexShrink: 0,
   },
   mintLeftColumn: {
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 2,
   },
   mintLabel: {
-    color: "#FFF",
+    color: '#FFF',
     fontSize: 10,
-    fontFamily: "Pretendard",
-    fontWeight: "700",
+    fontFamily: 'Pretendard',
+    fontWeight: '700',
     lineHeight: 12,
-    textAlign: "center",
+    textAlign: 'center',
   },
   mintValue: {
-    color: "#FFF",
+    color: '#FFF',
     fontSize: 14,
-    fontFamily: "Pretendard",
-    fontWeight: "700",
+    fontFamily: 'Pretendard',
+    fontWeight: '700',
     lineHeight: 16,
   },
 
   /** Category Pick */
   categoryPickTitle: {
-    color: "rgba(255, 255, 255, 0.50)",
-    fontFamily: "Pretendard",
+    color: 'rgba(255, 255, 255, 0.50)',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
     marginBottom: 8,
@@ -423,14 +405,14 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   categoryPickScrollContent: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     paddingRight: 20,
   },
   categoryPickItem: {
     width: 50,
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
     gap: 5,
     marginRight: 20,
   },
@@ -438,237 +420,237 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 10,
-    backgroundColor: "#222D39",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#222D39',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   categoryPickIconSelected: {
-    backgroundColor: "#76C7AD",
+    backgroundColor: '#76C7AD',
   },
   categoryPickLabel: {
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#fff',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 10,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 14,
     letterSpacing: -0.16,
-    width: "100%",
+    width: '100%',
   },
   categoryPickLabelSelected: {
-    color: "#76C7AD",
+    color: '#76C7AD',
   },
 
   /** Banner */
   bannerWrapper: {
-    width: "100%",
+    width: '100%',
     height: 180,
     borderRadius: 16,
-    overflow: "hidden",
+    overflow: 'hidden',
     marginBottom: 16,
   },
   bannerImage: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
   bannerTextWrapper: {
-    position: "absolute",
-    top: "50%",
+    position: 'absolute',
+    top: '50%',
     left: 20,
     transform: [{ translateY: -12 }],
   },
   bannerTitle: {
     fontSize: 20,
-    fontWeight: "700",
-    color: "#FFF",
-    fontFamily: "Inter",
+    fontWeight: '700',
+    color: '#FFF',
+    fontFamily: 'Inter',
     lineHeight: 24,
     letterSpacing: 0,
-    textShadowColor: "rgba(0,0,0,0.3)",
+    textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowRadius: 4,
   },
   bannerRightText: {
-    position: "absolute",
+    position: 'absolute',
     top: 20,
     right: 20,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 4,
   },
   bannerRightTextLabel: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#fff",
-    textShadowColor: "rgba(0,0,0,0.3)",
+    fontWeight: '600',
+    color: '#fff',
+    textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowRadius: 4,
   },
 
   /** Search Row (old - not used) */
   searchRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
     marginBottom: 16,
   },
   categoryBtn: {
-    backgroundColor: "#1FC58E",
+    backgroundColor: '#1FC58E',
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 12,
   },
   couponBtn: {
-    backgroundColor: "#394B70",
+    backgroundColor: '#394B70',
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 12,
   },
   categoryText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 13,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 
   /** Mint Card */
   mintCard: {
-    backgroundColor: "#1A2D48",
+    backgroundColor: '#1A2D48',
     borderRadius: 16,
     padding: 20,
     marginBottom: 28,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   cloudIcon: {
     marginRight: 16,
   },
   mintTitle: {
-    color: "#A8B7D8",
+    color: '#A8B7D8',
     fontSize: 14,
   },
   mintAmount: {
-    color: "#7DFFA4",
+    color: '#7DFFA4',
     fontSize: 26,
-    fontWeight: "800",
+    fontWeight: '800',
   },
 
   /** Section */
   sectionHeaderRow: {
-    display: "flex",
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    display: 'flex',
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 12,
   },
   sectionTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 24,
     letterSpacing: 0,
   },
 
   /** Category Tags */
   tag: {
-    backgroundColor: "#394B70",
+    backgroundColor: '#394B70',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
   },
   tagSelected: {
-    backgroundColor: "#1FC58E",
+    backgroundColor: '#1FC58E',
   },
   tagText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 
   /** Reward Grid */
   rewardGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
     gap: 10,
     marginBottom: 32,
   },
   rewardCard: {
     // (화면너비 - 패딩32 - gap20) / 3
-    width: (Dimensions.get("window").width - 32 - 20) / 3,
+    width: (Dimensions.get('window').width - 32 - 20) / 3,
     flexShrink: 0,
   },
   rewardImageContainer: {
-    width: "100%",
+    width: '100%',
     aspectRatio: 100 / 130,
     borderRadius: 10,
-    backgroundColor: "#D9D9D9",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#D9D9D9',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 4,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   rewardImage: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
   rewardInfo: {
-    flexDirection: "column",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: 5,
-    alignSelf: "stretch",
+    alignSelf: 'stretch',
   },
   rewardBrand: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 9,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   rewardTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 14,
     letterSpacing: -0.18,
   },
   rewardPriceBadge: {
-    flexDirection: "row",
+    flexDirection: 'row',
     width: 47,
     paddingVertical: 2,
     paddingHorizontal: 5,
-    alignItems: "center",
+    alignItems: 'center',
     gap: 3,
     borderRadius: 14,
-    backgroundColor: "#76C7AD",
+    backgroundColor: '#76C7AD',
   },
   rewardPrice: {
-    color: "#FFF",
-    textAlign: "right",
-    fontFamily: "Inter",
+    color: '#FFF',
+    textAlign: 'right',
+    fontFamily: 'Inter',
     fontSize: 10,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 12,
     letterSpacing: -0.18,
   },
 
   countText: {
-    color: "#76C7AD",
-    fontFamily: "Pretendard",
+    color: '#76C7AD',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
   loadingText: {
-    textAlign: "center",
-    color: "#A8B7D8",
+    textAlign: 'center',
+    color: '#A8B7D8',
     marginTop: 20,
   },
   emptyText: {
-    textAlign: "center",
-    color: "#888",
+    textAlign: 'center',
+    color: '#888',
     marginTop: 20,
   },
 });

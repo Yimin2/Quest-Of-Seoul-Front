@@ -1,7 +1,7 @@
-import { LinearGradient } from "expo-linear-gradient";
-import * as Location from "expo-location";
-import { useRouter } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Location from 'expo-location';
+import { useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -11,21 +11,21 @@ import {
   ScrollView,
   StyleSheet,
   View,
-} from "react-native";
-import Svg, { ClipPath, Defs, G, Path, Rect } from "react-native-svg";
+} from 'react-native';
+import Svg, { ClipPath, Defs, G, Path, Rect } from 'react-native-svg';
 
-import { ThemedText } from "@/components/themed-text";
-import { Images } from "@/constants/images";
-import { aiStationApi, mapApi } from "@/services/api";
-import { useQuestStore } from "@/store/useQuestStore";
+import { Images } from '@/constants/images';
+import { aiStationApi, mapApi } from '@/services/api';
+import { useQuestStore } from '@/store/useQuestStore';
+import { ThemedText } from '@shared/ui';
 
-import RouteResultList from "@/components/RouteResultList";
+import RouteResultList from '@/components/RouteResultList';
 
 const makeId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 type Message = {
   id: string;
-  role: "assistant" | "user";
+  role: 'assistant' | 'user';
   text: string;
   timestamp: Date;
 };
@@ -33,16 +33,16 @@ type Message = {
 const formatTimestamp = (date: Date) => {
   const hours = date.getHours();
   const minutes = date.getMinutes();
-  const ampm = hours >= 12 ? "PM" : "AM";
+  const ampm = hours >= 12 ? 'PM' : 'AM';
   const displayHours = hours % 12 || 12;
-  const displayMinutes = minutes.toString().padStart(2, "0");
+  const displayMinutes = minutes.toString().padStart(2, '0');
   return `${ampm} ${displayHours}:${displayMinutes}`;
 };
 
 const createInitialMessages = (): Message[] => [
   {
     id: makeId(),
-    role: "assistant",
+    role: 'assistant',
     text: "Hello! I'll recommend a travel route in Seoul. Please answer the questions!",
     timestamp: new Date(),
   },
@@ -75,17 +75,15 @@ export default function TravelPlanScreen() {
   const [canContinue, setCanContinue] = useState(false);
   const [pendingStepAnswer, setPendingStepAnswer] = useState<string | null>(null);
 
-  const [routeResults, setRouteResults] = useState<any[] | null>(
-    storedRouteResults
-  );
-  const [viewMode, setViewMode] = useState<"chat" | "result">(
-    storedRouteResults ? "result" : "chat"
+  const [routeResults, setRouteResults] = useState<any[] | null>(storedRouteResults);
+  const [viewMode, setViewMode] = useState<'chat' | 'result'>(
+    storedRouteResults ? 'result' : 'chat',
   );
 
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === "granted") {
+      if (status === 'granted') {
         const currentLocation = await Location.getCurrentPositionAsync({});
         setLocation({
           latitude: currentLocation.coords.latitude,
@@ -108,55 +106,46 @@ export default function TravelPlanScreen() {
     setPendingStepAnswer(null);
   }, [questStep]);
 
-  const addMessage = (text: string, role: "assistant" | "user") => {
-    setMessages((prev) => [
-      ...prev,
-      { id: makeId(), role, text, timestamp: new Date() },
-    ]);
+  const addMessage = (text: string, role: 'assistant' | 'user') => {
+    setMessages((prev) => [...prev, { id: makeId(), role, text, timestamp: new Date() }]);
   };
 
   const startTravelPlanFlow = () => {
     const cartCount = selectedQuests.length;
     if (cartCount > 0) {
-      addMessage(
-        `You have ${cartCount} place(s) in your quest cart.`,
-        "assistant"
-      );
+      addMessage(`You have ${cartCount} place(s) in your quest cart.`, 'assistant');
       if (cartCount === 1) {
         addMessage(
-          "Would you like me to create 4 courses including this place, or create 4 new courses?",
-          "assistant"
+          'Would you like me to create 4 courses including this place, or create 4 new courses?',
+          'assistant',
         );
       } else {
         addMessage(
           `Would you like me to create 4 courses including the first place (${selectedQuests[0].name}), or create 4 new courses?`,
-          "assistant"
+          'assistant',
         );
       }
       setQuestStep(0);
     } else {
-      addMessage("I'll create a new travel route for you!", "assistant");
-      addMessage("Where would you like to start?", "assistant");
+      addMessage("I'll create a new travel route for you!", 'assistant');
+      addMessage('Where would you like to start?', 'assistant');
       setQuestStep(1);
     }
   };
 
   const handleAnswer = useCallback(
     async (answer: string) => {
-      addMessage(answer, "user");
+      addMessage(answer, 'user');
 
       if (questStep === 0) {
-        if (answer.includes("Include") || answer.includes("Required")) {
+        if (answer.includes('Include') || answer.includes('Required')) {
           setPreferences((prev: any) => ({ ...prev, includeCart: true }));
-          addMessage("Great! Where would you like to start?", "assistant");
+          addMessage('Great! Where would you like to start?', 'assistant');
           setQuestStep(1);
         } else {
           setPreferences((prev: any) => ({ ...prev, includeCart: false }));
-          addMessage(
-            "I'll ask you some questions to create a new course!",
-            "assistant"
-          );
-          addMessage("Where would you like to start?", "assistant");
+          addMessage("I'll ask you some questions to create a new course!", 'assistant');
+          addMessage('Where would you like to start?', 'assistant');
           setQuestStep(1);
         }
         setCurrentSelection(null);
@@ -166,7 +155,7 @@ export default function TravelPlanScreen() {
       }
 
       if (questStep === 1) {
-        if (answer === "Current Location") {
+        if (answer === 'Current Location') {
           if (location) {
             setPreferences((prev: any) => ({
               ...prev,
@@ -175,14 +164,11 @@ export default function TravelPlanScreen() {
               startLongitude: location.longitude,
             }));
             addMessage(
-              "Starting from your current location! How far from the starting point are you willing to travel?",
-              "assistant"
+              'Starting from your current location! How far from the starting point are you willing to travel?',
+              'assistant',
             );
           } else {
-            addMessage(
-              "Unable to get location information. Please try again.",
-              "assistant"
-            );
+            addMessage('Unable to get location information. Please try again.', 'assistant');
             return;
           }
         } else {
@@ -190,10 +176,10 @@ export default function TravelPlanScreen() {
           const stationCoordinates: {
             [key: string]: { lat: number; lon: number };
           } = {
-            "Seoul Station": { lat: 37.5547, lon: 126.9707 },
-            "Gangnam Station": { lat: 37.4979, lon: 127.0276 },
-            "Hongik Univ. Station": { lat: 37.5572, lon: 126.9236 },
-            "Myeongdong Station": { lat: 37.5635, lon: 126.9849 },
+            'Seoul Station': { lat: 37.5547, lon: 126.9707 },
+            'Gangnam Station': { lat: 37.4979, lon: 127.0276 },
+            'Hongik Univ. Station': { lat: 37.5572, lon: 126.9236 },
+            'Myeongdong Station': { lat: 37.5635, lon: 126.9849 },
           };
 
           const coords = stationCoordinates[answer];
@@ -214,7 +200,7 @@ export default function TravelPlanScreen() {
           }
           addMessage(
             `Starting from ${answer}! How far from the starting point are you willing to travel?`,
-            "assistant"
+            'assistant',
           );
         }
         setQuestStep(2);
@@ -226,7 +212,7 @@ export default function TravelPlanScreen() {
 
       if (questStep === 2) {
         // Radius selection
-        const radius = parseInt(answer.replace("km", ""));
+        const radius = parseInt(answer.replace('km', ''));
         setRadiusKm(radius);
         setPreferences((prev: any) => ({
           ...prev,
@@ -234,7 +220,7 @@ export default function TravelPlanScreen() {
         }));
         addMessage(
           `Within ${radius}km from the starting point! What travel theme would you like?`,
-          "assistant"
+          'assistant',
         );
         setQuestStep(3);
         setCurrentSelection(null);
@@ -245,26 +231,23 @@ export default function TravelPlanScreen() {
 
       if (questStep === 3) {
         // Theme 다중 선택 처리
-        if (answer === "Done") {
+        if (answer === 'Done') {
           if (selectedThemes.length === 0) {
-            addMessage("Please select at least 1 theme!", "assistant");
+            addMessage('Please select at least 1 theme!', 'assistant');
             return;
           }
 
           setPreferences((prev: any) => ({
             ...prev,
             theme: selectedThemes, // 배열로 전달
-            category:
-              selectedThemes.length === 1
-                ? selectedThemes[0]
-                : selectedThemes[0], // 첫 번째를 category로도 설정 (하위 호환성)
+            category: selectedThemes.length === 1 ? selectedThemes[0] : selectedThemes[0], // 첫 번째를 category로도 설정 (하위 호환성)
           }));
 
-          const themeList = selectedThemes.join(", ");
-          addMessage(`Selected themes: ${themeList}`, "assistant");
+          const themeList = selectedThemes.join(', ');
+          addMessage(`Selected themes: ${themeList}`, 'assistant');
           addMessage(
             'Great! Which districts would you like to visit? (You can select multiple or choose "Anywhere")',
-            "assistant"
+            'assistant',
           );
           setQuestStep(4);
           setCurrentSelection(null);
@@ -278,17 +261,14 @@ export default function TravelPlanScreen() {
       }
 
       if (questStep === 4) {
-        if (answer === "Anywhere") {
+        if (answer === 'Anywhere') {
           // Anywhere 선택 시 API 호출 (districts를 빈 배열로 설정)
           const finalPreferences = {
             ...preferences,
             districts: [], // 빈 배열 = anywhere (장소 고려 안 함)
           };
           setPreferences(finalPreferences);
-          addMessage(
-            "Creating recommended courses for anywhere in Seoul...",
-            "assistant"
-          );
+          addMessage('Creating recommended courses for anywhere in Seoul...', 'assistant');
           setIsLoading(true);
           setCurrentSelection(null);
           setCanContinue(false);
@@ -296,8 +276,7 @@ export default function TravelPlanScreen() {
 
           try {
             // 장바구니에 담은 장소를 must_visit으로 설정
-            const firstQuest =
-              selectedQuests.length > 0 ? selectedQuests[0] : null;
+            const firstQuest = selectedQuests.length > 0 ? selectedQuests[0] : null;
 
             let mustVisitPlaceId: string | undefined = undefined;
             let mustVisitQuestId: number | undefined = undefined;
@@ -318,9 +297,7 @@ export default function TravelPlanScreen() {
             const startLon = finalPreferences.startLongitude;
             const hasStartPoint = startLat !== undefined && startLon !== undefined;
 
-            const currentLat = finalPreferences.useCurrentLocation
-              ? location?.latitude
-              : undefined;
+            const currentLat = finalPreferences.useCurrentLocation ? location?.latitude : undefined;
             const currentLon = finalPreferences.useCurrentLocation
               ? location?.longitude
               : undefined;
@@ -361,7 +338,6 @@ export default function TravelPlanScreen() {
             const response = await aiStationApi.routeRecommend(apiRequest);
 
             if (response.success && response.quests) {
-
               // 출발 지점 결정 (현재 위치 또는 지정된 위치)
               const startLat =
                 finalPreferences.useCurrentLocation && location
@@ -380,7 +356,7 @@ export default function TravelPlanScreen() {
                     startLat,
                     startLon,
                     quest.latitude,
-                    quest.longitude
+                    quest.longitude,
                   );
                 }
                 return {
@@ -401,22 +377,16 @@ export default function TravelPlanScreen() {
               storeRouteResults(sortedQuests);
               addMessage(
                 `Recommended courses are ready! (${response.quests.length} places)`,
-                "assistant"
+                'assistant',
               );
-              addMessage(
-                "Please click the button below to view the results!",
-                "assistant"
-              );
+              addMessage('Please click the button below to view the results!', 'assistant');
               setQuestStep(5);
             } else {
-              addMessage(
-                "Failed to create recommended courses. Please try again.",
-                "assistant"
-              );
+              addMessage('Failed to create recommended courses. Please try again.', 'assistant');
               setQuestStep(0);
             }
           } catch (error) {
-            addMessage("An error occurred. Please try again.", "assistant");
+            addMessage('An error occurred. Please try again.', 'assistant');
             setQuestStep(0);
           } finally {
             setIsLoading(false);
@@ -424,9 +394,9 @@ export default function TravelPlanScreen() {
           return;
         }
 
-        if (answer === "Done") {
+        if (answer === 'Done') {
           if (selectedDistricts.length === 0) {
-            addMessage("Please select at least 1 district!", "assistant");
+            addMessage('Please select at least 1 district!', 'assistant');
             return;
           }
 
@@ -436,11 +406,8 @@ export default function TravelPlanScreen() {
           };
           setPreferences(finalPreferences);
 
-          const districtList = selectedDistricts.join(", ");
-          addMessage(
-            `Creating recommended courses for ${districtList}...`,
-            "assistant"
-          );
+          const districtList = selectedDistricts.join(', ');
+          addMessage(`Creating recommended courses for ${districtList}...`, 'assistant');
           setIsLoading(true);
           setCurrentSelection(null);
           setCanContinue(false);
@@ -448,8 +415,7 @@ export default function TravelPlanScreen() {
 
           try {
             // 장바구니에 담은 장소를 must_visit으로 설정
-            const firstQuest =
-              selectedQuests.length > 0 ? selectedQuests[0] : null;
+            const firstQuest = selectedQuests.length > 0 ? selectedQuests[0] : null;
 
             let mustVisitPlaceId: string | undefined = undefined;
             let mustVisitQuestId: number | undefined = undefined;
@@ -470,9 +436,7 @@ export default function TravelPlanScreen() {
             const startLon = finalPreferences.startLongitude;
             const hasStartPoint = startLat !== undefined && startLon !== undefined;
 
-            const currentLat = finalPreferences.useCurrentLocation
-              ? location?.latitude
-              : undefined;
+            const currentLat = finalPreferences.useCurrentLocation ? location?.latitude : undefined;
             const currentLon = finalPreferences.useCurrentLocation
               ? location?.longitude
               : undefined;
@@ -513,7 +477,6 @@ export default function TravelPlanScreen() {
             const response = await aiStationApi.routeRecommend(apiRequest);
 
             if (response.success && response.quests) {
-
               // 출발 지점 결정
               const startLat =
                 finalPreferences.useCurrentLocation && location
@@ -532,7 +495,7 @@ export default function TravelPlanScreen() {
                     startLat,
                     startLon,
                     quest.latitude,
-                    quest.longitude
+                    quest.longitude,
                   );
                 }
                 return {
@@ -553,22 +516,16 @@ export default function TravelPlanScreen() {
               storeRouteResults(sortedQuests);
               addMessage(
                 `Recommended courses are ready! (${response.quests.length} places)`,
-                "assistant"
+                'assistant',
               );
-              addMessage(
-                "Please click the button below to view the results!",
-                "assistant"
-              );
+              addMessage('Please click the button below to view the results!', 'assistant');
               setQuestStep(5);
             } else {
-              addMessage(
-                "Failed to create recommended courses. Please try again.",
-                "assistant"
-              );
+              addMessage('Failed to create recommended courses. Please try again.', 'assistant');
               setQuestStep(0);
             }
           } catch (error) {
-            addMessage("An error occurred. Please try again.", "assistant");
+            addMessage('An error occurred. Please try again.', 'assistant');
             setQuestStep(0);
           } finally {
             setIsLoading(false);
@@ -578,10 +535,10 @@ export default function TravelPlanScreen() {
       }
 
       if (questStep === 5) {
-        if (answer === "View Results") {
-          setViewMode("result");
+        if (answer === 'View Results') {
+          setViewMode('result');
         } else {
-          addMessage("I'll recommend again from the beginning!", "assistant");
+          addMessage("I'll recommend again from the beginning!", 'assistant');
           setQuestStep(0);
           setPreferences({});
           setSelectedDistricts([]);
@@ -596,29 +553,21 @@ export default function TravelPlanScreen() {
         return;
       }
     },
-    [
-      questStep,
-      preferences,
-      location,
-      selectedQuests,
-      selectedDistricts,
-      selectedThemes,
-      radiusKm,
-    ]
+    [questStep, preferences, location, selectedQuests, selectedDistricts, selectedThemes, radiusKm],
   );
 
-  if (viewMode === "result" && routeResults) {
+  if (viewMode === 'result' && routeResults) {
     return (
       <RouteResultList
         places={routeResults}
         onPressPlace={(quest) => {
           router.push({
-            pathname: "/(tabs)/map/quest-detail",
+            pathname: '/(tabs)/map/quest-detail',
             params: { quest: JSON.stringify(quest) },
           });
         }}
         onClose={() => {
-          setViewMode("chat");
+          setViewMode('chat');
           clearRouteResults();
         }}
         onStartNavigation={() => {
@@ -634,9 +583,8 @@ export default function TravelPlanScreen() {
             addQuest(quest);
           });
 
-
           // 맵 화면으로 이동
-          router.push("/(tabs)/map");
+          router.push('/(tabs)/map');
         }}
       />
     );
@@ -649,7 +597,7 @@ export default function TravelPlanScreen() {
       case 0:
         return (
           <OptionRow
-            options={["Include Required", "Recommend 4 New"]}
+            options={['Include Required', 'Recommend 4 New']}
             selected={currentSelection}
             onSelect={(opt) => {
               setCurrentSelection(opt);
@@ -662,11 +610,11 @@ export default function TravelPlanScreen() {
         return (
           <OptionRow
             options={[
-              "Current Location",
-              "Seoul Station",
-              "Gangnam Station",
-              "Hongik Univ. Station",
-              "Myeongdong Station",
+              'Current Location',
+              'Seoul Station',
+              'Gangnam Station',
+              'Hongik Univ. Station',
+              'Myeongdong Station',
             ]}
             selected={currentSelection}
             onSelect={(opt) => {
@@ -679,7 +627,7 @@ export default function TravelPlanScreen() {
       case 2:
         return (
           <OptionRow
-            options={["5km", "10km", "15km", "20km", "25km", "30km"]}
+            options={['5km', '10km', '15km', '20km', '25km', '30km']}
             selected={currentSelection}
             onSelect={(opt) => {
               setCurrentSelection(opt);
@@ -710,18 +658,18 @@ export default function TravelPlanScreen() {
           <DistrictSelector
             selectedDistricts={selectedDistricts}
             onSelect={(district) => {
-              if (district === "Anywhere") {
-                setSelectedDistricts(["Anywhere"]);
+              if (district === 'Anywhere') {
+                setSelectedDistricts(['Anywhere']);
                 setCanContinue(true);
-                setPendingStepAnswer("Anywhere");
+                setPendingStepAnswer('Anywhere');
               } else {
                 setSelectedDistricts((prev) => {
                   const updated = prev.includes(district)
                     ? prev.filter((d) => d !== district)
-                    : [...prev.filter((d) => d !== "Anywhere"), district];
+                    : [...prev.filter((d) => d !== 'Anywhere'), district];
                   setCanContinue(updated.length > 0);
                   if (updated.length > 0) {
-                    setPendingStepAnswer("Done");
+                    setPendingStepAnswer('Done');
                   } else {
                     setPendingStepAnswer(null);
                   }
@@ -734,7 +682,7 @@ export default function TravelPlanScreen() {
       case 5:
         return (
           <OptionRow
-            options={["View Results", "Recommend Again"]}
+            options={['View Results', 'Recommend Again']}
             selected={currentSelection}
             onSelect={(opt) => {
               setCurrentSelection(opt);
@@ -767,31 +715,19 @@ export default function TravelPlanScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={{ flex: 1, backgroundColor: "#8FB6F1" }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={{ flex: 1, backgroundColor: '#8FB6F1' }}
     >
       <View style={styles.container}>
         {/* Background Stars */}
         <View style={styles.backgroundStars}>
-          <Svg
-            width="194"
-            height="195"
-            viewBox="0 0 194 195"
-            fill="none"
-            style={styles.bigStar}
-          >
+          <Svg width="194" height="195" viewBox="0 0 194 195" fill="none" style={styles.bigStar}>
             <Path
               d="M193.967 97.1671C194.05 100.086 193.128 102.947 191.356 105.268C189.584 107.589 187.069 109.232 184.231 109.922C167.582 116.056 151.03 122.191 134.284 128.033C132.771 128.5 131.395 129.33 130.275 130.45C129.155 131.57 128.325 132.945 127.858 134.458C122.113 150.717 116.174 166.879 110.235 183.139C109.578 186.182 107.913 188.913 105.51 190.892C103.107 192.871 100.106 193.983 96.9939 194.044C93.8025 193.952 90.7321 192.8 88.265 190.773C85.7979 188.747 84.0735 185.959 83.363 182.846C77.5212 166.684 71.5822 150.522 65.7404 134.165C65.316 132.736 64.5417 131.437 63.4876 130.383C62.4335 129.329 61.133 128.554 59.704 128.13C42.9577 122.191 26.406 116.056 9.75708 109.922C6.85892 109.24 4.29446 107.559 2.51374 105.173C0.73302 102.787 -0.149966 99.8496 0.0208503 96.8771C-0.0708871 93.9332 0.844134 91.0449 2.61417 88.6907C4.3842 86.3366 6.90348 84.6566 9.75708 83.9272C26.2113 77.8908 42.6657 71.756 59.2173 65.9143C60.7302 65.4465 62.1064 64.6166 63.2261 63.4969C64.3459 62.3771 65.1752 61.0022 65.643 59.4893C71.3873 43.3272 77.327 27.0677 83.2661 10.8082C83.9263 7.77517 85.5945 5.05522 87.9993 3.09248C90.4041 1.12975 93.4034 0.0390538 96.5073 0C102.836 0 107.315 3.60373 110.041 11.1006C115.98 27.2627 121.918 43.5222 127.76 59.7816C128.162 61.2327 128.928 62.5568 129.984 63.63C131.04 64.7032 132.352 65.4891 133.797 65.9143C150.673 71.8209 167.452 77.9235 184.133 84.2196C187.032 84.8794 189.606 86.5369 191.404 88.9047C193.202 91.2724 194.11 94.1975 193.967 97.1671Z"
               fill="#659DF2"
             />
           </Svg>
-          <Svg
-            width="91"
-            height="112"
-            viewBox="0 0 111 112"
-            fill="none"
-            style={styles.smallStar}
-          >
+          <Svg width="91" height="112" viewBox="0 0 111 112" fill="none" style={styles.smallStar}>
             <Path
               d="M110.129 55.5958C110.171 57.2594 109.657 58.8889 108.67 60.2286C107.683 61.5683 106.278 62.5421 104.677 62.9954L76.1501 73.4115C75.2756 73.6429 74.4753 74.0973 73.8271 74.7283C73.179 75.3594 72.7049 76.147 72.4502 77.015C69.1399 86.7512 65.7323 95.6099 62.714 104.957C62.3368 106.692 61.3782 108.246 59.9971 109.361C58.616 110.477 56.8948 111.088 55.1195 111.092C53.2932 111.087 51.5238 110.456 50.1064 109.304C48.6889 108.153 47.7092 106.548 47.3306 104.762C43.9229 95.0256 40.5152 86.1669 37.5944 76.9176C37.3434 76.0902 36.8925 75.3373 36.2811 74.726C35.6697 74.1146 34.9169 73.6625 34.0895 73.4115L5.46492 62.9954C3.8288 62.5701 2.39098 61.5887 1.39667 60.2215C0.402362 58.8543 -0.0868065 57.186 0.0126555 55.4984C-0.0223303 53.7967 0.515252 52.1324 1.53929 50.7729C2.56333 49.4134 4.01462 48.4374 5.65984 48.0013L33.992 37.7778C34.8614 37.5053 35.6523 37.0268 36.2965 36.3825C36.9408 35.7383 37.4193 34.9462 37.6918 34.0768C41.0021 24.3406 44.4098 15.482 47.4281 6.23262C47.7686 4.47141 48.7142 2.88508 50.101 1.74721C51.4878 0.609352 53.2282 -0.00980297 55.022 0.000117385C56.8483 0.00498416 58.6183 0.635961 60.0357 1.78762C61.4532 2.93929 62.4329 4.54344 62.8115 6.33008C66.2192 16.0663 69.6268 24.9249 72.5477 34.1743C72.7548 35.0236 73.1912 35.8001 73.8093 36.4182C74.4274 37.0363 75.2033 37.4733 76.0526 37.6804C85.7888 41.088 95.5251 44.6912 105.261 48.1962C106.762 48.7395 108.048 49.7531 108.925 51.0867C109.802 52.4202 110.225 54.0024 110.129 55.5958Z"
               fill="#659DF2"
@@ -833,18 +769,16 @@ export default function TravelPlanScreen() {
           ref={scrollRef}
           style={{ flex: 1 }}
           contentContainerStyle={styles.messages}
-          onContentSizeChange={() =>
-            scrollRef.current?.scrollToEnd({ animated: true })
-          }
+          onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
         >
           {messages.map((msg, index) => (
             <React.Fragment key={msg.id}>
               <View style={styles.messageContainer}>
-                {msg.role === "assistant" ? (
+                {msg.role === 'assistant' ? (
                   <View style={styles.assistantMessageRow}>
                     <View style={styles.profileCircle}>
                       <Image
-                        source={require("@/assets/images/face-3.png")}
+                        source={require('@/assets/images/face-3.png')}
                         style={styles.profileImage}
                         resizeMode="contain"
                       />
@@ -853,9 +787,7 @@ export default function TravelPlanScreen() {
                       <ThemedText style={styles.nickname}>AI Docent</ThemedText>
                       <View style={styles.bubbleWithTime}>
                         <View style={styles.assistantBubble}>
-                          <ThemedText style={styles.assistantBubbleText}>
-                            {msg.text}
-                          </ThemedText>
+                          <ThemedText style={styles.assistantBubbleText}>{msg.text}</ThemedText>
                         </View>
                         <ThemedText style={styles.timestamp}>
                           {formatTimestamp(msg.timestamp)}
@@ -869,57 +801,51 @@ export default function TravelPlanScreen() {
                       {formatTimestamp(msg.timestamp)}
                     </ThemedText>
                     <View style={styles.userBubble}>
-                      <ThemedText style={styles.userText}>
-                        {msg.text}
-                      </ThemedText>
+                      <ThemedText style={styles.userText}>{msg.text}</ThemedText>
                     </View>
                   </View>
                 )}
               </View>
 
               {/* 첫 번째 AI Docent 메시지 뒤에 퀘스트 카트 표시 (퀘스트가 있을 때만) */}
-              {index === 0 &&
-                msg.role === "assistant" &&
-                selectedQuests.length > 0 && (
-                  <View style={styles.cartOuterContainer}>
-                    <LinearGradient
-                      colors={["#FF7F50", "#994C30"]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      style={styles.cartGradientContainer}
-                    >
-                      {[0, 1, 2, 3].map((slotIndex) => {
-                        const quest = selectedQuests[slotIndex];
-                        return (
-                          <View key={slotIndex} style={styles.cartSlot}>
-                            {quest ? (
-                              <Image
-                                source={{ uri: quest.place_image_url }}
-                                style={styles.cartSlotImage}
-                                resizeMode="cover"
-                              />
-                            ) : (
-                              <Image
-                                source={Images.group57}
-                                style={styles.cartSlotImage}
-                                resizeMode="cover"
-                              />
-                            )}
-                          </View>
-                        );
-                      })}
-                    </LinearGradient>
-                  </View>
-                )}
+              {index === 0 && msg.role === 'assistant' && selectedQuests.length > 0 && (
+                <View style={styles.cartOuterContainer}>
+                  <LinearGradient
+                    colors={['#FF7F50', '#994C30']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.cartGradientContainer}
+                  >
+                    {[0, 1, 2, 3].map((slotIndex) => {
+                      const quest = selectedQuests[slotIndex];
+                      return (
+                        <View key={slotIndex} style={styles.cartSlot}>
+                          {quest ? (
+                            <Image
+                              source={{ uri: quest.place_image_url }}
+                              style={styles.cartSlotImage}
+                              resizeMode="cover"
+                            />
+                          ) : (
+                            <Image
+                              source={Images.group57}
+                              style={styles.cartSlotImage}
+                              resizeMode="cover"
+                            />
+                          )}
+                        </View>
+                      );
+                    })}
+                  </LinearGradient>
+                </View>
+              )}
             </React.Fragment>
           ))}
 
           {isLoading && (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#659DF2" />
-              <ThemedText style={styles.loadingText}>
-                Creating recommended route...
-              </ThemedText>
+              <ThemedText style={styles.loadingText}>Creating recommended route...</ThemedText>
             </View>
           )}
         </ScrollView>
@@ -940,13 +866,13 @@ export default function TravelPlanScreen() {
                 setPendingStepAnswer(null);
                 setCanContinue(false);
               } else if (questStep === 3 && selectedThemes.length > 0) {
-                handleAnswer("Done");
+                handleAnswer('Done');
                 setCanContinue(false);
               } else if (questStep === 4) {
-                if (selectedDistricts.includes("Anywhere")) {
-                  handleAnswer("Anywhere");
+                if (selectedDistricts.includes('Anywhere')) {
+                  handleAnswer('Anywhere');
                 } else if (selectedDistricts.length > 0) {
-                  handleAnswer("Done");
+                  handleAnswer('Done');
                 }
                 setCanContinue(false);
               }
@@ -976,10 +902,7 @@ function OptionRow({
         return (
           <Pressable
             key={opt}
-            style={[
-              optionStyles.button,
-              isSelected && { backgroundColor: "#FF7F50" },
-            ]}
+            style={[optionStyles.button, isSelected && { backgroundColor: '#FF7F50' }]}
             onPress={() => onSelect(opt)}
           >
             <ThemedText style={optionStyles.text}>{opt}</ThemedText>
@@ -998,14 +921,14 @@ function ThemeSelector({
   onSelect: (s: string) => void;
 }) {
   const themes = [
-    "History",
-    "Nature",
-    "Culture",
-    "Events",
-    "Shopping",
-    "Food",
-    "Extreme",
-    "Activities",
+    'History',
+    'Nature',
+    'Culture',
+    'Events',
+    'Shopping',
+    'Food',
+    'Extreme',
+    'Activities',
   ];
 
   return (
@@ -1016,17 +939,11 @@ function ThemeSelector({
           return (
             <Pressable
               key={theme}
-              style={[
-                themeStyles.themeButton,
-                isSelected && themeStyles.themeButtonSelected,
-              ]}
+              style={[themeStyles.themeButton, isSelected && themeStyles.themeButtonSelected]}
               onPress={() => onSelect(theme)}
             >
               <ThemedText
-                style={[
-                  themeStyles.themeText,
-                  isSelected && themeStyles.themeTextSelected,
-                ]}
+                style={[themeStyles.themeText, isSelected && themeStyles.themeTextSelected]}
               >
                 {theme}
               </ThemedText>
@@ -1046,32 +963,32 @@ function DistrictSelector({
   onSelect: (s: string) => void;
 }) {
   const districts = [
-    "Anywhere",
-    "Gangnam-gu",
-    "Gangdong-gu",
-    "Gangbuk-gu",
-    "Gangseo-gu",
-    "Gwanak-gu",
-    "Gwangjin-gu",
-    "Guro-gu",
-    "Geumcheon-gu",
-    "Nowon-gu",
-    "Dobong-gu",
-    "Dongdaemun-gu",
-    "Dongjak-gu",
-    "Mapo-gu",
-    "Seodaemun-gu",
-    "Seocho-gu",
-    "Seongdong-gu",
-    "Seongbuk-gu",
-    "Songpa-gu",
-    "Yangcheon-gu",
-    "Yeongdeungpo-gu",
-    "Yongsan-gu",
-    "Eunpyeong-gu",
-    "Jongno-gu",
-    "Jung-gu",
-    "Jungnang-gu",
+    'Anywhere',
+    'Gangnam-gu',
+    'Gangdong-gu',
+    'Gangbuk-gu',
+    'Gangseo-gu',
+    'Gwanak-gu',
+    'Gwangjin-gu',
+    'Guro-gu',
+    'Geumcheon-gu',
+    'Nowon-gu',
+    'Dobong-gu',
+    'Dongdaemun-gu',
+    'Dongjak-gu',
+    'Mapo-gu',
+    'Seodaemun-gu',
+    'Seocho-gu',
+    'Seongdong-gu',
+    'Seongbuk-gu',
+    'Songpa-gu',
+    'Yangcheon-gu',
+    'Yeongdeungpo-gu',
+    'Yongsan-gu',
+    'Eunpyeong-gu',
+    'Jongno-gu',
+    'Jung-gu',
+    'Jungnang-gu',
   ];
 
   return (
@@ -1106,23 +1023,23 @@ function DistrictSelector({
 
 const optionStyles = StyleSheet.create({
   row: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 90,
     left: 0,
     right: 0,
-    width: "100%",
+    width: '100%',
     maxHeight: 267,
     padding: 10,
     paddingHorizontal: 20,
     paddingBottom: 10,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-    alignItems: "center",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     gap: 10,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    backgroundColor: "#162028",
+    backgroundColor: '#162028',
     zIndex: 100,
     elevation: 100,
   },
@@ -1130,79 +1047,79 @@ const optionStyles = StyleSheet.create({
     height: 40,
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 39,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
   },
   text: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
   },
 });
 
 const themeStyles = StyleSheet.create({
   container: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 90,
     left: 0,
     right: 0,
-    width: "100%",
+    width: '100%',
     maxHeight: 267,
     padding: 10,
     paddingHorizontal: 20,
     paddingBottom: 10,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-    alignItems: "center",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     gap: 10,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    backgroundColor: "#162028",
+    backgroundColor: '#162028',
     zIndex: 100,
     elevation: 100,
   },
   grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   themeButton: {
     height: 40,
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 39,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
   },
   themeButtonSelected: {
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
   },
   themeText: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
   },
   themeTextSelected: {
-    color: "#fff",
-    fontWeight: "600",
+    color: '#fff',
+    fontWeight: '600',
   },
 });
 
 const districtStyles = StyleSheet.create({
   container: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 90,
     left: 0,
     right: 0,
-    width: "100%",
+    width: '100%',
     maxHeight: 267,
     padding: 10,
     paddingHorizontal: 20,
@@ -1210,45 +1127,45 @@ const districtStyles = StyleSheet.create({
     gap: 12,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    backgroundColor: "#162028",
+    backgroundColor: '#162028',
     zIndex: 100,
     elevation: 100,
   },
   grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   districtButton: {
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: "transparent",
+    borderColor: 'transparent',
   },
   districtButtonSelected: {
-    backgroundColor: "#FF7F50",
-    borderColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
+    borderColor: '#FF7F50',
   },
   districtText: {
-    color: "#FFF",
+    color: '#FFF',
     fontSize: 13,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   districtTextSelected: {
-    color: "#fff",
-    fontWeight: "600",
+    color: '#fff',
+    fontWeight: '600',
   },
 });
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#8FB6F1",
+    backgroundColor: '#8FB6F1',
   },
   backgroundStars: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
@@ -1256,60 +1173,60 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   bigStar: {
-    position: "absolute",
+    position: 'absolute',
     top: 159,
     left: 136,
   },
   smallStar: {
-    position: "absolute",
+    position: 'absolute',
     top: 288,
     right: -10,
   },
   header: {
-    width: "100%",
+    width: '100%',
     height: 112,
-    backgroundColor: "#8FB6F1",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    backgroundColor: '#8FB6F1',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingTop: 60,
   },
   menuButton: {
     width: 20,
     height: 20,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 16,
   },
   closeButton: {
     width: 15,
     height: 15,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   // 장바구니 표시 창
   cartOuterContainer: {
     marginTop: -20,
     paddingVertical: 8,
     paddingHorizontal: 20,
-    alignItems: "center",
+    alignItems: 'center',
   },
   cartGradientContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     padding: 6,
     paddingLeft: 7.715,
     paddingRight: 7.409,
     paddingTop: 6,
     paddingBottom: 7,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 4.82,
     borderRadius: 10,
   },
@@ -1317,7 +1234,7 @@ const styles = StyleSheet.create({
     width: 58,
     height: 60,
     borderRadius: 10,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   cartSlotImage: {
     width: 58,
@@ -1332,21 +1249,21 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     marginBottom: 10,
-    width: "100%",
+    width: '100%',
   },
   assistantMessageRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     gap: 8,
   },
   profileCircle: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#FEF5E7",
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
+    backgroundColor: '#FEF5E7',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
   profileImage: {
     width: 32,
@@ -1357,105 +1274,105 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   nickname: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   bubbleWithTime: {
-    flexDirection: "row",
-    alignItems: "flex-end",
+    flexDirection: 'row',
+    alignItems: 'flex-end',
     gap: 6,
   },
   assistantBubble: {
-    alignSelf: "flex-start",
-    backgroundColor: "#FFF",
+    alignSelf: 'flex-start',
+    backgroundColor: '#FFF',
     padding: 12,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
     borderBottomLeftRadius: 10,
-    maxWidth: "80%",
+    maxWidth: '80%',
   },
   assistantBubbleText: {
-    color: "#34495E",
-    fontFamily: "Pretendard",
+    color: '#34495E',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   userBubbleContainer: {
-    alignSelf: "flex-end",
-    flexDirection: "row",
-    alignItems: "flex-end",
+    alignSelf: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
     gap: 6,
   },
   userBubble: {
-    alignSelf: "flex-end",
-    backgroundColor: "#9DFFE0",
+    alignSelf: 'flex-end',
+    backgroundColor: '#9DFFE0',
     padding: 12,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 0,
     borderBottomRightRadius: 10,
     borderBottomLeftRadius: 10,
-    maxWidth: "80%",
+    maxWidth: '80%',
   },
   userText: {
-    color: "#34495E",
-    fontFamily: "Pretendard",
+    color: '#34495E',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   timestamp: {
-    color: "#FFFFFF",
-    fontFamily: "Pretendard",
+    color: '#FFFFFF',
+    fontFamily: 'Pretendard',
     fontSize: 10,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 12,
     marginBottom: 2,
   },
   loadingContainer: {
-    alignItems: "center",
+    alignItems: 'center',
     gap: 12,
     paddingVertical: 20,
   },
   loadingText: {
     fontSize: 14,
-    color: "#FFF",
+    color: '#FFF',
   },
   // Continue 버튼 - 하단 고정
   fixedContinueContainer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     height: 90,
     paddingBottom: 20,
-    backgroundColor: "rgba(22,32,40,0.9)",
+    backgroundColor: 'rgba(22,32,40,0.9)',
     zIndex: 1000,
     elevation: 1000,
   },
   fixedContinueButton: {
-    width: "90%",
+    width: '90%',
     height: 50,
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
     borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   fixedContinueButtonDisabled: {
-    backgroundColor: "#B0B0B0",
+    backgroundColor: '#B0B0B0',
   },
   fixedContinueText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 });

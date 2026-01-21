@@ -1,25 +1,16 @@
-import QuestMiniModal from "@/components/quest-mini-modal";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Images } from "@/constants/images";
-import { pointsApi, questApi, type Quest } from "@/services/api";
-import { useQuestStore } from "@/store/useQuestStore";
-import Constants from "expo-constants";
-import { LinearGradient } from "expo-linear-gradient";
-import * as Location from "expo-location";
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import QuestMiniModal from '@/components/quest-mini-modal';
+import { Images } from '@/constants/images';
+import { pointsApi, questApi, type Quest } from '@/services/api';
+import { useQuestStore } from '@/store/useQuestStore';
+import { ThemedText, ThemedView } from '@shared/ui';
+import Constants from 'expo-constants';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Location from 'expo-location';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
 
-import { useFocusEffect } from "@react-navigation/native";
-import {
-  ActivityIndicator,
-  Image,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { useFocusEffect } from '@react-navigation/native';
+import { ActivityIndicator, Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, {
   Defs,
   G,
@@ -27,8 +18,8 @@ import Svg, {
   RadialGradient,
   Stop,
   LinearGradient as SvgLinearGradient,
-} from "react-native-svg";
-import { WebView } from "react-native-webview";
+} from 'react-native-svg';
+import { WebView } from 'react-native-webview';
 
 export default function MapScreen() {
   const params = useLocalSearchParams();
@@ -36,11 +27,8 @@ export default function MapScreen() {
   const [error, setError] = useState<string | null>(null);
   const [quests, setQuests] = useState<Quest[]>([]);
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
-  const { selectedQuests, removeQuest, startQuest, endQuest, reorderQuests } =
-    useQuestStore();
-  const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(
-    null
-  );
+  const { selectedQuests, removeQuest, startQuest, endQuest, reorderQuests } = useQuestStore();
+  const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(null);
   const [userLocation, setUserLocation] = useState<{
     latitude: number;
     longitude: number;
@@ -49,9 +37,7 @@ export default function MapScreen() {
   const [userMint, setUserMint] = useState<number>(0);
   const [showStartModal, setShowStartModal] = useState(false);
   const webViewRef = useRef<WebView>(null);
-  const locationSubscription = useRef<Location.LocationSubscription | null>(
-    null
-  );
+  const locationSubscription = useRef<Location.LocationSubscription | null>(null);
   const kakaoMapJsKey = Constants.expoConfig?.extra?.kakaoMapJsKey;
   const kakaoRestApiKey = Constants.expoConfig?.extra?.kakaoRestApiKey;
 
@@ -94,7 +80,7 @@ export default function MapScreen() {
   useFocusEffect(
     React.useCallback(() => {
       fetchUserPoints();
-    }, [])
+    }, []),
   );
 
   const fetchUserPoints = async () => {
@@ -107,21 +93,16 @@ export default function MapScreen() {
   };
 
   // Calculate distance between two coordinates using Haversine formula
-  const calculateDistance = (
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ): number => {
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Earth's radius in kilometers
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
     const dLon = ((lon2 - lon1) * Math.PI) / 180;
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c;
     return distance;
@@ -132,18 +113,18 @@ export default function MapScreen() {
     startLat: number,
     startLng: number,
     endLat: number,
-    endLng: number
+    endLng: number,
   ) => {
     try {
       const response = await fetch(
         `https://apis-navi.kakaomobility.com/v1/directions?origin=${startLng},${startLat}&destination=${endLng},${endLat}&priority=RECOMMEND&car_fuel=GASOLINE&car_hipass=false&alternatives=false&road_details=false`,
         {
-          method: "GET",
+          method: 'GET',
           headers: {
             Authorization: `KakaoAK ${kakaoRestApiKey}`,
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -243,9 +224,7 @@ export default function MapScreen() {
         // 선택된 퀘스트만 표시
         webViewRef.current.injectJavaScript(`
           if (typeof showSelectedQuestsOnly === 'function') {
-            showSelectedQuestsOnly(${JSON.stringify(
-          selectedIds
-        )}, ${JSON.stringify(slotNumbers)});
+            showSelectedQuestsOnly(${JSON.stringify(selectedIds)}, ${JSON.stringify(slotNumbers)});
           }
           true;
         `);
@@ -256,7 +235,7 @@ export default function MapScreen() {
             userLocation.latitude,
             userLocation.longitude,
             firstQuest.latitude,
-            firstQuest.longitude
+            firstQuest.longitude,
           );
 
           // 기존 경로 제거
@@ -274,7 +253,7 @@ export default function MapScreen() {
                 userLocation.latitude,
                 userLocation.longitude,
                 firstQuest.latitude,
-                firstQuest.longitude
+                firstQuest.longitude,
               );
 
               if (routeCoordinates && routeCoordinates.length > 0) {
@@ -375,8 +354,8 @@ export default function MapScreen() {
     try {
       // 위치 권한 요청
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setError("Location permission denied.");
+      if (status !== 'granted') {
+        setError('Location permission denied.');
         return;
       }
 
@@ -411,10 +390,10 @@ export default function MapScreen() {
               true;
             `);
           }
-        }
+        },
       );
     } catch (err) {
-      setError("Failed to get location.");
+      setError('Failed to get location.');
     }
   };
 
@@ -423,7 +402,7 @@ export default function MapScreen() {
       const questList = await questApi.getQuestList();
       setQuests(questList);
     } catch (err) {
-      setError("Failed to load quest data.");
+      setError('Failed to load quest data.');
     }
   };
 
@@ -1010,12 +989,8 @@ export default function MapScreen() {
       <ThemedView style={styles.container}>
         <ThemedView style={styles.errorContainer}>
           <ThemedText type="title">Error</ThemedText>
-          <ThemedText style={styles.errorText}>
-            Kakao Map API Key is not configured.
-          </ThemedText>
-          <ThemedText style={styles.errorText}>
-            Please check your .env file.
-          </ThemedText>
+          <ThemedText style={styles.errorText}>Kakao Map API Key is not configured.</ThemedText>
+          <ThemedText style={styles.errorText}>Please check your .env file.</ThemedText>
         </ThemedView>
       </ThemedView>
     );
@@ -1027,18 +1002,9 @@ export default function MapScreen() {
       <View style={styles.fullHeader}>
         {/* 검색 + walk + mint */}
         <View style={styles.topRow}>
-          <Pressable
-            style={{ flex: 1 }}
-            onPress={() => router.push("/(tabs)/map/search")}
-          >
+          <Pressable style={{ flex: 1 }} onPress={() => router.push('/(tabs)/map/search')}>
             <View style={styles.searchBox}>
-              <Svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                style={styles.searchIcon}
-              >
+              <Svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={styles.searchIcon}>
                 <Path
                   d="M15.1753 4.32863C14.0003 3.15758 12.4092 2.5 10.7504 2.5C9.0916 2.5 7.50043 3.15758 6.32546 4.32863C5.41627 5.23994 4.80963 6.40903 4.58797 7.67716C4.3663 8.94528 4.54037 10.251 5.08648 11.4167L2.68227 13.8212C2.47232 14.015 2.30371 14.2492 2.18654 14.5098C2.06937 14.7704 2.00605 15.052 2.00041 15.3377C1.99478 15.6234 2.04692 15.9072 2.15373 16.1722C2.26053 16.4372 2.4198 16.6779 2.62195 16.8798C2.82409 17.0817 3.06493 17.2407 3.33004 17.3472C3.59516 17.4537 3.87908 17.5055 4.16471 17.4995C4.45035 17.4935 4.73181 17.4299 4.99223 17.3124C5.25265 17.1948 5.48665 17.0259 5.68016 16.8157L8.08438 14.4112C8.91749 14.8022 9.82643 15.0049 10.7467 15.005C11.5694 15.0046 12.3839 14.8415 13.1433 14.525C13.9027 14.2086 14.592 13.745 15.1716 13.1611C16.3425 11.986 17 10.3946 17 8.73562C17 7.07663 16.3425 5.48528 15.1716 4.31017L15.1753 4.32863ZM14.4157 10.2697C14.0402 11.1836 13.3381 11.9251 12.4462 12.3498C11.5543 12.7746 10.5362 12.8523 9.59014 12.5678C8.64407 12.2834 7.83768 11.6571 7.3278 10.8109C6.81793 9.96461 6.64105 8.95894 6.83163 7.98949C7.0222 7.02004 7.56657 6.15612 8.35882 5.5659C9.15107 4.97569 10.1345 4.70136 11.1179 4.79628C12.1012 4.89119 13.0141 5.34861 13.6788 6.07947C14.3436 6.81032 14.7127 7.76238 14.7144 8.75038C14.7151 9.27151 14.6136 9.78766 14.4157 10.2697Z"
                   fill="#34495E"
@@ -1106,13 +1072,7 @@ export default function MapScreen() {
           </Pressable>
 
           {/* Filter Icon */}
-          <Svg
-            width="30"
-            height="30"
-            viewBox="0 0 30 30"
-            fill="none"
-            style={styles.filterIcon}
-          >
+          <Svg width="30" height="30" viewBox="0 0 30 30" fill="none" style={styles.filterIcon}>
             <Path
               d="M26.5625 15H11.1188M5.6675 15H3.4375M5.6675 15C5.6675 14.2773 5.9546 13.5842 6.46563 13.0731C6.97667 12.5621 7.66979 12.275 8.3925 12.275C9.11522 12.275 9.80833 12.5621 10.3194 13.0731C10.8304 13.5842 11.1175 14.2773 11.1175 15C11.1175 15.7227 10.8304 16.4158 10.3194 16.9269C9.80833 17.4379 9.11522 17.725 8.3925 17.725C7.66979 17.725 6.97667 17.4379 6.46563 16.9269C5.9546 16.4158 5.6675 15.7227 5.6675 15ZM26.5625 23.2587H19.3775M19.3775 23.2587C19.3775 23.9816 19.0897 24.6755 18.5786 25.1867C18.0674 25.6978 17.3741 25.985 16.6513 25.985C15.9285 25.985 15.2354 25.6966 14.7244 25.1856C14.2133 24.6746 13.9262 23.9815 13.9262 23.2587M19.3775 23.2587C19.3775 22.5359 19.0897 21.8432 18.5786 21.3321C18.0674 20.8209 17.3741 20.5337 16.6513 20.5337C15.9285 20.5337 15.2354 20.8208 14.7244 21.3319C14.2133 21.8429 13.9262 22.536 13.9262 23.2587M13.9262 23.2587H3.4375M26.5625 6.74124H22.6813M17.23 6.74124H3.4375M17.23 6.74124C17.23 6.01852 17.5171 5.32541 18.0281 4.81437C18.5392 4.30333 19.2323 4.01624 19.955 4.01624C20.3129 4.01624 20.6672 4.08672 20.9978 4.22366C21.3284 4.36061 21.6288 4.56133 21.8819 4.81437C22.1349 5.06741 22.3356 5.36781 22.4726 5.69842C22.6095 6.02904 22.68 6.38338 22.68 6.74124C22.68 7.09909 22.6095 7.45344 22.4726 7.78405C22.3356 8.11466 22.1349 8.41506 21.8819 8.6681C21.6288 8.92114 21.3284 9.12186 20.9978 9.25881C20.6672 9.39575 20.3129 9.46623 19.955 9.46623C19.2323 9.46623 18.5392 9.17914 18.0281 8.6681C17.5171 8.15706 17.23 7.46395 17.23 6.74124Z"
               stroke="white"
@@ -1145,30 +1105,18 @@ export default function MapScreen() {
         </View>
       </View>
 
-      <View style={[
-        styles.questTooltip,
-        isQuestActive && { borderBottomColor: '#FF7F50' }
-      ]}>
+      <View style={[styles.questTooltip, isQuestActive && { borderBottomColor: '#FF7F50' }]}>
         {/* Explore Mode / Quest Mode 라벨 */}
         <View style={styles.exploreModeLabel}>
-          <Text
-            style={[
-              styles.exploreModeLabelText,
-              isQuestActive && { color: "#FF7F50" },
-            ]}
-          >
-            {isQuestActive ? "Quest Mode" : "Explore Mode"}
+          <Text style={[styles.exploreModeLabelText, isQuestActive && { color: '#FF7F50' }]}>
+            {isQuestActive ? 'Quest Mode' : 'Explore Mode'}
           </Text>
         </View>
 
         {/* 콘텐츠 영역: 호랑이(왼쪽) + 텍스트(오른쪽) */}
         <View style={styles.questContentRow}>
           {/* 호랑이 이미지 */}
-          <Image
-            source={Images.horangFace}
-            style={styles.horangFaceImage}
-            resizeMode="contain"
-          />
+          <Image source={Images.horangFace} style={styles.horangFaceImage} resizeMode="contain" />
 
           {/* 텍스트 컨텐츠 */}
           <View style={styles.questTextContent}>
@@ -1179,18 +1127,14 @@ export default function MapScreen() {
                   userLocation.latitude,
                   userLocation.longitude,
                   firstQuest.latitude,
-                  firstQuest.longitude
+                  firstQuest.longitude,
                 );
 
                 if (distance > 10) {
                   return (
                     <>
-                      <Text style={styles.questTitle}>
-                        Oh No! I can&apos;t find you
-                      </Text>
-                      <Text style={styles.questDesc}>
-                        Please move near to the marker
-                      </Text>
+                      <Text style={styles.questTitle}>Oh No! I can&apos;t find you</Text>
+                      <Text style={styles.questDesc}>Please move near to the marker</Text>
                     </>
                   );
                 }
@@ -1198,9 +1142,7 @@ export default function MapScreen() {
                 if (distance <= 1) {
                   return (
                     <>
-                      <Text style={styles.questTitle}>
-                        You&apos;re Almost There!
-                      </Text>
+                      <Text style={styles.questTitle}>You&apos;re Almost There!</Text>
                       <Text style={styles.questDesc}>
                         You can now chat with Quest Mode AI Docent
                       </Text>
@@ -1210,12 +1152,9 @@ export default function MapScreen() {
 
                 return (
                   <>
-                    <Text style={styles.questTitle}>
-                      You&apos;re now at my sight!
-                    </Text>
+                    <Text style={styles.questTitle}>You&apos;re now at my sight!</Text>
                     <Text style={styles.questDesc}>
-                      Follow the route I show you. You&apos;re headed to your
-                      1st Quest.
+                      Follow the route I show you. You&apos;re headed to your 1st Quest.
                     </Text>
                   </>
                 );
@@ -1224,7 +1163,7 @@ export default function MapScreen() {
               <>
                 <Text style={styles.questTitle}>Add to your Quest List!</Text>
                 <Text style={styles.questDesc}>
-                  Touch the marker in the map{"\n"}I&apos;ll show you the detail
+                  Touch the marker in the map{'\n'}I&apos;ll show you the detail
                 </Text>
               </>
             )}
@@ -1242,7 +1181,7 @@ export default function MapScreen() {
             userLocation.latitude,
             userLocation.longitude,
             firstQuest.latitude,
-            firstQuest.longitude
+            firstQuest.longitude,
           );
           return distance <= 1;
         })() && (
@@ -1250,7 +1189,7 @@ export default function MapScreen() {
             style={styles.aiDocentButton}
             onPress={() => {
               // AI Docent 화면으로 이동
-              router.push("/travel-plan");
+              router.push('/travel-plan');
             }}
           >
             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -1259,9 +1198,7 @@ export default function MapScreen() {
                 fill="white"
               />
             </Svg>
-            <Text style={styles.aiDocentButtonText}>
-              Start QuestMode AI Docent
-            </Text>
+            <Text style={styles.aiDocentButtonText}>Start QuestMode AI Docent</Text>
             <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <Path
                 d="M9.39415 16.9275C9.31897 17.007 9.26019 17.1006 9.22118 17.2029C9.18216 17.3052 9.16368 17.4141 9.16677 17.5235C9.16987 17.6329 9.19448 17.7407 9.23922 17.8406C9.28395 17.9405 9.34792 18.0306 9.42748 18.1058C9.50704 18.181 9.60063 18.2397 9.7029 18.2788C9.80518 18.3178 9.91413 18.3363 10.0236 18.3332C10.133 18.3301 10.2407 18.3055 10.3406 18.2607C10.4405 18.216 10.5306 18.152 10.6058 18.0725L17.6891 10.5725C17.8354 10.4177 17.9169 10.2129 17.9169 9.99996C17.9169 9.78703 17.8354 9.58218 17.6891 9.42746L10.6058 1.92662C10.5311 1.84532 10.441 1.77967 10.3408 1.73348C10.2405 1.6873 10.132 1.66149 10.0217 1.65757C9.91138 1.65366 9.80137 1.6717 9.69808 1.71065C9.59478 1.74961 9.50025 1.8087 9.41998 1.88449C9.33972 1.96029 9.27531 2.05128 9.2305 2.15217C9.1857 2.25307 9.16139 2.36187 9.15899 2.47224C9.15658 2.58261 9.17613 2.69236 9.2165 2.79511C9.25687 2.89787 9.31726 2.99157 9.39415 3.07079L15.9375 9.99996L9.39415 16.9275Z"
@@ -1273,7 +1210,7 @@ export default function MapScreen() {
 
       <WebView
         ref={webViewRef}
-        originWhitelist={["*"]}
+        originWhitelist={['*']}
         source={{ html: kakaoMapHTML }}
         style={styles.webview}
         javaScriptEnabled={true}
@@ -1301,9 +1238,9 @@ export default function MapScreen() {
         onMessage={(event) => {
           try {
             const data = JSON.parse(event.nativeEvent.data);
-            if (data.type === "error") {
+            if (data.type === 'error') {
               setError(data.message);
-            } else if (data.type === "questClick") {
+            } else if (data.type === 'questClick') {
               openQuestModal(data.quest);
             }
           } catch (e) {
@@ -1313,10 +1250,7 @@ export default function MapScreen() {
       />
 
       {selectedQuest && (
-        <QuestMiniModal
-          quest={selectedQuest}
-          onClose={() => setSelectedQuest(null)}
-        />
+        <QuestMiniModal quest={selectedQuest} onClose={() => setSelectedQuest(null)} />
       )}
 
       {loading && (
@@ -1337,14 +1271,10 @@ export default function MapScreen() {
         <Pressable
           style={styles.mapSmallButton}
           onPress={() => {
-            router.push("/(tabs)/find/quest-recommendation");
+            router.push('/(tabs)/find/quest-recommendation');
           }}
         >
-          <Image
-            source={Images.mapSmall}
-            style={styles.mapSmallButtonImage}
-            resizeMode="contain"
-          />
+          <Image source={Images.mapSmall} style={styles.mapSmallButtonImage} resizeMode="contain" />
         </Pressable>
       </View>
 
@@ -1366,22 +1296,11 @@ export default function MapScreen() {
         >
           <Svg width="48" height="48" viewBox="0 0 48 48" fill="none">
             <Defs>
-              <RadialGradient
-                id="paint0_radial_72_5040"
-                cx="0.5"
-                cy="0.5"
-                r="0.5"
-              >
+              <RadialGradient id="paint0_radial_72_5040" cx="0.5" cy="0.5" r="0.5">
                 <Stop offset="0" stopColor="white" />
                 <Stop offset="1" stopColor="white" stopOpacity="0.85" />
               </RadialGradient>
-              <SvgLinearGradient
-                id="paint1_linear_72_5040"
-                x1="0.5"
-                y1="0"
-                x2="0.5"
-                y2="1"
-              >
+              <SvgLinearGradient id="paint1_linear_72_5040" x1="0.5" y1="0" x2="0.5" y2="1">
                 <Stop offset="0" stopColor="#659DF2" />
                 <Stop offset="1" stopColor="#659DF2" stopOpacity="0.85" />
               </SvgLinearGradient>
@@ -1409,7 +1328,7 @@ export default function MapScreen() {
       {/* Bottom Route Selection Bar */}
       <View style={styles.routeContainer} pointerEvents="box-none">
         <LinearGradient
-          colors={["#FF7F50", "#994C30"]}
+          colors={['#FF7F50', '#994C30']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.routeBar}
@@ -1466,18 +1385,13 @@ export default function MapScreen() {
                     handleLongPress();
                   }}
                   delayLongPress={200}
-                  style={[
-                    styles.questSlot,
-                    isSelected && styles.questSlotSelected,
-                  ]}
+                  style={[styles.questSlot, isSelected && styles.questSlotSelected]}
                 >
                   {quest ? (
                     <View style={styles.slotImageContainer}>
                       <Image
                         source={{
-                          uri:
-                            quest.place_image_url ||
-                            "https://picsum.photos/58/60",
+                          uri: quest.place_image_url || 'https://picsum.photos/58/60',
                         }}
                         style={styles.slotQuestImage}
                       />
@@ -1488,12 +1402,7 @@ export default function MapScreen() {
                       )}
                       {quest && (
                         <View style={styles.slotRemoveIconContainer}>
-                          <Svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 12 12"
-                            fill="none"
-                          >
+                          <Svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                             <Path
                               d="M10.0322 11.6485L5.99158 7.60793L1.95097 11.6485C1.73664 11.8629 1.44595 11.9833 1.14285 11.9833C0.83974 11.9833 0.549051 11.8629 0.334723 11.6485C0.120396 11.4342 -1.2327e-05 11.1435 -1.19898e-05 10.8404C-1.2327e-05 10.5373 0.120396 10.2466 0.334724 10.0323L4.37533 5.99169L0.334723 1.95108C0.120395 1.73675 -1.20741e-05 1.44606 -1.23692e-05 1.14296C-1.20004e-05 0.83985 0.120395 0.549161 0.334723 0.334833C0.54905 0.120505 0.83974 9.80094e-05 1.14284 9.79777e-05C1.44595 9.79356e-05 1.73664 0.120506 1.95097 0.334833L5.99158 4.37544L10.0322 0.334833C10.2465 0.120506 10.5372 9.75563e-05 10.8403 9.75984e-05C11.1434 9.76248e-05 11.4341 0.120505 11.6484 0.334833C11.8628 0.549161 11.9832 0.83985 11.9832 1.14295C11.9832 1.44606 11.8628 1.73675 11.6484 1.95108L7.60782 5.99169L11.6484 10.0323C11.8628 10.2466 11.9832 10.5373 11.9832 10.8404C11.9832 11.1435 11.8628 11.4342 11.6484 11.6485C11.4341 11.8629 11.1434 11.9833 10.8403 11.9833C10.5372 11.9833 10.2465 11.8629 10.0322 11.6485Z"
                               fill="white"
@@ -1517,10 +1426,7 @@ export default function MapScreen() {
           </Pressable>
 
           <Pressable
-            style={[
-              styles.startButton,
-              selectedQuests.length > 0 && styles.startButtonActive,
-            ]}
+            style={[styles.startButton, selectedQuests.length > 0 && styles.startButtonActive]}
             onPress={() => {
               if (selectedQuests.length > 0) {
                 if (isQuestActive) {
@@ -1554,7 +1460,7 @@ export default function MapScreen() {
                 selectedQuests.length > 0 && styles.startButtonTextActive,
               ]}
             >
-              {isQuestActive ? "QUIT?" : "START"}
+              {isQuestActive ? 'QUIT?' : 'START'}
             </Text>
           </Pressable>
         </LinearGradient>
@@ -1567,29 +1473,18 @@ export default function MapScreen() {
         animationType="fade"
         onRequestClose={() => setShowStartModal(false)}
       >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setShowStartModal(false)}
-        >
-          <Pressable
-            style={styles.modalContent}
-            onPress={(e) => e.stopPropagation()}
-          >
+        <Pressable style={styles.modalOverlay} onPress={() => setShowStartModal(false)}>
+          <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
             {/* Tiger Icon */}
-            <Image
-              source={Images.main2}
-              style={styles.modalTigerIcon}
-              resizeMode="contain"
-            />
+            <Image source={Images.main2} style={styles.modalTigerIcon} resizeMode="contain" />
 
             {/* Title */}
             <Text style={styles.modalTitle}>Start the Quest Mode?</Text>
 
             {/* Main Description */}
             <Text style={styles.modalSubtitle}>
-              Do you agree to allow us to use your GPS location for the Quest
-              Mode and to collect this data for the purpose of improving the
-              tourism experience?
+              Do you agree to allow us to use your GPS location for the Quest Mode and to collect
+              this data for the purpose of improving the tourism experience?
             </Text>
 
             {/* Privacy Details */}
@@ -1597,34 +1492,31 @@ export default function MapScreen() {
               <Text style={styles.modalPrivacyText}>
                 <Text style={styles.modalPrivacyBold}>Purpose: </Text>
                 <Text style={styles.modalPrivacyRegular}>
-                  Your location will be used to guide you to nearby quest
-                  locations, provide tailored recommendations, and analyze
-                  tourism behavior patterns to improve the service.
+                  Your location will be used to guide you to nearby quest locations, provide
+                  tailored recommendations, and analyze tourism behavior patterns to improve the
+                  service.
                 </Text>
               </Text>
               <Text style={styles.modalPrivacyText}>
                 <Text style={styles.modalPrivacyBold}>Data Sharing: </Text>
                 <Text style={styles.modalPrivacyRegular}>
-                  In order to improve the overall experience, your location data
-                  may be shared with trusted partners for analysis and research
-                  purposes (e.g., visitor behavior analysis).
+                  In order to improve the overall experience, your location data may be shared with
+                  trusted partners for analysis and research purposes (e.g., visitor behavior
+                  analysis).
                 </Text>
               </Text>
               <Text style={styles.modalPrivacyText}>
                 <Text style={styles.modalPrivacyBold}>Privacy Policy: </Text>
                 <Text style={styles.modalPrivacyRegular}>
-                  For detailed information on how your data will be handled,
-                  please review our [Privacy Policy].
+                  For detailed information on how your data will be handled, please review our
+                  [Privacy Policy].
                 </Text>
               </Text>
             </View>
 
             {/* Action Buttons */}
             <View style={styles.modalActions}>
-              <Pressable
-                style={styles.modalCancelButton}
-                onPress={() => setShowStartModal(false)}
-              >
+              <Pressable style={styles.modalCancelButton} onPress={() => setShowStartModal(false)}>
                 <Svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                   <Path
                     fillRule="evenodd"
@@ -1648,7 +1540,7 @@ export default function MapScreen() {
                       userLocation.latitude,
                       userLocation.longitude,
                       firstQuest.latitude,
-                      firstQuest.longitude
+                      firstQuest.longitude,
                     );
 
                     // 위치 정보 수집 (1km 이내일 때만)
@@ -1677,15 +1569,14 @@ export default function MapScreen() {
                       webViewRef.current.injectJavaScript(`
                         if (typeof showSelectedQuestsOnly === 'function') {
                           showSelectedQuestsOnly(${JSON.stringify(
-                        selectedIds
-                      )}, ${JSON.stringify(slotNumbers)});
+                            selectedIds,
+                          )}, ${JSON.stringify(slotNumbers)});
                         }
                         true;
                       `);
                     }
 
                     if (distance <= 10) {
-
                       // Fetch and draw walking route from API
                       if (webViewRef.current && userLocation) {
                         (async () => {
@@ -1693,7 +1584,7 @@ export default function MapScreen() {
                             userLocation.latitude,
                             userLocation.longitude,
                             firstQuest.latitude,
-                            firstQuest.longitude
+                            firstQuest.longitude,
                           );
 
                           if (routeCoordinates && routeCoordinates.length > 0) {
@@ -1726,9 +1617,7 @@ export default function MapScreen() {
                 }}
               >
                 <Text style={styles.modalConfirmTextBold}>Agree, </Text>
-                <Text style={styles.modalConfirmTextRegular}>
-                  Start Quest Mode
-                </Text>
+                <Text style={styles.modalConfirmTextRegular}>Start Quest Mode</Text>
               </Pressable>
             </View>
           </Pressable>
@@ -1746,42 +1635,42 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   loadingContainer: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
   },
   loadingText: {
     marginTop: 12,
   },
   errorContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
   },
   errorOverlay: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 20,
     left: 20,
     right: 20,
     padding: 16,
-    backgroundColor: "rgba(255, 0, 0, 0.1)",
+    backgroundColor: 'rgba(255, 0, 0, 0.1)',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "rgba(255, 0, 0, 0.3)",
+    borderColor: 'rgba(255, 0, 0, 0.3)',
   },
   errorText: {
     marginTop: 8,
-    textAlign: "center",
+    textAlign: 'center',
   },
   // Map small button styles
   mapSmallButtonContainer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 175, // 117px (location button bottom) + 48px (button height) + 10px (gap)
     right: 20,
     zIndex: 1001,
@@ -1790,8 +1679,8 @@ const styles = StyleSheet.create({
   mapSmallButton: {
     width: 48,
     height: 48,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   mapSmallButtonImage: {
     width: 48,
@@ -1799,7 +1688,7 @@ const styles = StyleSheet.create({
   },
   // Current location button styles
   locationButtonContainer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 117, // 73px (bar height) + 30px (bottom margin) + 14px (gap)
     right: 20,
     zIndex: 1001,
@@ -1808,8 +1697,8 @@ const styles = StyleSheet.create({
   locationButton: {
     width: 48,
     height: 48,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   locationButtonIcon: {
     width: 48,
@@ -1817,11 +1706,11 @@ const styles = StyleSheet.create({
   },
   // New compact route bar styles
   routeContainer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 30,
     left: 0,
     right: 0,
-    alignItems: "center",
+    alignItems: 'center',
     zIndex: 1600,
     elevation: 1600,
   },
@@ -1831,50 +1720,50 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 8.68,
     paddingVertical: 6.5,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 4.82,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 8,
   },
   questSlotsContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 4.82,
   },
   questSlot: {
     width: 58,
     height: 60,
-    backgroundColor: "#EF6A39",
+    backgroundColor: '#EF6A39',
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 2,
     elevation: 4,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   questSlotSelected: {
-    backgroundColor: "#FF9B7A", // 꾸욱 누르면 색이 약간 진하게
+    backgroundColor: '#FF9B7A', // 꾸욱 누르면 색이 약간 진하게
     borderWidth: 2,
-    borderColor: "#FF7F50",
-    shadowColor: "#FF7F50",
+    borderColor: '#FF7F50',
+    shadowColor: '#FF7F50',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.4,
     shadowRadius: 4,
     elevation: 6,
   },
   questSlotFilled: {
-    backgroundColor: "#EF6A39",
+    backgroundColor: '#EF6A39',
   },
   slotImageContainer: {
     width: 58,
     height: 60,
-    position: "relative",
+    position: 'relative',
   },
   slotQuestImage: {
     width: 58,
@@ -1882,79 +1771,79 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   slotNumberContainer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 4,
     right: 4,
-    backgroundColor: "rgba(239, 106, 57, 0.9)",
+    backgroundColor: 'rgba(239, 106, 57, 0.9)',
     borderRadius: 8,
     width: 16,
     height: 16,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: "#fff",
+    borderColor: '#fff',
   },
   slotNumber: {
     fontSize: 10,
-    fontWeight: "700",
-    color: "#fff",
-    textAlign: "center",
+    fontWeight: '700',
+    color: '#fff',
+    textAlign: 'center',
     lineHeight: 10,
   },
   slotRemoveIconContainer: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
     transform: [{ translateX: -6 }, { translateY: -6 }],
     width: 12,
     height: 12,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   slotPlusIcon: {
     fontSize: 32,
-    fontWeight: "300",
-    color: "#fff",
-    textAlign: "center",
+    fontWeight: '300',
+    color: '#fff',
+    textAlign: 'center',
     lineHeight: 32,
   },
   slotPlusImage: {
     width: 58,
     height: 60,
     borderRadius: 10,
-    textShadowColor: "rgba(0, 0, 0, 0.25)",
+    textShadowColor: 'rgba(0, 0, 0, 0.25)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 1,
   },
   startButton: {
     width: 58,
     height: 60,
-    backgroundColor: "#EF6A39",
+    backgroundColor: '#EF6A39',
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 2,
     elevation: 4,
   },
   startButtonActive: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
   },
   startButtonText: {
     fontSize: 14,
-    fontWeight: "500",
-    color: "rgba(154, 77, 49, 0.46)",
-    textAlign: "center",
+    fontWeight: '500',
+    color: 'rgba(154, 77, 49, 0.46)',
+    textAlign: 'center',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
   startButtonTextActive: {
-    color: "#EF6A39",
-    fontFamily: "Inter",
+    color: '#EF6A39',
+    fontFamily: 'Inter',
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
@@ -1962,12 +1851,12 @@ const styles = StyleSheet.create({
    FULL HEADER
 ------------------------*/
   fullHeader: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     height: 168,
-    backgroundColor: "#659DF2",
+    backgroundColor: '#659DF2',
     paddingTop: 60,
     paddingBottom: 20,
     paddingHorizontal: 10,
@@ -1979,29 +1868,29 @@ const styles = StyleSheet.create({
    TOP ROW (search + walk + mint)
 ------------------------*/
   topRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
   },
 
   searchBox: {
-    display: "flex",
+    display: 'flex',
     flex: 1,
     height: 47,
     padding: 10,
-    alignItems: "center",
+    alignItems: 'center',
     gap: 5,
     borderRadius: 10,
-    backgroundColor: "#FFF",
-    flexDirection: "row",
+    backgroundColor: '#FFF',
+    flexDirection: 'row',
   },
   searchIcon: {},
   searchText: {
-    color: "rgba(52, 73, 94, 0.55)",
-    fontFamily: "Inter",
+    color: 'rgba(52, 73, 94, 0.55)',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontStyle: "normal",
-    fontWeight: "500",
+    fontStyle: 'normal',
+    fontWeight: '500',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
@@ -2009,49 +1898,49 @@ const styles = StyleSheet.create({
   walkBox: {
     width: 76,
     height: 47,
-    backgroundColor: "#4888D3",
+    backgroundColor: '#4888D3',
     borderRadius: 10,
     padding: 10,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
   },
 
   mintBox: {
     width: 76,
     height: 47,
-    backgroundColor: "#76C7AD",
+    backgroundColor: '#76C7AD',
     borderRadius: 10,
     padding: 10,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
   },
 
   statColumn: {
     width: 26,
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
     gap: 2,
     flexShrink: 0,
   },
 
   statLabel: {
-    color: "#FFF",
-    textAlign: "center",
+    color: '#FFF',
+    textAlign: 'center',
     fontSize: 9,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 10,
     letterSpacing: 0,
   },
 
   statValue: {
-    color: "#FFF",
-    textAlign: "center",
+    color: '#FFF',
+    textAlign: 'center',
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 16,
     letterSpacing: 0,
   },
@@ -2069,8 +1958,8 @@ const styles = StyleSheet.create({
 ------------------------*/
   /* 필터 + 카테고리 (3개) */
   filterCategoryRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 14,
     gap: 5,
   },
@@ -2085,64 +1974,64 @@ const styles = StyleSheet.create({
 
   /* All Themes - Primary (Orange) */
   categoryChipPrimary: {
-    display: "flex",
+    display: 'flex',
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 42,
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
   },
 
   categoryTextPrimary: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   /* Nearest Trip - Secondary (White with blue text and icon) */
   categoryChipSecondary: {
-    display: "flex",
-    flexDirection: "row",
+    display: 'flex',
+    flexDirection: 'row',
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 4,
     borderRadius: 42,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
 
   categoryTextSecondary: {
-    color: "#659DF2",
-    fontFamily: "Pretendard",
+    color: '#659DF2',
+    fontFamily: 'Pretendard',
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   /* All Districts - Tertiary (White with border and blue text) */
   categoryChipTertiary: {
-    display: "flex",
+    display: 'flex',
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 42,
     borderWidth: 1,
-    borderColor: "#FFF",
-    backgroundColor: "#FFF",
+    borderColor: '#FFF',
+    backgroundColor: '#FFF',
   },
 
   categoryTextTertiary: {
-    color: "#659DF2",
-    fontFamily: "Pretendard",
+    color: '#659DF2',
+    fontFamily: 'Pretendard',
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
@@ -2151,7 +2040,7 @@ const styles = StyleSheet.create({
    QUEST TOOLTIP (Tiger Box)
 ---------------------------*/
   questTooltip: {
-    position: "absolute",
+    position: 'absolute',
     top: 190,
     left: 20,
     right: 20,
@@ -2160,9 +2049,9 @@ const styles = StyleSheet.create({
     gap: 20,
     borderRadius: 10,
     borderBottomWidth: 4,
-    borderBottomColor: "#659DF2",
-    backgroundColor: "rgba(254, 245, 231, 0.85)",
-    shadowColor: "#000",
+    borderBottomColor: '#659DF2',
+    backgroundColor: 'rgba(254, 245, 231, 0.85)',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -2171,32 +2060,32 @@ const styles = StyleSheet.create({
   },
 
   exploreModeLabel: {
-    position: "absolute",
+    position: 'absolute',
     top: 10,
     left: 10,
     padding: 5,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 42,
     borderWidth: 1,
-    borderColor: "#FFF",
-    backgroundColor: "#FFF",
+    borderColor: '#FFF',
+    backgroundColor: '#FFF',
     zIndex: 1,
   },
 
   exploreModeLabelText: {
-    color: "#659DF2",
-    textAlign: "right",
-    fontFamily: "Inter",
+    color: '#659DF2',
+    textAlign: 'right',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   questContentRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 15,
     marginTop: 34,
   },
@@ -2209,23 +2098,23 @@ const styles = StyleSheet.create({
 
   questTextContent: {
     flex: 1,
-    alignItems: "flex-start",
-    justifyContent: "center",
+    alignItems: 'flex-start',
+    justifyContent: 'center',
     gap: 4,
   },
 
   questTitle: {
-    color: "#4A90E2",
+    color: '#4A90E2',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 22,
     letterSpacing: -0.18,
   },
 
   questDesc: {
-    color: "#4A90E2",
+    color: '#4A90E2',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
@@ -2234,21 +2123,21 @@ const styles = StyleSheet.create({
    AI DOCENT BUTTON
 ---------------------------*/
   aiDocentButton: {
-    position: "absolute",
+    position: 'absolute',
     top: 330, // questTooltip 아래 80px
     left: 20,
     right: 20,
     height: 47,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     gap: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#659DF2",
-    backgroundColor: "rgba(101, 157, 242, 0.85)", // 85% opacity
-    shadowColor: "#000",
+    borderColor: '#659DF2',
+    backgroundColor: 'rgba(101, 157, 242, 0.85)', // 85% opacity
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -2258,32 +2147,32 @@ const styles = StyleSheet.create({
 
   aiDocentButtonText: {
     flex: 1,
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 14,
-    textAlign: "left", // 왼쪽 정렬
+    textAlign: 'left', // 왼쪽 정렬
   },
 
   // Modal styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modalContent: {
     width: 320,
     paddingHorizontal: 10,
     paddingTop: 40,
     paddingBottom: 20,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 20,
     borderRadius: 10,
-    backgroundColor: "#FEF5E7",
+    backgroundColor: '#FEF5E7',
   },
   modalTigerIcon: {
     width: 152,
@@ -2291,87 +2180,87 @@ const styles = StyleSheet.create({
     aspectRatio: 19 / 18,
   },
   modalTitle: {
-    color: "#4A90E2",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#4A90E2',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 24,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 36,
     letterSpacing: -0.18,
   },
   modalSubtitle: {
-    color: "#4A90E2",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#4A90E2',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
   modalPrivacyContainer: {
     gap: 10,
-    alignSelf: "stretch",
+    alignSelf: 'stretch',
   },
   modalPrivacyText: {
-    color: "#34495E",
-    fontFamily: "Pretendard",
+    color: '#34495E',
+    fontFamily: 'Pretendard',
     fontSize: 11,
     lineHeight: 14,
     letterSpacing: -0.16,
   },
   modalPrivacyBold: {
-    color: "#34495E",
-    fontFamily: "Pretendard",
+    color: '#34495E',
+    fontFamily: 'Pretendard',
     fontSize: 11,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 14,
     letterSpacing: -0.16,
   },
   modalPrivacyRegular: {
-    color: "#34495E",
-    fontFamily: "Pretendard",
+    color: '#34495E',
+    fontFamily: 'Pretendard',
     fontSize: 11,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 14,
     letterSpacing: -0.16,
   },
   modalActions: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 5,
-    alignSelf: "stretch",
+    alignSelf: 'stretch',
   },
   modalCancelButton: {
     width: 50,
     height: 50,
     padding: 10,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 41,
-    backgroundColor: "#659DF2",
+    backgroundColor: '#659DF2',
   },
   modalConfirmButton: {
     flex: 1,
     height: 50,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 35,
-    backgroundColor: "#FF7F50",
-    flexDirection: "row",
+    backgroundColor: '#FF7F50',
+    flexDirection: 'row',
   },
   modalConfirmTextBold: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   modalConfirmTextRegular: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "400",
+    fontWeight: '400',
   },
 });

@@ -1,28 +1,39 @@
-import { mapApi, pointsApi, questApi, type Quest } from "@/services/api";
-import { useQuestStore } from "@/store/useQuestStore";
-import { LinearGradient } from "expo-linear-gradient";
-import * as Location from "expo-location";
-import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import Svg, { Path } from "react-native-svg";
-import { Images } from "@/constants/images";
+import { mapApi, pointsApi, questApi, type Quest } from '@/services/api';
+import { useQuestStore } from '@/store/useQuestStore';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Location from 'expo-location';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import Svg, { Path } from 'react-native-svg';
+import { Images } from '@/constants/images';
 
-type SortByType = "nearest" | "rewarded" | "newest";
+type SortByType = 'nearest' | 'rewarded' | 'newest';
 
 export default function FindScreen() {
   const params = useLocalSearchParams();
   const { selectedQuests, addQuest, removeQuest, startQuest, reorderQuests } = useQuestStore();
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(null);
   const [userMint, setUserMint] = useState<number>(0);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Quest[]>([]);
   const [loading, setLoading] = useState(false);
-  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(
+    null,
+  );
 
-  const [selectedSort, setSelectedSort] = useState<SortByType>("nearest");
-  const [selectedThemes, setSelectedThemes] = useState<string[]>(["All Themes"]);
-  const [selectedDistricts, setSelectedDistricts] = useState<string[]>(["All Districts"]);
+  const [selectedSort, setSelectedSort] = useState<SortByType>('nearest');
+  const [selectedThemes, setSelectedThemes] = useState<string[]>(['All Themes']);
+  const [selectedDistricts, setSelectedDistricts] = useState<string[]>(['All Districts']);
 
   useEffect(() => {
     fetchUserPoints();
@@ -31,12 +42,12 @@ export default function FindScreen() {
 
   // Update filters when coming back from filter page
   useEffect(() => {
-    if (params.fromFilter === "true") {
+    if (params.fromFilter === 'true') {
       if (params.selectedThemes) {
-        setSelectedThemes((params.selectedThemes as string).split(","));
+        setSelectedThemes((params.selectedThemes as string).split(','));
       }
       if (params.selectedDistricts) {
-        setSelectedDistricts((params.selectedDistricts as string).split(","));
+        setSelectedDistricts((params.selectedDistricts as string).split(','));
       }
       if (params.selectedSort) {
         setSelectedSort(params.selectedSort as SortByType);
@@ -48,25 +59,24 @@ export default function FindScreen() {
     try {
       const data = await pointsApi.getPoints();
       setUserMint(data.total_points);
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   const getUserLocation = async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          setUserLocation({ latitude: 37.5665, longitude: 126.9780 });
+      if (status !== 'granted') {
+        setUserLocation({ latitude: 37.5665, longitude: 126.978 });
         return;
       }
 
       const location = await Location.getCurrentPositionAsync({});
       setUserLocation({
         latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        });
-      } catch (error) {
-        setUserLocation({ latitude: 37.5665, longitude: 126.9780 });
+        longitude: location.coords.longitude,
+      });
+    } catch (error) {
+      setUserLocation({ latitude: 37.5665, longitude: 126.978 });
     }
   };
 
@@ -83,14 +93,12 @@ export default function FindScreen() {
           radius_km: 50.0,
           limit: 100,
           sort_by: selectedSort,
-          categories: selectedThemes.includes("All Themes")
+          categories: selectedThemes.includes('All Themes')
             ? []
-            : selectedThemes.map(theme =>
-              theme === "Attractions" ? "Attraction" : theme
-            ),
-          districts: selectedDistricts.includes("All Districts")
+            : selectedThemes.map((theme) => (theme === 'Attractions' ? 'Attraction' : theme)),
+          districts: selectedDistricts.includes('All Districts')
             ? []
-            : selectedDistricts.map(d => d.replace("-district", "-gu")),
+            : selectedDistricts.map((d) => d.replace('-district', '-gu')),
         };
 
         const response = await questApi.getFilteredQuests(filterParams);
@@ -98,20 +106,21 @@ export default function FindScreen() {
         if (response && response.quests && Array.isArray(response.quests)) {
           // Client-side filtering by search query (only if search query exists)
           let filteredQuests = searchQuery.trim()
-            ? response.quests.filter(quest =>
-              quest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              quest.description?.toLowerCase().includes(searchQuery.toLowerCase())
-            )
+            ? response.quests.filter(
+                (quest) =>
+                  quest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  quest.description?.toLowerCase().includes(searchQuery.toLowerCase()),
+              )
             : response.quests;
 
           // Calculate distance if not provided by backend
-          filteredQuests = filteredQuests.map(quest => {
+          filteredQuests = filteredQuests.map((quest) => {
             if (quest.distance_km === undefined && quest.latitude && quest.longitude) {
               const distance = mapApi.calculateDistance(
                 userLocation.latitude,
                 userLocation.longitude,
                 quest.latitude,
-                quest.longitude
+                quest.longitude,
               );
               return { ...quest, distance_km: distance };
             }
@@ -139,11 +148,11 @@ export default function FindScreen() {
   }, [searchQuery, selectedThemes, selectedDistricts, selectedSort, userLocation]);
 
   const handleRefresh = () => {
-    setSearchQuery("");
+    setSearchQuery('');
     setSearchResults([]);
-    setSelectedThemes(["All Themes"]);
-    setSelectedSort("nearest");
-    setSelectedDistricts(["All Districts"]);
+    setSelectedThemes(['All Themes']);
+    setSelectedSort('nearest');
+    setSelectedDistricts(['All Districts']);
   };
 
   return (
@@ -153,13 +162,7 @@ export default function FindScreen() {
           {/* 검색 + walk + mint */}
           <View style={styles.topRow}>
             <View style={styles.searchBox}>
-              <Svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                style={styles.searchIcon}
-              >
+              <Svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={styles.searchIcon}>
                 <Path
                   d="M15.1753 4.32863C14.0003 3.15758 12.4092 2.5 10.7504 2.5C9.0916 2.5 7.50043 3.15758 6.32546 4.32863C5.41627 5.23994 4.80963 6.40903 4.58797 7.67716C4.3663 8.94528 4.54037 10.251 5.08648 11.4167L2.68227 13.8212C2.47232 14.015 2.30371 14.2492 2.18654 14.5098C2.06937 14.7704 2.00605 15.052 2.00041 15.3377C1.99478 15.6234 2.04692 15.9072 2.15373 16.1722C2.26053 16.4372 2.4198 16.6779 2.62195 16.8798C2.82409 17.0817 3.06493 17.2407 3.33004 17.3472C3.59516 17.4537 3.87908 17.5055 4.16471 17.4995C4.45035 17.4935 4.73181 17.4299 4.99223 17.3124C5.25265 17.1948 5.48665 17.0259 5.68016 16.8157L8.08438 14.4112C8.91749 14.8022 9.82643 15.0049 10.7467 15.005C11.5694 15.0046 12.3839 14.8415 13.1433 14.525C13.9027 14.2086 14.592 13.745 15.1716 13.1611C16.3425 11.986 17 10.3946 17 8.73562C17 7.07663 16.3425 5.48528 15.1716 4.31017L15.1753 4.32863ZM14.4157 10.2697C14.0402 11.1836 13.3381 11.9251 12.4462 12.3498C11.5543 12.7746 10.5362 12.8523 9.59014 12.5678C8.64407 12.2834 7.83768 11.6571 7.3278 10.8109C6.81793 9.96461 6.64105 8.95894 6.83163 7.98949C7.0222 7.02004 7.56657 6.15612 8.35882 5.5659C9.15107 4.97569 10.1345 4.70136 11.1179 4.79628C12.1012 4.89119 13.0141 5.34861 13.6788 6.07947C14.3436 6.81032 14.7127 7.76238 14.7144 8.75038C14.7151 9.27151 14.6136 9.78766 14.4157 10.2697Z"
                   fill="#34495E"
@@ -231,9 +234,7 @@ export default function FindScreen() {
             </Pressable>
 
             <View style={styles.filterCategoryRow}>
-              <Pressable
-                onPress={() => router.push("/(tabs)/find/filter")}
-              >
+              <Pressable onPress={() => router.push('/(tabs)/find/filter')}>
                 <Svg
                   width="30"
                   height="30"
@@ -272,7 +273,11 @@ export default function FindScreen() {
                     />
                   </Svg>
                   <Text style={styles.sortTextActive}>
-                    {selectedSort === "nearest" ? "Nearest Trip" : selectedSort === "rewarded" ? "Most Rewarded" : "Newest"}
+                    {selectedSort === 'nearest'
+                      ? 'Nearest Trip'
+                      : selectedSort === 'rewarded'
+                        ? 'Most Rewarded'
+                        : 'Newest'}
                   </Text>
                 </View>
 
@@ -297,7 +302,9 @@ export default function FindScreen() {
         {!loading && searchResults.length > 0 && (
           <View style={styles.resultsContainer}>
             <Text style={styles.resultsTitle}>
-              {searchQuery ? `Found ${searchResults.length} place${searchResults.length > 1 ? 's' : ''}` : `${searchResults.length} places available`}
+              {searchQuery
+                ? `Found ${searchResults.length} place${searchResults.length > 1 ? 's' : ''}`
+                : `${searchResults.length} places available`}
             </Text>
             <View style={styles.resultsGrid}>
               {searchResults.map((quest) => (
@@ -305,23 +312,17 @@ export default function FindScreen() {
                   key={quest.id}
                   onPress={() => {
                     router.push({
-                      pathname: "/(tabs)/map/quest-detail",
+                      pathname: '/(tabs)/map/quest-detail',
                       params: {
                         quest: JSON.stringify(quest),
                       },
                     });
                   }}
-                  style={({ pressed }) => [
-                    styles.cardWrapper,
-                    pressed && { opacity: 0.95 }
-                  ]}
+                  style={({ pressed }) => [styles.cardWrapper, pressed && { opacity: 0.95 }]}
                 >
                   <View style={styles.placeImageContainer}>
                     {quest.place_image_url && (
-                      <Image
-                        source={{ uri: quest.place_image_url }}
-                        style={styles.placeImage}
-                      />
+                      <Image source={{ uri: quest.place_image_url }} style={styles.placeImage} />
                     )}
                     <Text style={styles.placeCategoryText}>{quest.category || 'Place'}</Text>
                     <Pressable
@@ -332,20 +333,28 @@ export default function FindScreen() {
                       }}
                     >
                       <Svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <Path d="M14.8571 9.14286H9.14286V14.8571C9.14286 15.1602 9.02245 15.4509 8.80812 15.6653C8.59379 15.8796 8.30311 16 8 16C7.6969 16 7.40621 15.8796 7.19188 15.6653C6.97755 15.4509 6.85714 15.1602 6.85714 14.8571V9.14286H1.14286C0.839753 9.14286 0.549063 9.02245 0.334735 8.80812C0.120408 8.59379 0 8.30311 0 8C0 7.6969 0.120408 7.40621 0.334735 7.19188C0.549063 6.97755 0.839753 6.85714 1.14286 6.85714H6.85714V1.14286C6.85714 0.839753 6.97755 0.549062 7.19188 0.334735C7.40621 0.120407 7.6969 0 8 0C8.30311 0 8.59379 0.120407 8.80812 0.334735C9.02245 0.549062 9.14286 0.839753 9.14286 1.14286V6.85714H14.8571C15.1602 6.85714 15.4509 6.97755 15.6653 7.19188C15.8796 7.40621 16 7.6969 16 8C16 8.30311 15.8796 8.59379 15.6653 8.80812C15.4509 9.02245 15.1602 9.14286 14.8571 9.14286Z" fill="white" />
+                        <Path
+                          d="M14.8571 9.14286H9.14286V14.8571C9.14286 15.1602 9.02245 15.4509 8.80812 15.6653C8.59379 15.8796 8.30311 16 8 16C7.6969 16 7.40621 15.8796 7.19188 15.6653C6.97755 15.4509 6.85714 15.1602 6.85714 14.8571V9.14286H1.14286C0.839753 9.14286 0.549063 9.02245 0.334735 8.80812C0.120408 8.59379 0 8.30311 0 8C0 7.6969 0.120408 7.40621 0.334735 7.19188C0.549063 6.97755 0.839753 6.85714 1.14286 6.85714H6.85714V1.14286C6.85714 0.839753 6.97755 0.549062 7.19188 0.334735C7.40621 0.120407 7.6969 0 8 0C8.30311 0 8.59379 0.120407 8.80812 0.334735C9.02245 0.549062 9.14286 0.839753 9.14286 1.14286V6.85714H14.8571C15.1602 6.85714 15.4509 6.97755 15.6653 7.19188C15.8796 7.40621 16 7.6969 16 8C16 8.30311 15.8796 8.59379 15.6653 8.80812C15.4509 9.02245 15.1602 9.14286 14.8571 9.14286Z"
+                          fill="white"
+                        />
                       </Svg>
                     </Pressable>
                     {quest.distance_km !== undefined && (
                       <View style={styles.distanceBadge}>
                         <Svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                          <Path d="M9.49609 0.501953C9.4967 0.511802 9.50014 0.523321 9.5 0.537109C9.49887 0.64138 9.4678 0.808104 9.38184 1.04883L5.61035 9.19434L5.60156 9.21387L5.59375 9.2334C5.56315 9.31782 5.50604 9.38903 5.43262 9.43652C5.35932 9.48388 5.27333 9.50595 5.1875 9.49902C5.1016 9.49207 5.01943 9.45648 4.9541 9.39746C4.88881 9.33843 4.84406 9.25842 4.82715 9.16992V9.16895L4.79199 9.01465C4.59556 8.24175 4.04883 7.43937 3.41504 6.80273C2.7393 6.12398 1.87207 5.54092 1.04492 5.38672L0.828125 5.34375L0.824219 5.34277L0.761719 5.32617C0.701821 5.30413 0.647322 5.2667 0.603516 5.21777C0.545136 5.15242 0.508439 5.06864 0.500977 4.97949C0.493596 4.89034 0.515442 4.8013 0.5625 4.72656C0.609571 4.65182 0.679301 4.59552 0.759766 4.56543L0.78125 4.55762L0.801758 4.54785L8.95898 0.625C9.19511 0.535375 9.35976 0.503188 9.46289 0.5C9.47568 0.499607 9.48672 0.501617 9.49609 0.501953Z" stroke="#F5F5F5" />
+                          <Path
+                            d="M9.49609 0.501953C9.4967 0.511802 9.50014 0.523321 9.5 0.537109C9.49887 0.64138 9.4678 0.808104 9.38184 1.04883L5.61035 9.19434L5.60156 9.21387L5.59375 9.2334C5.56315 9.31782 5.50604 9.38903 5.43262 9.43652C5.35932 9.48388 5.27333 9.50595 5.1875 9.49902C5.1016 9.49207 5.01943 9.45648 4.9541 9.39746C4.88881 9.33843 4.84406 9.25842 4.82715 9.16992V9.16895L4.79199 9.01465C4.59556 8.24175 4.04883 7.43937 3.41504 6.80273C2.7393 6.12398 1.87207 5.54092 1.04492 5.38672L0.828125 5.34375L0.824219 5.34277L0.761719 5.32617C0.701821 5.30413 0.647322 5.2667 0.603516 5.21777C0.545136 5.15242 0.508439 5.06864 0.500977 4.97949C0.493596 4.89034 0.515442 4.8013 0.5625 4.72656C0.609571 4.65182 0.679301 4.59552 0.759766 4.56543L0.78125 4.55762L0.801758 4.54785L8.95898 0.625C9.19511 0.535375 9.35976 0.503188 9.46289 0.5C9.47568 0.499607 9.48672 0.501617 9.49609 0.501953Z"
+                            stroke="#F5F5F5"
+                          />
                         </Svg>
                         <Text style={styles.distanceText}>{quest.distance_km.toFixed(1)}km</Text>
                       </View>
                     )}
                   </View>
                   <View style={styles.placeInfoBottom}>
-                    <Text style={styles.placeNameText} numberOfLines={2}>{quest.name}</Text>
+                    <Text style={styles.placeNameText} numberOfLines={2}>
+                      {quest.name}
+                    </Text>
                     {quest.district && (
                       <Text style={styles.placeLocationText}>{quest.district}</Text>
                     )}
@@ -359,17 +368,11 @@ export default function FindScreen() {
         {!loading && searchQuery && searchResults.length === 0 && (
           <View style={styles.noResultsContainer}>
             <Image
-              source={require("@/assets/images/face-2-2.png")}
+              source={require('@/assets/images/face-2-2.png')}
               style={styles.docentFaceImage}
               resizeMode="contain"
             />
-            <Svg
-              width="130"
-              height="46"
-              viewBox="0 0 130 46"
-              fill="none"
-              style={styles.oopsText}
-            >
+            <Svg width="130" height="46" viewBox="0 0 130 46" fill="none" style={styles.oopsText}>
               <Path
                 d="M15.936 36.3333C12.5016 36.3333 9.59688 35.5873 7.22173 34.0952C4.84658 32.6032 3.04918 30.5397 1.82951 27.9048C0.609835 25.2698 0 22.2381 0 18.8095C0 15.4127 0.609835 12.3968 1.82951 9.76191C3.04918 7.09524 4.84658 5.01587 7.22173 3.52381C9.59688 2 12.5016 1.2381 15.936 1.2381C19.3703 1.2381 22.259 2 24.602 3.52381C26.9772 5.01587 28.7746 7.09524 29.9943 9.76191C31.2139 12.3968 31.8238 15.4127 31.8238 18.8095C31.8238 22.2381 31.2139 25.2698 29.9943 27.9048C28.7746 30.5397 26.9772 32.6032 24.602 34.0952C22.259 35.5873 19.3703 36.3333 15.936 36.3333ZM6.06625 18.0476C6.06625 19.0317 6.30698 19.9683 6.78843 20.8571C7.26988 21.7143 8.21672 22.4127 9.62897 22.9524C11.0412 23.4603 13.1436 23.7143 15.936 23.7143C18.7284 23.7143 20.8146 23.4603 22.1948 22.9524C23.607 22.4127 24.5539 21.7143 25.0353 20.8571C25.5168 19.9683 25.7575 19.0317 25.7575 18.0476C25.7575 17.0317 25.5168 16.127 25.0353 15.3333C24.5539 14.5079 23.607 13.8571 22.1948 13.381C20.8146 12.873 18.7284 12.619 15.936 12.619C13.1436 12.619 11.0412 12.873 9.62897 13.381C8.21672 13.8571 7.26988 14.5079 6.78843 15.3333C6.30698 16.127 6.06625 17.0317 6.06625 18.0476Z"
                 fill="#FEF5E7"
@@ -404,12 +407,12 @@ export default function FindScreen() {
       {/* Bottom Route Selection Bar */}
       <View style={styles.routeContainer} pointerEvents="box-none">
         <LinearGradient
-          colors={["#FF7F50", "#994C30"]}
+          colors={['#FF7F50', '#994C30']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.routeBar}
         >
-          <Pressable 
+          <Pressable
             style={styles.questSlotsContainer}
             onPress={() => {
               // 빈 곳 탭 시 선택 취소
@@ -421,10 +424,10 @@ export default function FindScreen() {
             {[0, 1, 2, 3].map((index) => {
               const quest = selectedQuests[index];
               const isSelected = selectedSlotIndex === index;
-              
+
               const handlePress = () => {
                 if (!quest) return;
-                
+
                 // 선택 모드일 때 → 교체
                 if (selectedSlotIndex !== null) {
                   // 같은 슬롯 누르면 선택 해제
@@ -432,23 +435,23 @@ export default function FindScreen() {
                     setSelectedSlotIndex(null);
                     return;
                   }
-                  
+
                   // 슬롯 교체
                   reorderQuests(selectedSlotIndex, index);
                   setSelectedSlotIndex(null);
                   return;
                 }
-                
+
                 // 선택 모드가 아닐 때 → 삭제
                 removeQuest(quest.id);
               };
-              
+
               const handleLongPress = () => {
                 if (quest) {
                   setSelectedSlotIndex(index);
                 }
               };
-              
+
               return (
                 <Pressable
                   key={quest ? `quest-${quest.id}` : `empty-${index}`}
@@ -461,16 +464,13 @@ export default function FindScreen() {
                     handleLongPress();
                   }}
                   delayLongPress={200}
-                  style={[
-                    styles.questSlot,
-                    isSelected && styles.questSlotSelected
-                  ]}
+                  style={[styles.questSlot, isSelected && styles.questSlotSelected]}
                 >
                   {quest ? (
                     <View style={styles.slotImageContainer}>
                       <Image
                         source={{
-                          uri: quest.place_image_url || "https://picsum.photos/58/60",
+                          uri: quest.place_image_url || 'https://picsum.photos/58/60',
                         }}
                         style={styles.slotQuestImage}
                       />
@@ -481,12 +481,7 @@ export default function FindScreen() {
                       )}
                       {quest && (
                         <View style={styles.slotRemoveIconContainer}>
-                          <Svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 12 12"
-                            fill="none"
-                          >
+                          <Svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                             <Path
                               d="M10.0322 11.6485L5.99158 7.60793L1.95097 11.6485C1.73664 11.8629 1.44595 11.9833 1.14285 11.9833C0.83974 11.9833 0.549051 11.8629 0.334723 11.6485C0.120396 11.4342 -1.2327e-05 11.1435 -1.19898e-05 10.8404C-1.2327e-05 10.5373 0.120396 10.2466 0.334724 10.0323L4.37533 5.99169L0.334723 1.95108C0.120395 1.73675 -1.20741e-05 1.44606 -1.23692e-05 1.14296C-1.20004e-05 0.83985 0.120395 0.549161 0.334723 0.334833C0.54905 0.120505 0.83974 9.80094e-05 1.14284 9.79777e-05C1.44595 9.79356e-05 1.73664 0.120506 1.95097 0.334833L5.99158 4.37544L10.0322 0.334833C10.2465 0.120506 10.5372 9.75563e-05 10.8403 9.75984e-05C11.1434 9.76248e-05 11.4341 0.120505 11.6484 0.334833C11.8628 0.549161 11.9832 0.83985 11.9832 1.14295C11.9832 1.44606 11.8628 1.73675 11.6484 1.95108L7.60782 5.99169L11.6484 10.0323C11.8628 10.2466 11.9832 10.5373 11.9832 10.8404C11.9832 11.1435 11.8628 11.4342 11.6484 11.6485C11.4341 11.8629 11.1434 11.9833 10.8403 11.9833C10.5372 11.9833 10.2465 11.8629 10.0322 11.6485Z"
                               fill="white"
@@ -510,10 +505,7 @@ export default function FindScreen() {
           </Pressable>
 
           <Pressable
-            style={[
-              styles.startButton,
-              selectedQuests.length > 0 && styles.startButtonActive,
-            ]}
+            style={[styles.startButton, selectedQuests.length > 0 && styles.startButtonActive]}
             disabled={selectedQuests.length === 0}
             onPress={async () => {
               if (selectedQuests.length > 0) {
@@ -527,24 +519,26 @@ export default function FindScreen() {
                     userLocation.latitude,
                     userLocation.longitude,
                     firstQuest.latitude,
-                    firstQuest.longitude
+                    firstQuest.longitude,
                   );
 
                   if (distance <= 1.0) {
-                    questApi.startQuest({
-                      quest_id: firstQuest.id,
-                      place_id: firstQuest.place_id || undefined,
-                      latitude: userLocation.latitude,
-                      longitude: userLocation.longitude,
-                      start_latitude: userLocation.latitude,
-                      start_longitude: userLocation.longitude,
-                    }).catch(() => {
-                      // Ignore
-                    });
+                    questApi
+                      .startQuest({
+                        quest_id: firstQuest.id,
+                        place_id: firstQuest.place_id || undefined,
+                        latitude: userLocation.latitude,
+                        longitude: userLocation.longitude,
+                        start_latitude: userLocation.latitude,
+                        start_longitude: userLocation.longitude,
+                      })
+                      .catch(() => {
+                        // Ignore
+                      });
                   }
                 }
 
-                router.push("/(tabs)/map");
+                router.push('/(tabs)/map');
               }
             }}
           >
@@ -566,47 +560,47 @@ export default function FindScreen() {
 const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
   },
 
   container: {
     flex: 1,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
   },
 
   fullHeader: {
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
     paddingTop: 60,
     paddingBottom: 20,
     paddingHorizontal: 16,
   },
 
   topRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
   },
 
   searchBox: {
     flex: 1,
     height: 52,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     paddingHorizontal: 16,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   searchIcon: {
-    marginRight: 8
+    marginRight: 8,
   },
 
   searchText: {
-    color: "rgba(52, 73, 94, 0.55)",
-    fontFamily: "Inter",
+    color: 'rgba(52, 73, 94, 0.55)',
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontStyle: "normal",
-    fontWeight: "500",
+    fontStyle: 'normal',
+    fontWeight: '500',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
@@ -614,63 +608,63 @@ const styles = StyleSheet.create({
   walkBox: {
     width: 76,
     height: 47,
-    backgroundColor: "#4888D3",
+    backgroundColor: '#4888D3',
     borderRadius: 10,
     padding: 10,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
   },
 
   mintBox: {
     width: 76,
     height: 47,
-    backgroundColor: "#76C7AD",
+    backgroundColor: '#76C7AD',
     borderRadius: 10,
     padding: 10,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
   },
 
   statColumn: {
     width: 26,
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
     gap: 2,
     flexShrink: 0,
   },
 
   statLabel: {
-    color: "#FFF",
-    textAlign: "center",
+    color: '#FFF',
+    textAlign: 'center',
     fontSize: 9,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 10,
     letterSpacing: 0,
   },
 
   statValue: {
-    color: "#FFF",
-    textAlign: "center",
+    color: '#FFF',
+    textAlign: 'center',
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 16,
     letterSpacing: 0,
   },
 
   filterRowContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginTop: 14,
   },
 
   filterCategoryRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
   },
 
@@ -685,83 +679,83 @@ const styles = StyleSheet.create({
   },
 
   categoryChipActive: {
-    display: "flex",
+    display: 'flex',
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 42,
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
     marginRight: 5,
   },
 
   categoryTextActive: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 13,
-    fontStyle: "normal",
-    fontWeight: "700",
+    fontStyle: 'normal',
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   sortButtonActive: {
-    display: "flex",
+    display: 'flex',
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 42,
-    backgroundColor: "#FFF",
-    flexDirection: "row",
+    backgroundColor: '#FFF',
+    flexDirection: 'row',
     marginRight: 5,
   },
 
   sortTextActive: {
-    color: "#659DF2",
-    fontFamily: "Pretendard",
+    color: '#659DF2',
+    fontFamily: 'Pretendard',
     fontSize: 13,
-    fontStyle: "normal",
-    fontWeight: "700",
+    fontStyle: 'normal',
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   districtChipActive: {
-    display: "flex",
+    display: 'flex',
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 42,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     marginRight: 5,
   },
 
   districtTextActive: {
-    color: "#659DF2",
-    fontFamily: "Pretendard",
+    color: '#659DF2',
+    fontFamily: 'Pretendard',
     fontSize: 13,
-    fontStyle: "normal",
-    fontWeight: "700",
+    fontStyle: 'normal',
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   searchInput: {
     flex: 1,
-    color: "#34495E",
-    fontFamily: "Pretendard",
+    color: '#34495E',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 20,
   },
 
   loadingContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingVertical: 40,
   },
 
@@ -770,84 +764,84 @@ const styles = StyleSheet.create({
   },
 
   resultsTitle: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: '700',
     marginBottom: 16,
   },
 
   resultsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 12,
   },
 
   cardWrapper: {
-    width: "48%",
+    width: '48%',
     marginBottom: 12,
   },
 
   placeImageContainer: {
-    position: "relative",
-    width: "100%",
+    position: 'relative',
+    width: '100%',
     height: 160,
     borderRadius: 12,
-    overflow: "hidden",
-    backgroundColor: "#2C3E50",
+    overflow: 'hidden',
+    backgroundColor: '#2C3E50',
   },
 
   placeImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
 
   placeCategoryText: {
-    position: "absolute",
+    position: 'absolute',
     top: 8,
     left: 8,
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 11,
-    fontWeight: "600",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    fontWeight: '600',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
   },
 
   plusButton: {
-    position: "absolute",
+    position: 'absolute',
     top: 5,
     right: 5,
     width: 38,
     height: 38,
     padding: 11,
     borderRadius: 10,
-    backgroundColor: "rgba(255, 127, 80, 0.85)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(255, 127, 80, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   distanceBadge: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 8,
     left: 8,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 4,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
 
   distanceText: {
-    color: "#F5F5F5",
-    fontFamily: "Pretendard",
+    color: '#F5F5F5',
+    fontFamily: 'Pretendard',
     fontSize: 11,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 
   placeInfoBottom: {
@@ -855,25 +849,25 @@ const styles = StyleSheet.create({
   },
 
   placeNameText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 18,
     marginBottom: 4,
   },
 
   placeLocationText: {
-    color: "rgba(255, 255, 255, 0.7)",
-    fontFamily: "Pretendard",
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
   },
 
   noResultsContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingVertical: 60,
     paddingHorizontal: 20,
   },
@@ -890,37 +884,37 @@ const styles = StyleSheet.create({
   },
 
   noResultsTextContainer: {
-    alignItems: "center",
+    alignItems: 'center',
   },
 
   noResultsText: {
-    textAlign: "center",
+    textAlign: 'center',
   },
 
   noResultsRegular: {
-    color: "#FEF5E7",
-    fontFamily: "Pretendard",
+    color: '#FEF5E7',
+    fontFamily: 'Pretendard',
     fontSize: 16,
-    fontWeight: "400",
+    fontWeight: '400',
   },
 
   noResultsBold: {
-    color: "#FEF5E7",
-    fontFamily: "Pretendard",
+    color: '#FEF5E7',
+    fontFamily: 'Pretendard',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   recommendationCard: {
-    flexDirection: "row",
+    flexDirection: 'row',
     padding: 20,
-    alignItems: "center",
+    alignItems: 'center',
     gap: 20,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#FEF5E7",
-    backgroundColor: "#FEF5E7",
-    shadowColor: "#000",
+    borderColor: '#FEF5E7',
+    backgroundColor: '#FEF5E7',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -930,7 +924,7 @@ const styles = StyleSheet.create({
   },
 
   cardImagesContainer: {
-    position: "relative",
+    position: 'relative',
     width: 65,
     height: 66,
   },
@@ -938,8 +932,8 @@ const styles = StyleSheet.create({
   rionImage: {
     width: 65,
     height: 66,
-    transform: [{ rotate: "-15deg" }],
-    position: "absolute",
+    transform: [{ rotate: '-15deg' }],
+    position: 'absolute',
     top: -15,
     left: 0,
   },
@@ -947,42 +941,42 @@ const styles = StyleSheet.create({
   mapIconImage: {
     width: 40,
     height: 40,
-    transform: [{ rotate: "15deg" }],
-    position: "absolute",
+    transform: [{ rotate: '15deg' }],
+    position: 'absolute',
     bottom: -20,
     right: -15,
   },
 
   cardTextContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: 10,
   },
 
   cardTitle: {
-    color: "#4A90E2",
-    fontFamily: "Inter",
+    color: '#4A90E2',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 22,
     letterSpacing: -0.18,
-    textAlign: "left",
+    textAlign: 'left',
   },
 
   cardDescription: {
-    color: "#4A90E2",
-    fontFamily: "Pretendard",
+    color: '#4A90E2',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
-    textAlign: "left",
+    textAlign: 'left',
   },
 
   tryItButtonContainer: {
     marginBottom: 54,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -994,8 +988,8 @@ const styles = StyleSheet.create({
     height: 47,
     flexShrink: 0,
     borderRadius: 10,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   tryItIcon: {
@@ -1003,10 +997,10 @@ const styles = StyleSheet.create({
   },
 
   tryItText: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     marginLeft: 8,
     flex: 1,
   },
@@ -1017,14 +1011,14 @@ const styles = StyleSheet.create({
 
   aiDocentCard: {
     padding: 20,
-    alignItems: "center",
+    alignItems: 'center',
     gap: 20,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#FEF5E7",
-    backgroundColor: "#FEF5E7",
-    flexDirection: "row",
-    shadowColor: "#000",
+    borderColor: '#FEF5E7',
+    backgroundColor: '#FEF5E7',
+    flexDirection: 'row',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -1034,44 +1028,44 @@ const styles = StyleSheet.create({
 
   aiDocentIconContainer: {
     padding: 20,
-    alignItems: "center",
+    alignItems: 'center',
     gap: 10,
     flex: 1,
     borderRadius: 10,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
 
   aiDocentTextContainer: {
     width: 161.865,
-    flexDirection: "column",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: 10,
     flexShrink: 0,
   },
 
   aiDocentTitle: {
-    color: "#4A90E2",
-    fontFamily: "Inter",
+    color: '#4A90E2',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 22,
     letterSpacing: -0.18,
-    textAlign: "left",
+    textAlign: 'left',
   },
 
   aiDocentDescription: {
-    color: "#4A90E2",
-    fontFamily: "Pretendard",
+    color: '#4A90E2',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
-    textAlign: "left",
+    textAlign: 'left',
   },
 
   askAiButtonContainer: {
     marginBottom: 20,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -1083,9 +1077,9 @@ const styles = StyleSheet.create({
     height: 47,
     flexShrink: 0,
     borderRadius: 10,
-    backgroundColor: "#8FB6F1",
-    flexDirection: "row",
-    alignItems: "center",
+    backgroundColor: '#8FB6F1',
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 13,
   },
 
@@ -1095,11 +1089,11 @@ const styles = StyleSheet.create({
 
   // Bottom Route Selection Bar
   routeContainer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 30,
     left: 0,
     right: 0,
-    alignItems: "center",
+    alignItems: 'center',
     zIndex: 1600,
     elevation: 1600,
   },
@@ -1109,38 +1103,38 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 8.68,
     paddingVertical: 6.5,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 4.82,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 8,
   },
   questSlotsContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 4.82,
   },
   questSlot: {
     width: 58,
     height: 60,
-    backgroundColor: "#EF6A39",
+    backgroundColor: '#EF6A39',
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 2,
     elevation: 4,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   questSlotSelected: {
-    backgroundColor: "#FF9B7A", // 꾸욱 누르면 색이 약간 진하게
+    backgroundColor: '#FF9B7A', // 꾸욱 누르면 색이 약간 진하게
     borderWidth: 2,
-    borderColor: "#FF7F50",
-    shadowColor: "#FF7F50",
+    borderColor: '#FF7F50',
+    shadowColor: '#FF7F50',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.4,
     shadowRadius: 4,
@@ -1149,7 +1143,7 @@ const styles = StyleSheet.create({
   slotImageContainer: {
     width: 58,
     height: 60,
-    position: "relative",
+    position: 'relative',
   },
   slotQuestImage: {
     width: 58,
@@ -1157,42 +1151,42 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   slotNumberContainer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 4,
     right: 4,
-    backgroundColor: "rgba(239, 106, 57, 0.9)",
+    backgroundColor: 'rgba(239, 106, 57, 0.9)',
     borderRadius: 8,
     width: 16,
     height: 16,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: "#fff",
+    borderColor: '#fff',
   },
   slotNumber: {
     fontSize: 10,
-    fontWeight: "700",
-    color: "#fff",
-    textAlign: "center",
+    fontWeight: '700',
+    color: '#fff',
+    textAlign: 'center',
     lineHeight: 10,
   },
   slotRemoveIconContainer: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
     transform: [{ translateX: -6 }, { translateY: -6 }],
     width: 12,
     height: 12,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   slotPlusIcon: {
     fontSize: 32,
-    fontWeight: "300",
-    color: "#fff",
-    textAlign: "center",
+    fontWeight: '300',
+    color: '#fff',
+    textAlign: 'center',
     lineHeight: 32,
-    textShadowColor: "rgba(0, 0, 0, 0.25)",
+    textShadowColor: 'rgba(0, 0, 0, 0.25)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 1,
   },
@@ -1204,32 +1198,32 @@ const styles = StyleSheet.create({
   startButton: {
     width: 58,
     height: 60,
-    backgroundColor: "#EF6A39",
+    backgroundColor: '#EF6A39',
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 2,
     elevation: 4,
   },
   startButtonActive: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
   },
   startButtonText: {
     fontSize: 14,
-    fontWeight: "500",
-    color: "rgba(154, 77, 49, 0.46)",
-    textAlign: "center",
+    fontWeight: '500',
+    color: 'rgba(154, 77, 49, 0.46)',
+    textAlign: 'center',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
   startButtonTextActive: {
-    color: "#EF6A39",
-    fontFamily: "Inter",
+    color: '#EF6A39',
+    fontFamily: 'Inter',
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 20,
     letterSpacing: -0.16,
   },

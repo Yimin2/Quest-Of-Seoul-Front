@@ -1,14 +1,13 @@
-import RouteResultList from "@/components/RouteResultList";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import type { ChatSession, Quest } from "@/services/api";
-import { questApi } from "@/services/api";
-import { useAuthStore } from "@/store/useAuthStore";
-import { useChatHistoryStore } from "@/store/useChatHistoryStore";
-import { Ionicons } from "@expo/vector-icons";
-import Constants from "expo-constants";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import RouteResultList from '@/components/RouteResultList';
+import type { ChatSession, Quest } from '@/services/api';
+import { questApi } from '@/services/api';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useChatHistoryStore } from '@/store/useChatHistoryStore';
+import { Ionicons } from '@expo/vector-icons';
+import { ThemedText, ThemedView } from '@shared/ui';
+import Constants from 'expo-constants';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -19,39 +18,26 @@ import {
   ScrollView,
   StyleSheet,
   View,
-} from "react-native";
-import Svg, {
-  Circle,
-  Defs,
-  LinearGradient,
-  Path,
-  RadialGradient,
-  Stop,
-} from "react-native-svg";
+} from 'react-native';
+import Svg, { Circle, Defs, LinearGradient, Path, RadialGradient, Stop } from 'react-native-svg';
 
 // 🔥 Supabase URL 절대경로 처리
 const SUPABASE_URL =
-  Constants.expoConfig?.extra?.supabaseUrl ||
-  process.env.EXPO_PUBLIC_SUPABASE_URL;
+  Constants.expoConfig?.extra?.supabaseUrl || process.env.EXPO_PUBLIC_SUPABASE_URL;
 
 const getFullImageUrl = (url?: string | null): string | null => {
   // 🔥 NULL, undefined, 빈 문자열, "null" 문자열 모두 필터링
-  if (
-    !url ||
-    url === "null" ||
-    url === "undefined" ||
-    url.trim().length === 0
-  ) {
+  if (!url || url === 'null' || url === 'undefined' || url.trim().length === 0) {
     return null;
   }
 
   // HTTP/HTTPS로 시작하면 절대경로
-  if (url.startsWith("http://") || url.startsWith("https://")) {
+  if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
 
   // 상대경로인 경우 절대경로로 변환
-  if (url.startsWith("/storage")) {
+  if (url.startsWith('/storage')) {
     return `${SUPABASE_URL}${url}`;
   }
 
@@ -61,13 +47,11 @@ const getFullImageUrl = (url?: string | null): string | null => {
 
 export default function ChatHistoryScreen() {
   const router = useRouter();
-  const [tab, setTab] = useState<"ai" | "plus" | "plan">("ai");
+  const [tab, setTab] = useState<'ai' | 'plus' | 'plan'>('ai');
   const { sessions, isLoading, error, fetchChatList } = useChatHistoryStore();
   const { isAuthenticated } = useAuthStore();
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedSession, setSelectedSession] = useState<ChatSession | null>(
-    null
-  );
+  const [selectedSession, setSelectedSession] = useState<ChatSession | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showRouteResults, setShowRouteResults] = useState(false);
   const [routeQuests, setRouteQuests] = useState<Quest[]>([]);
@@ -81,22 +65,22 @@ export default function ChatHistoryScreen() {
   const loadChats = async () => {
     let params: {
       limit?: number;
-      mode?: "explore" | "quest";
-      function_type?: "rag_chat" | "vlm_chat" | "route_recommend";
+      mode?: 'explore' | 'quest';
+      function_type?: 'rag_chat' | 'vlm_chat' | 'route_recommend';
     } = { limit: 20 };
 
-    if (tab === "ai") {
+    if (tab === 'ai') {
       // 일반 AI 채팅: Explore 모드 RAG 채팅
-      params.mode = "explore";
-      params.function_type = "rag_chat";
-    } else if (tab === "plus") {
+      params.mode = 'explore';
+      params.function_type = 'rag_chat';
+    } else if (tab === 'plus') {
       // AI PLUS 채팅: Quest 모드 RAG + VLM 채팅 모두 포함
-      params.mode = "quest";
+      params.mode = 'quest';
       // function_type을 지정하지 않으면 quest mode의 모든 채팅 (rag_chat, vlm_chat) 가져옴
-    } else if (tab === "plan") {
+    } else if (tab === 'plan') {
       // Plan 채팅: 여행 경로 추천
-      params.mode = "explore";
-      params.function_type = "route_recommend";
+      params.mode = 'explore';
+      params.function_type = 'route_recommend';
     }
 
     await fetchChatList(params);
@@ -125,19 +109,17 @@ export default function ChatHistoryScreen() {
 
       if (!questIds || questIds.length === 0) {
         alert(
-          "This recommendation result cannot be viewed.\nPlease request a new travel route recommendation."
+          'This recommendation result cannot be viewed.\nPlease request a new travel route recommendation.',
         );
         return;
       }
 
       const allQuests = await questApi.getQuestList();
 
-      const selectedQuests = allQuests.filter((q: Quest) =>
-        questIds.includes(q.id)
-      );
+      const selectedQuests = allQuests.filter((q: Quest) => questIds.includes(q.id));
 
       if (selectedQuests.length === 0) {
-        alert("Could not find recommended quests.");
+        alert('Could not find recommended quests.');
         return;
       }
 
@@ -145,7 +127,7 @@ export default function ChatHistoryScreen() {
       setShowRouteResults(true);
       setShowDetailModal(false);
     } catch (error) {
-      alert("An error occurred while loading the recommendation results.");
+      alert('An error occurred while loading the recommendation results.');
     }
   };
 
@@ -158,76 +140,62 @@ export default function ChatHistoryScreen() {
     const imageUrl = getFullImageUrl(chat.image_url);
 
     // 📌 AI PLUS - 이미지 + 텍스트
-    if (type === "vlm_chat") {
-
+    if (type === 'vlm_chat') {
       return (
         <View key={chat.id} style={{ marginBottom: 20 }}>
           {/* User Bubble */}
           <View style={[styles.bubble, styles.userBubble]}>
             {chat.user_message && (
-              <ThemedText style={styles.userMessageText}>
-                {chat.user_message}
-              </ThemedText>
+              <ThemedText style={styles.userMessageText}>{chat.user_message}</ThemedText>
             )}
             {imageUrl && (
               <Image
                 source={{ uri: imageUrl }}
                 style={styles.bubbleImage}
                 resizeMode="cover"
-                onError={() => { }}
-                onLoad={() => { }}
+                onError={() => {}}
+                onLoad={() => {}}
               />
             )}
           </View>
 
           {/* AI Bubble */}
           <View style={[styles.bubble, styles.assistantBubble]}>
-            <ThemedText style={styles.assistantMessageText}>
-              {chat.ai_response}
-            </ThemedText>
+            <ThemedText style={styles.assistantMessageText}>{chat.ai_response}</ThemedText>
           </View>
         </View>
       );
     }
 
-    if (type === "route_recommend") {
-
+    if (type === 'route_recommend') {
       return (
         <View key={chat.id} style={{ marginBottom: 20 }}>
           <View style={styles.planBubble}>
             <ThemedText style={styles.planTitle}>
-              {chat.title || "Travel Recommendation Result"}
+              {chat.title || 'Travel Recommendation Result'}
             </ThemedText>
 
             {chat.selected_theme && (
-              <ThemedText style={styles.planMeta}>
-                • Theme: {chat.selected_theme}
-              </ThemedText>
+              <ThemedText style={styles.planMeta}>• Theme: {chat.selected_theme}</ThemedText>
             )}
 
             {chat.selected_districts &&
               Array.isArray(chat.selected_districts) &&
               chat.selected_districts.length > 0 && (
                 <ThemedText style={styles.planMeta}>
-                  • Districts: {chat.selected_districts.join(", ")}
+                  • Districts: {chat.selected_districts.join(', ')}
                 </ThemedText>
               )}
 
             {chat.include_cart && (
-              <ThemedText style={styles.planMeta}>
-                • Cart places included
-              </ThemedText>
+              <ThemedText style={styles.planMeta}>• Cart places included</ThemedText>
             )}
 
             {chat.user_message && (
-              <ThemedText style={styles.planMeta}>
-                📝 요청: {chat.user_message}
-              </ThemedText>
+              <ThemedText style={styles.planMeta}>📝 요청: {chat.user_message}</ThemedText>
             )}
 
-            <ThemedText style={styles.planMessage}>
-              {chat.ai_response}
-            </ThemedText>
+            <ThemedText style={styles.planMessage}>{chat.ai_response}</ThemedText>
 
             {chat.options?.quest_ids && chat.options.quest_ids.length > 0 ? (
               <Pressable
@@ -242,9 +210,7 @@ export default function ChatHistoryScreen() {
               </Pressable>
             ) : (
               <View style={[styles.planButton, styles.planButtonDisabled]}>
-                <ThemedText
-                  style={[styles.planButtonText, styles.planButtonTextDisabled]}
-                >
+                <ThemedText style={[styles.planButtonText, styles.planButtonTextDisabled]}>
                   ⚠️ Previous Version (Results Unavailable)
                 </ThemedText>
               </View>
@@ -259,36 +225,28 @@ export default function ChatHistoryScreen() {
       <View key={chat.id} style={{ marginBottom: 20 }}>
         {/* User */}
         <View style={[styles.bubble, styles.userBubble]}>
-          <ThemedText style={styles.userMessageText}>
-            {chat.user_message}
-          </ThemedText>
+          <ThemedText style={styles.userMessageText}>{chat.user_message}</ThemedText>
         </View>
 
         {/* AI */}
         <View style={[styles.bubble, styles.assistantBubble]}>
-          <ThemedText style={styles.assistantMessageText}>
-            {chat.ai_response}
-          </ThemedText>
+          <ThemedText style={styles.assistantMessageText}>{chat.ai_response}</ThemedText>
         </View>
       </View>
     );
   };
 
   const renderItem = ({ item }: { item: ChatSession }) => {
-    const isAiPlus = tab === "plus";
-    const isPlan = tab === "plan";
+    const isAiPlus = tab === 'plus';
+    const isPlan = tab === 'plan';
     const landmark = item.chats?.[0]?.landmark;
 
     // 제목: user_message를 우선 표시
-    const displayTitle =
-      item.chats?.[0]?.user_message || item.title || "제목 없음";
+    const displayTitle = item.chats?.[0]?.user_message || item.title || '제목 없음';
 
     return (
       <View style={styles.chatListItem}>
-        <Pressable
-          style={styles.chatCardLeft}
-          onPress={() => handleSessionPress(item)}
-        >
+        <Pressable style={styles.chatCardLeft} onPress={() => handleSessionPress(item)}>
           {isPlan ? (
             // Plan Chat 아이콘 (깃발 모양)
             <View style={{ marginLeft: 10, marginRight: 10 }}>
@@ -305,13 +263,13 @@ export default function ChatHistoryScreen() {
               style={{
                 width: 35,
                 height: 35,
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative",
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: 'relative',
               }}
             >
               {/* 더블 스타 아이콘 - 오른쪽 위 */}
-              <View style={{ position: "absolute", top: 0, right: 0 }}>
+              <View style={{ position: 'absolute', top: 0, right: 0 }}>
                 <Svg
                   width={23.899}
                   height={20.97}
@@ -330,7 +288,7 @@ export default function ChatHistoryScreen() {
                 </Svg>
               </View>
               {/* 이미지 아이콘 - 왼쪽 아래 */}
-              <View style={{ position: "absolute", bottom: 0, left: 0 }}>
+              <View style={{ position: 'absolute', bottom: 0, left: 0 }}>
                 <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
                   <Path
                     d="M13.4142 5.96214C13.4142 6.35744 13.2571 6.73655 12.9776 7.01606C12.6981 7.29558 12.319 7.45261 11.9237 7.45261C11.5284 7.45261 11.1493 7.29558 10.8698 7.01606C10.5903 6.73655 10.4332 6.35744 10.4332 5.96214C10.4332 5.56685 10.5903 5.18774 10.8698 4.90823C11.1493 4.62871 11.5284 4.47168 11.9237 4.47168C12.319 4.47168 12.6981 4.62871 12.9776 4.90823C13.2571 5.18774 13.4142 5.56685 13.4142 5.96214Z"
@@ -367,16 +325,11 @@ export default function ChatHistoryScreen() {
                   {item.chats?.[0]?.selected_districts &&
                     item.chats[0].selected_districts.length > 0 && (
                       <>
-                        <ThemedText
-                          style={styles.planInfoText}
-                          numberOfLines={1}
-                        >
+                        <ThemedText style={styles.planInfoText} numberOfLines={1}>
                           {item.chats[0].selected_districts[0]}
                         </ThemedText>
                         {item.chats?.[0]?.selected_theme && (
-                          <ThemedText style={styles.planInfoText}>
-                            ,{" "}
-                          </ThemedText>
+                          <ThemedText style={styles.planInfoText}>, </ThemedText>
                         )}
                       </>
                     )}
@@ -387,9 +340,7 @@ export default function ChatHistoryScreen() {
                   )}
                 </View>
                 {/* 시간 정보 */}
-                <ThemedText style={styles.chatCardTime}>
-                  {formatTime(item.time_ago)}
-                </ThemedText>
+                <ThemedText style={styles.chatCardTime}>{formatTime(item.time_ago)}</ThemedText>
               </>
             ) : (
               // AI Chat & AI PLUS Chat
@@ -401,25 +352,17 @@ export default function ChatHistoryScreen() {
                   {isAiPlus && landmark ? (
                     // AI PLUS Chat: 장소명 · 시간
                     <>
-                      <ThemedText
-                        style={styles.chatCardLandmark}
-                        numberOfLines={1}
-                      >
+                      <ThemedText style={styles.chatCardLandmark} numberOfLines={1}>
                         {landmark}
                       </ThemedText>
-                      <ThemedText style={styles.chatCardTimeSeparator}>
-                        {" "}
-                        ·{" "}
-                      </ThemedText>
+                      <ThemedText style={styles.chatCardTimeSeparator}> · </ThemedText>
                       <ThemedText style={styles.chatCardTime}>
                         {formatTime(item.time_ago)}
                       </ThemedText>
                     </>
                   ) : (
                     // AI Chat: 시간만
-                    <ThemedText style={styles.chatCardTime}>
-                      {formatTime(item.time_ago)}
-                    </ThemedText>
+                    <ThemedText style={styles.chatCardTime}>{formatTime(item.time_ago)}</ThemedText>
                   )}
                 </View>
               </>
@@ -441,7 +384,7 @@ export default function ChatHistoryScreen() {
   };
 
   const getData = () => {
-    if (tab === "plan") {
+    if (tab === 'plan') {
     }
     return sessions;
   };
@@ -457,9 +400,7 @@ export default function ChatHistoryScreen() {
           <ThemedText style={styles.headerTitle}>AI Station</ThemedText>
           <View style={styles.modeToggleButtons}>
             <Pressable style={[styles.modeButton, styles.modeButtonActive]}>
-              <ThemedText
-                style={[styles.modeButtonText, styles.modeButtonTextActive]}
-              >
+              <ThemedText style={[styles.modeButtonText, styles.modeButtonTextActive]}>
                 Explore Mode
               </ThemedText>
             </Pressable>
@@ -477,13 +418,7 @@ export default function ChatHistoryScreen() {
             <Pressable style={styles.shortcutItem}>
               <View style={styles.shortcutIconContainer}>
                 <Svg width="50" height="50" viewBox="0 0 50 50" fill="none">
-                  <Circle
-                    cx="25"
-                    cy="25"
-                    r="24.5"
-                    fill="url(#paint0_radial_ai)"
-                    stroke="white"
-                  />
+                  <Circle cx="25" cy="25" r="24.5" fill="url(#paint0_radial_ai)" stroke="white" />
                   <Path
                     d="M30.2855 22.3513C30.295 22.6848 30.1897 23.0116 29.9872 23.2768C29.7847 23.542 29.4974 23.7297 29.1732 23.8085C27.271 24.5093 25.38 25.2102 23.4668 25.8776C23.2939 25.9311 23.1367 26.0259 23.0088 26.1538C22.8809 26.2817 22.786 26.4388 22.7326 26.6117C22.0763 28.4693 21.3978 30.3158 20.7192 32.1734C20.6442 32.5211 20.454 32.8332 20.1794 33.0593C19.9049 33.2854 19.5621 33.4124 19.2065 33.4194C18.8418 33.4088 18.491 33.2773 18.2092 33.0457C17.9273 32.8142 17.7303 32.4957 17.6491 32.14C16.9817 30.2935 16.3032 28.447 15.6358 26.5783C15.5873 26.415 15.4988 26.2666 15.3784 26.1462C15.258 26.0258 15.1094 25.9372 14.9461 25.8888C13.0329 25.2102 11.1419 24.5093 9.23974 23.8085C8.90862 23.7306 8.61564 23.5385 8.41219 23.2659C8.20875 22.9933 8.10787 22.6577 8.12738 22.3181C8.1169 21.9818 8.22144 21.6518 8.42367 21.3829C8.62589 21.1139 8.91372 20.922 9.23974 20.8386C11.1196 20.149 12.9995 19.4481 14.8905 18.7807C15.0634 18.7272 15.2206 18.6324 15.3485 18.5045C15.4764 18.3765 15.5712 18.2195 15.6246 18.0466C16.2809 16.2001 16.9595 14.3425 17.6381 12.4848C17.7135 12.1383 17.9041 11.8276 18.1788 11.6033C18.4536 11.3791 18.7962 11.2545 19.1509 11.25C19.8739 11.25 20.3856 11.6617 20.697 12.5182C21.3756 14.3647 22.0541 16.2224 22.7215 18.08C22.7674 18.2458 22.8548 18.3971 22.9755 18.5197C23.0962 18.6423 23.2461 18.7321 23.4111 18.7807C25.3392 19.4555 27.2562 20.1527 29.162 20.872C29.4932 20.9474 29.7873 21.1368 29.9927 21.4073C30.1981 21.6778 30.3018 22.012 30.2855 22.3513Z"
                     fill="#659DF2"
@@ -514,13 +449,7 @@ export default function ChatHistoryScreen() {
             <Pressable style={styles.shortcutItem}>
               <View style={styles.shortcutIconContainer}>
                 <Svg width="50" height="50" viewBox="0 0 50 50" fill="none">
-                  <Circle
-                    cx="25"
-                    cy="25"
-                    r="24.5"
-                    fill="url(#paint0_radial_plan)"
-                    stroke="white"
-                  />
+                  <Circle cx="25" cy="25" r="24.5" fill="url(#paint0_radial_plan)" stroke="white" />
                   <Path
                     d="M40.6249 10.3966C40.6291 10.8678 40.4843 11.3283 40.2112 11.7118C39.9381 12.0954 39.5509 12.3823 39.105 12.5314L33.6051 14.4272C33.4657 14.4763 33.3214 14.5103 33.1747 14.5284V18.7201C33.1747 19.0592 33.0404 19.3846 32.8014 19.6245C32.5624 19.8645 32.2381 19.9996 31.8998 20C31.5617 19.9991 31.2377 19.8639 30.9988 19.6241C30.7598 19.3842 30.6254 19.0591 30.625 18.7201V12.3953C30.625 12.3604 30.625 12.3272 30.625 12.2923V8.5008C30.625 8.4676 30.625 8.43272 30.625 8.39952C30.63 8.28792 30.6438 8.1769 30.6664 8.06751C30.729 7.75156 30.8584 7.45271 31.0457 7.19104C31.2331 6.92936 31.4741 6.7109 31.7526 6.55036C32.0311 6.38981 32.3407 6.29092 32.6605 6.26025C32.9803 6.22959 33.3029 6.26789 33.6068 6.3726L39.1067 8.26837C39.5511 8.41741 39.9373 8.70347 40.2099 9.08567C40.4826 9.46787 40.6278 9.92667 40.6249 10.3966Z"
                     fill="#659DF2"
@@ -547,9 +476,7 @@ export default function ChatHistoryScreen() {
                   </Defs>
                 </Svg>
               </View>
-              <ThemedText style={styles.shortcutLabel}>
-                New Plan Chat
-              </ThemedText>
+              <ThemedText style={styles.shortcutLabel}>New Plan Chat</ThemedText>
             </Pressable>
 
             {/* Image Find */}
@@ -582,7 +509,7 @@ export default function ChatHistoryScreen() {
                   height="32"
                   viewBox="0 0 32 32"
                   fill="none"
-                  style={{ position: "absolute", top: 9, left: 9 }}
+                  style={{ position: 'absolute', top: 9, left: 9 }}
                 >
                   <Path
                     d="M15.625 31.25C24.2544 31.25 31.25 24.2544 31.25 15.625C31.25 6.99555 24.2544 0 15.625 0C6.99555 0 0 6.99555 0 15.625C0 24.2544 6.99555 31.25 15.625 31.25Z"
@@ -607,7 +534,7 @@ export default function ChatHistoryScreen() {
                   height="21"
                   viewBox="0 0 21 21"
                   fill="none"
-                  style={{ position: "absolute", top: 14.5, left: 14.5 }}
+                  style={{ position: 'absolute', top: 14.5, left: 14.5 }}
                 >
                   <Path
                     d="M12.3311 0.255859L12.3301 0.256836C13.7465 0.256898 14.7818 1.34299 14.9365 2.80859H14.9541C15.4493 2.80859 15.9665 2.80836 16.4844 2.82715H16.4863C17.2169 2.85985 17.901 3.2085 18.3955 3.78809C18.8887 4.36627 19.1563 5.13042 19.1484 5.91797V7.71191C19.1484 7.97564 19.055 8.23399 18.8809 8.42773C18.7059 8.62227 18.4622 8.7373 18.2021 8.7373C17.9423 8.73724 17.6993 8.62206 17.5244 8.42773C17.3503 8.23397 17.2559 7.97561 17.2559 7.71191V5.92188C17.2636 5.64637 17.173 5.38213 17.0098 5.1875C16.8472 4.99373 16.628 4.88635 16.4033 4.87695L16.4014 4.87598C15.9332 4.85314 15.4413 4.85627 14.9639 4.85938H14.1973L14.1836 4.8584C13.8694 4.82473 13.5839 4.66264 13.3799 4.41309C13.1763 4.16405 13.0667 3.84371 13.0664 3.51562V3.18652C13.0663 2.89325 12.9811 2.67576 12.8564 2.53516C12.7495 2.41472 12.5999 2.33534 12.4082 2.31641L12.3232 2.31152C10.5857 2.30378 8.82407 2.30378 7.08789 2.31152H7.08691C6.85435 2.31157 6.67818 2.39583 6.55664 2.5332C6.43218 2.67406 6.34681 2.89209 6.34375 3.18457V3.51855L6.33887 3.64746C6.31273 3.94818 6.19345 4.23462 5.99609 4.45703C5.76989 4.71183 5.45672 4.86298 5.12207 4.86719H4.70117C4.17503 4.86719 3.67513 4.86775 3.16406 4.8584L3.15332 4.85742C3.02865 4.84943 2.90267 4.8703 2.78418 4.91992C2.66555 4.96962 2.55536 5.04799 2.46191 5.15039C2.36075 5.26365 2.28015 5.40001 2.22559 5.55176C2.18441 5.66638 2.15895 5.78779 2.15039 5.91113L2.14746 6.03516V6.03809C2.1614 7.97032 2.15862 9.93056 2.15723 11.8271V14.4619C2.15729 14.8685 2.26513 15.1615 2.43359 15.3496C2.59891 15.5341 2.84809 15.6464 3.19238 15.6465H9.76562C10.0258 15.6465 10.2694 15.7624 10.4443 15.957C10.6182 16.1507 10.7119 16.4084 10.7119 16.6719C10.7118 16.9354 10.6184 17.193 10.4443 17.3867C10.2694 17.5814 10.0257 17.6963 9.76562 17.6963H9.5791L9.5752 17.6826H3.18848C2.33147 17.6826 1.59378 17.3467 1.07227 16.7656C0.552552 16.1865 0.259766 15.3779 0.259766 14.4473V11.8135C0.259766 9.92112 0.259746 7.96548 0.25 6.04297L0.250977 6.04199C0.247299 5.61038 0.320432 5.18192 0.467773 4.78125C0.615415 4.37989 0.833877 4.01288 1.1123 3.7041L1.11426 3.70312C1.38854 3.40472 1.71611 3.16933 2.07812 3.01465C2.44028 2.85994 2.82849 2.78889 3.21777 2.80664H3.2168C3.62676 2.8197 4.04155 2.81873 4.4707 2.81543C4.62159 1.34748 5.65821 0.262659 7.07715 0.255859C8.819 0.248107 10.5878 0.248107 12.3311 0.255859Z"
@@ -637,26 +564,20 @@ export default function ChatHistoryScreen() {
       {/* Chat Type Tabs */}
       <View style={styles.chatTypeTabs}>
         <Pressable
-          style={[styles.chatTypeTab, tab === "ai" && styles.chatTypeTabActive]}
-          onPress={() => setTab("ai")}
+          style={[styles.chatTypeTab, tab === 'ai' && styles.chatTypeTabActive]}
+          onPress={() => setTab('ai')}
         >
           <ThemedText style={styles.chatTypeTabText}>AI Chat</ThemedText>
         </Pressable>
         <Pressable
-          style={[
-            styles.chatTypeTab,
-            tab === "plus" && styles.chatTypeTabActive,
-          ]}
-          onPress={() => setTab("plus")}
+          style={[styles.chatTypeTab, tab === 'plus' && styles.chatTypeTabActive]}
+          onPress={() => setTab('plus')}
         >
           <ThemedText style={styles.chatTypeTabText}>AI PLUS Chat</ThemedText>
         </Pressable>
         <Pressable
-          style={[
-            styles.chatTypeTab,
-            tab === "plan" && styles.chatTypeTabActive,
-          ]}
-          onPress={() => setTab("plan")}
+          style={[styles.chatTypeTab, tab === 'plan' && styles.chatTypeTabActive]}
+          onPress={() => setTab('plan')}
         >
           <ThemedText style={styles.chatTypeTabText}>Plan Chat</ThemedText>
         </Pressable>
@@ -671,9 +592,7 @@ export default function ChatHistoryScreen() {
         {/* Chat list */}
         {!isAuthenticated ? (
           <View style={styles.emptyContainer}>
-            <ThemedText style={styles.emptyText}>
-              로그인이 필요합니다.
-            </ThemedText>
+            <ThemedText style={styles.emptyText}>로그인이 필요합니다.</ThemedText>
           </View>
         ) : error ? (
           <View style={styles.emptyContainer}>
@@ -688,20 +607,16 @@ export default function ChatHistoryScreen() {
           </View>
         ) : getData().length === 0 ? (
           <View style={styles.emptyContainer}>
-            <ThemedText style={styles.emptyText}>
-              채팅 내역이 없습니다.
-            </ThemedText>
+            <ThemedText style={styles.emptyText}>채팅 내역이 없습니다.</ThemedText>
           </View>
         ) : (
           <FlatList
             data={getData()}
             keyExtractor={(item) => item.session_id}
             renderItem={renderItem}
-            style={{ width: "100%" }}
+            style={{ width: '100%' }}
             contentContainerStyle={{ paddingBottom: 30, paddingHorizontal: 20 }}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           />
         )}
       </View>
@@ -720,7 +635,7 @@ export default function ChatHistoryScreen() {
             onPressPlace={(quest) => {
               setShowRouteResults(false);
               router.push({
-                pathname: "/(tabs)/map/quest-detail",
+                pathname: '/(tabs)/map/quest-detail',
                 params: { quest: JSON.stringify(quest) },
               });
             }}
@@ -731,16 +646,14 @@ export default function ChatHistoryScreen() {
               if (routeQuests.length > 0) {
                 setShowRouteResults(false);
                 router.push({
-                  pathname: "/(tabs)/map/quest-detail",
+                  pathname: '/(tabs)/map/quest-detail',
                   params: { quest: JSON.stringify(routeQuests[0]) },
                 });
               }
             }}
           />
         ) : (
-          <ThemedView
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          >
+          <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <ThemedText>Loading data...</ThemedText>
           </ThemedView>
         )}
@@ -759,16 +672,13 @@ export default function ChatHistoryScreen() {
             <View style={styles.modalHeader}>
               <View style={styles.modalHeaderContent}>
                 <ThemedText type="subtitle" style={styles.modalTitle}>
-                  {selectedSession.title || "Chat History"}
+                  {selectedSession.title || 'Chat History'}
                 </ThemedText>
                 <ThemedText style={styles.modalSubtitle}>
                   {selectedSession.chats?.length || 0} messages
                 </ThemedText>
               </View>
-              <Pressable
-                onPress={() => setShowDetailModal(false)}
-                style={styles.modalCloseButton}
-              >
+              <Pressable onPress={() => setShowDetailModal(false)} style={styles.modalCloseButton}>
                 <Ionicons name="close" size={24} color="#fff" />
               </Pressable>
             </View>
@@ -780,16 +690,11 @@ export default function ChatHistoryScreen() {
             >
               {selectedSession.chats && selectedSession.chats.length > 0 ? (
                 selectedSession.chats.map((chat) =>
-                  renderChatMessage(
-                    chat,
-                    selectedSession.function_type || "rag_chat"
-                  )
+                  renderChatMessage(chat, selectedSession.function_type || 'rag_chat'),
                 )
               ) : (
                 <View style={styles.emptyContainer}>
-                  <ThemedText style={styles.emptyText}>
-                    채팅 내역이 없습니다.
-                  </ThemedText>
+                  <ThemedText style={styles.emptyText}>채팅 내역이 없습니다.</ThemedText>
                 </View>
               )}
             </ScrollView>
@@ -805,43 +710,43 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 0,
     paddingHorizontal: 0,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
   },
   header: {
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
     height: 244,
-    width: "100%",
-    backgroundColor: "#34495E",
+    width: '100%',
+    backgroundColor: '#34495E',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 4,
   },
   headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   backButton: {
     width: 26,
     height: 26,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
-    fontFamily: "Inter",
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
-    color: "#FFFFFF",
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   modeToggleButtons: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 8,
   },
   shortcutsSection: {
@@ -850,36 +755,36 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   shortcutsTitle: {
-    color: "rgba(255, 255, 255, 0.50)",
-    fontFamily: "Pretendard",
+    color: 'rgba(255, 255, 255, 0.50)',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
     marginBottom: 16,
   },
   shortcutsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   shortcutItem: {
-    alignItems: "center",
+    alignItems: 'center',
     gap: 8,
   },
   shortcutIconContainer: {
     width: 50,
     height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
   },
   shortcutLabel: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
@@ -888,144 +793,144 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 42,
     borderWidth: 1,
-    borderColor: "#FFFFFF",
-    backgroundColor: "transparent",
-    justifyContent: "center",
-    alignItems: "center",
+    borderColor: '#FFFFFF',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modeButtonActive: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
   },
   modeButtonText: {
-    fontFamily: "Inter",
+    fontFamily: 'Inter',
     fontSize: 12,
-    fontWeight: "700",
-    color: "#FFFFFF",
-    textAlign: "right",
+    fontWeight: '700',
+    color: '#FFFFFF',
+    textAlign: 'right',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   modeButtonTextActive: {
-    color: "#659DF2",
+    color: '#659DF2',
   },
   modeBadge: {
-    backgroundColor: "#3E4A63",
+    backgroundColor: '#3E4A63',
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 12,
     fontSize: 12,
-    color: "#fff",
+    color: '#fff',
   },
   chatTypeTabs: {
-    flexDirection: "row",
-    backgroundColor: "#1B2630",
-    width: "100%",
+    flexDirection: 'row',
+    backgroundColor: '#1B2630',
+    width: '100%',
   },
   chatTypeTab: {
     flex: 1,
     paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#1B2630",
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1B2630',
   },
   chatTypeTabActive: {
     borderBottomWidth: 3,
-    borderBottomColor: "#659DF2",
-    backgroundColor: "#1B2630",
+    borderBottomColor: '#659DF2',
+    backgroundColor: '#1B2630',
   },
   chatTypeTabText: {
-    color: "#FFF",
-    textAlign: "center",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    textAlign: 'center',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
   chatListSection: {
     flex: 1,
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
   },
   chatListHeader: {
-    backgroundColor: "#34495E",
+    backgroundColor: '#34495E',
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 12,
   },
   chatListTitle: {
-    color: "rgba(255, 255, 255, 0.50)",
-    fontFamily: "Pretendard",
+    color: 'rgba(255, 255, 255, 0.50)',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
   chatListItem: {
-    flexDirection: "row",
-    width: "100%",
-    alignItems: "center",
+    flexDirection: 'row',
+    width: '100%',
+    alignItems: 'center',
     gap: 5,
     marginBottom: 10,
   },
   chatCardLeft: {
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 70,
     paddingHorizontal: 10,
-    alignItems: "center",
+    alignItems: 'center',
     gap: 10,
     flex: 1,
     borderTopLeftRadius: 10,
     borderBottomLeftRadius: 10,
     borderTopRightRadius: 5,
     borderBottomRightRadius: 5,
-    backgroundColor: "#222D39",
+    backgroundColor: '#222D39',
   },
   chatCardTextColumn: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   chatCardTitle: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
   chatCardTime: {
-    color: "rgba(255, 255, 255, 0.50)",
-    fontFamily: "Pretendard",
+    color: 'rgba(255, 255, 255, 0.50)',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
   chatCardTimeRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   chatCardTimeSeparator: {
-    color: "rgba(255, 255, 255, 0.50)",
-    fontFamily: "Pretendard",
+    color: 'rgba(255, 255, 255, 0.50)',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
   chatCardLandmark: {
-    color: "#659DF2",
-    fontFamily: "Pretendard",
+    color: '#659DF2',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
     flex: 1,
   },
   planInfoText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
   },
@@ -1033,78 +938,78 @@ const styles = StyleSheet.create({
     width: 35,
     height: 70,
     paddingHorizontal: 3,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderTopLeftRadius: 5,
     borderBottomLeftRadius: 5,
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
-    backgroundColor: "#659DF2",
+    backgroundColor: '#659DF2',
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingVertical: 60,
   },
   emptyText: {
     fontSize: 16,
-    color: "#A5B4CC",
-    textAlign: "center",
+    color: '#A5B4CC',
+    textAlign: 'center',
   },
   errorText: {
     fontSize: 16,
-    color: "#FF6B6B",
-    textAlign: "center",
+    color: '#FF6B6B',
+    textAlign: 'center',
     marginBottom: 16,
   },
   retryButton: {
-    backgroundColor: "#5B7DFF",
+    backgroundColor: '#5B7DFF',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
   },
   retryText: {
-    color: "#fff",
-    fontWeight: "600",
+    color: '#fff',
+    fontWeight: '600',
   },
   // Modal styles
   modalContainer: {
     flex: 1,
   },
   modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 16,
-    backgroundColor: "#2F3F5B",
+    backgroundColor: '#2F3F5B',
   },
   modalHeaderContent: {
     flex: 1,
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#fff",
+    fontWeight: '700',
+    color: '#fff',
     marginBottom: 4,
   },
   modalSubtitle: {
     fontSize: 13,
-    color: "#94A3B8",
+    color: '#94A3B8',
   },
   modalCloseButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modalContent: {
     flex: 1,
-    backgroundColor: "#0F1A2A",
+    backgroundColor: '#0F1A2A',
   },
   modalContentInner: {
     padding: 20,
@@ -1114,31 +1019,31 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   userMessageContainer: {
-    alignItems: "flex-end",
+    alignItems: 'flex-end',
   },
   userBubble: {
-    backgroundColor: "#5B7DFF",
+    backgroundColor: '#5B7DFF',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 16,
-    maxWidth: "80%",
+    maxWidth: '80%',
   },
   userMessageText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
   },
   aiMessageContainer: {
-    alignItems: "flex-start",
+    alignItems: 'flex-start',
   },
   aiBubble: {
-    backgroundColor: "#2F3F5B",
+    backgroundColor: '#2F3F5B',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 16,
-    maxWidth: "80%",
+    maxWidth: '80%',
   },
   aiMessageText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
   },
   // Quest Chat 스타일 추가
@@ -1148,17 +1053,17 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   bubble: {
-    maxWidth: "80%",
+    maxWidth: '80%',
     padding: 12,
     borderRadius: 14,
     marginBottom: 10,
   },
   assistantBubble: {
-    alignSelf: "flex-start",
-    backgroundColor: "#C1C9D9",
+    alignSelf: 'flex-start',
+    backgroundColor: '#C1C9D9',
   },
   assistantMessageText: {
-    color: "#1F2937",
+    color: '#1F2937',
     fontSize: 15,
   },
   bubbleImage: {
@@ -1168,50 +1073,50 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   planBubble: {
-    backgroundColor: "#1E2A3B",
+    backgroundColor: '#1E2A3B',
     padding: 18,
     borderRadius: 14,
     marginBottom: 16,
-    alignSelf: "stretch",
+    alignSelf: 'stretch',
   },
   planTitle: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#fff",
+    fontWeight: '700',
+    color: '#fff',
     marginBottom: 8,
   },
   planMeta: {
     fontSize: 13,
-    color: "#A5B4CC",
+    color: '#A5B4CC',
     marginBottom: 4,
   },
   planMessage: {
     marginTop: 12,
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
   },
   planButton: {
     marginTop: 14,
-    backgroundColor: "#5B7DFF",
+    backgroundColor: '#5B7DFF',
     paddingVertical: 10,
     borderRadius: 12,
-    alignItems: "center",
+    alignItems: 'center',
   },
   planButtonText: {
-    color: "#fff",
-    fontWeight: "600",
+    color: '#fff',
+    fontWeight: '600',
   },
   planButtonDisabled: {
-    backgroundColor: "#3E4A63",
+    backgroundColor: '#3E4A63',
     opacity: 0.6,
   },
   planButtonTextDisabled: {
-    color: "#94A3B8",
+    color: '#94A3B8',
   },
   planMessageTitle: {
     fontSize: 15,
-    fontWeight: "700",
-    color: "#fff",
+    fontWeight: '700',
+    color: '#fff',
     marginBottom: 6,
   },
 });

@@ -1,14 +1,14 @@
-import { useEffect } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Drawer } from 'expo-router/drawer';
-import { StatusBar } from 'expo-status-bar';
-import { useRouter, useSegments } from 'expo-router';
 import { useFonts } from 'expo-font';
+import { useRouter, useSegments } from 'expo-router';
+import { Drawer } from 'expo-router/drawer';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useColorScheme } from '@shared/lib';
 
 // 폰트 로딩 중 스플래시 화면 유지
 SplashScreen.preventAutoHideAsync();

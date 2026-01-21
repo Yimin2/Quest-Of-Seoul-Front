@@ -1,3 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -10,13 +13,9 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { useAuthStore } from '@/store/useAuthStore';
+import { ThemedText } from '@shared/ui';
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -27,7 +26,7 @@ export default function SignupScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   const signup = useAuthStore((state) => state.signup);
 
   const handleSignup = async () => {
@@ -65,7 +64,7 @@ export default function SignupScreen() {
     } catch (error) {
       Alert.alert(
         'Sign Up Failed',
-        error instanceof Error ? error.message : 'Sign up failed. Please try again.'
+        error instanceof Error ? error.message : 'Sign up failed. Please try again.',
       );
     } finally {
       setIsLoading(false);
@@ -81,10 +80,7 @@ export default function SignupScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.container}
     >
-      <LinearGradient
-        colors={['#7EC8E3', '#4A90E2']}
-        style={styles.gradient}
-      >
+      <LinearGradient colors={['#7EC8E3', '#4A90E2']} style={styles.gradient}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
@@ -96,9 +92,7 @@ export default function SignupScreen() {
             <ThemedText type="title" style={styles.title}>
               Sign Up
             </ThemedText>
-            <ThemedText style={styles.subtitle}>
-              Create a new account
-            </ThemedText>
+            <ThemedText style={styles.subtitle}>Create a new account</ThemedText>
           </View>
 
           <View style={styles.form}>
@@ -132,7 +126,12 @@ export default function SignupScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="Password (min 6 characters)"
@@ -144,10 +143,7 @@ export default function SignupScreen() {
                 autoCorrect={false}
                 editable={!isLoading}
               />
-              <Pressable
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.eyeIcon}
-              >
+              <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
                 <Ionicons
                   name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                   size={20}
@@ -157,7 +153,12 @@ export default function SignupScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="Confirm Password"
@@ -194,7 +195,7 @@ export default function SignupScreen() {
             </Pressable>
 
             <View style={styles.loginContainer}>
-              <ThemedText style={styles.loginText}>Already have an account? </ThemedText>
+              <ThemedText style={styles.loginText}>Already have an account?</ThemedText>
               <Pressable onPress={goToLogin} disabled={isLoading}>
                 <ThemedText style={styles.loginLink}>Login</ThemedText>
               </Pressable>
@@ -297,4 +298,3 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 });
-

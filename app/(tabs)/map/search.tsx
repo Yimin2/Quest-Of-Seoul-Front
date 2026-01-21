@@ -1,8 +1,8 @@
-import { questApi, type Quest } from "@/services/api";
-import * as Location from "expo-location";
-import { LinearGradient } from "expo-linear-gradient";
-import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { questApi, type Quest } from '@/services/api';
+import * as Location from 'expo-location';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -12,35 +12,35 @@ import {
   Text,
   TextInput,
   View,
-} from "react-native";
-import Svg, { Path, Defs, RadialGradient, Stop } from "react-native-svg";
+} from 'react-native';
+import Svg, { Path, Defs, RadialGradient, Stop } from 'react-native-svg';
 
-type SortByType = "nearest" | "rewarded" | "newest";
+type SortByType = 'nearest' | 'rewarded' | 'newest';
 
 export default function MapSearchScreen() {
   const params = useLocalSearchParams();
-  const lastProcessedParamsRef = useRef<string>("");
+  const lastProcessedParamsRef = useRef<string>('');
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Quest[]>([]);
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState<{
     latitude: number;
     longitude: number;
   } | null>(null);
-  const [debugInfo, setDebugInfo] = useState<string>("");
-  const [selectedFilter, setSelectedFilter] = useState<"themes" | "districts">("themes");
-  const [selectedSort, setSelectedSort] = useState<SortByType>("nearest");
-  const [selectedThemes, setSelectedThemes] = useState<string[]>(["All Themes"]);
-  const [selectedDistricts, setSelectedDistricts] = useState<string[]>(["All Districts"]);
+  const [debugInfo, setDebugInfo] = useState<string>('');
+  const [selectedFilter, setSelectedFilter] = useState<'themes' | 'districts'>('themes');
+  const [selectedSort, setSelectedSort] = useState<SortByType>('nearest');
+  const [selectedThemes, setSelectedThemes] = useState<string[]>(['All Themes']);
+  const [selectedDistricts, setSelectedDistricts] = useState<string[]>(['All Districts']);
 
   // Get user location on mount
   useEffect(() => {
     (async () => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          setUserLocation({ latitude: 37.5665, longitude: 126.9780 });
+        if (status !== 'granted') {
+          setUserLocation({ latitude: 37.5665, longitude: 126.978 });
           return;
         }
 
@@ -50,14 +50,14 @@ export default function MapSearchScreen() {
           longitude: location.coords.longitude,
         });
       } catch (error) {
-        setUserLocation({ latitude: 37.5665, longitude: 126.9780 });
+        setUserLocation({ latitude: 37.5665, longitude: 126.978 });
       }
     })();
   }, []);
 
   // Handle params from filter page
   useEffect(() => {
-    if (params.fromFilter === "true") {
+    if (params.fromFilter === 'true') {
       // Create a unique key for this set of params to prevent re-processing
       const paramsKey = JSON.stringify(params);
 
@@ -82,13 +82,13 @@ export default function MapSearchScreen() {
       }
 
       if (params.selectedThemes) {
-        const themes = (params.selectedThemes as string).split(",");
+        const themes = (params.selectedThemes as string).split(',');
         setSelectedThemes(themes);
-        setSelectedFilter("themes");
+        setSelectedFilter('themes');
       }
 
       if (params.selectedDistricts) {
-        const districts = (params.selectedDistricts as string).split(",");
+        const districts = (params.selectedDistricts as string).split(',');
         setSelectedDistricts(districts);
       }
 
@@ -114,27 +114,28 @@ export default function MapSearchScreen() {
           radius_km: 50.0,
           limit: 100,
           sort_by: selectedSort,
-          categories: selectedThemes.includes("All Themes")
+          categories: selectedThemes.includes('All Themes')
             ? []
-            : selectedThemes.map(theme =>
-                theme === "Attractions" ? "Attraction" : theme
-              ),
-          districts: selectedDistricts.includes("All Districts")
+            : selectedThemes.map((theme) => (theme === 'Attractions' ? 'Attraction' : theme)),
+          districts: selectedDistricts.includes('All Districts')
             ? []
-            : selectedDistricts.map(d => d.replace("-district", "-gu")),
+            : selectedDistricts.map((d) => d.replace('-district', '-gu')),
         };
 
         setDebugInfo(`Sending request to API...`);
 
         const response = await questApi.getFilteredQuests(filterParams);
 
-        setDebugInfo(`API: success=${response.success}, count=${response.count}, quests=${response.quests?.length || 0}\nJSON: ${JSON.stringify(response).substring(0, 150)}`);
+        setDebugInfo(
+          `API: success=${response.success}, count=${response.count}, quests=${response.quests?.length || 0}\nJSON: ${JSON.stringify(response).substring(0, 150)}`,
+        );
 
         if (response && response.quests && Array.isArray(response.quests)) {
           // Client-side filtering by search query
-          const filteredQuests = response.quests.filter(quest =>
-            quest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            quest.description?.toLowerCase().includes(searchQuery.toLowerCase())
+          const filteredQuests = response.quests.filter(
+            (quest) =>
+              quest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              quest.description?.toLowerCase().includes(searchQuery.toLowerCase()),
           );
 
           setSearchResults(filteredQuests);
@@ -170,13 +171,7 @@ export default function MapSearchScreen() {
 
         {/* Search box */}
         <View style={styles.searchBox}>
-          <Svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            style={styles.searchIcon}
-          >
+          <Svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={styles.searchIcon}>
             <Path
               d="M14.0537 1.95054C12.8004 0.70142 11.1031 0 9.33375 0C7.56437 0 5.86713 0.70142 4.61382 1.95054C3.64403 2.9226 2.99694 4.16963 2.7605 5.5223C2.52406 6.87497 2.70972 8.26769 3.29225 9.51116L0.727749 12.076C0.503805 12.2827 0.323959 12.5325 0.198976 12.8105C0.0739928 13.0884 0.00645004 13.3888 0.000439965 13.6935C-0.00557011 13.9982 0.0500487 14.301 0.163974 14.5837C0.2779 14.8664 0.447792 15.1231 0.663411 15.3385C0.879031 15.5539 1.13592 15.7234 1.41871 15.837C1.7015 15.9506 2.00435 16.0059 2.30903 15.9995C2.61371 15.9931 2.91393 15.9252 3.19171 15.7998C3.46949 15.6745 3.71909 15.4943 3.9255 15.2701L6.49 12.7053C7.37865 13.1223 8.3482 13.3386 9.32981 13.3387C10.2074 13.3382 11.0762 13.1642 11.8862 12.8267C12.6962 12.4891 13.4315 11.9947 14.0497 11.3718C15.2987 10.1184 16 8.42091 16 6.65133C16 4.88174 15.2987 3.1843 14.0497 1.93085L14.0537 1.95054ZM13.2434 8.28772C12.8429 9.26248 12.094 10.0534 11.1426 10.5065C10.1912 10.9596 9.10529 11.0424 8.09615 10.739C7.08701 10.4356 6.22686 9.76757 5.68299 8.86491C5.13912 7.96225 4.95046 6.88954 5.15374 5.85546C5.35701 4.82137 5.93767 3.89986 6.78274 3.2703C7.62781 2.64073 8.67685 2.34812 9.72573 2.44936C10.7746 2.5506 11.7483 3.03852 12.4574 3.8181C13.1665 4.59768 13.5602 5.6132 13.562 6.66708C13.5628 7.22294 13.4545 7.77351 13.2434 8.28772Z"
               fill="#34495E"
@@ -196,7 +191,7 @@ export default function MapSearchScreen() {
 
       {/* Filter row */}
       <View style={styles.filterRow}>
-        <Pressable style={styles.iconButton} onPress={() => setSearchQuery("")}>
+        <Pressable style={styles.iconButton} onPress={() => setSearchQuery('')}>
           <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <Path
               d="M12 20C9.76667 20 7.875 19.225 6.325 17.675C4.775 16.125 4 14.2333 4 12C4 9.76667 4.775 7.875 6.325 6.325C7.875 4.775 9.76667 4 12 4C13.15 4 14.25 4.23734 15.3 4.712C16.35 5.18667 17.25 5.866 18 6.75V5C18 4.71667 18.096 4.47934 18.288 4.288C18.48 4.09667 18.7173 4.00067 19 4C19.2827 3.99934 19.5203 4.09534 19.713 4.288C19.9057 4.48067 20.0013 4.718 20 5V10C20 10.2833 19.904 10.521 19.712 10.713C19.52 10.905 19.2827 11.0007 19 11H14C13.7167 11 13.4793 10.904 13.288 10.712C13.0967 10.52 13.0007 10.2827 13 10C12.9993 9.71734 13.0953 9.48 13.288 9.288C13.4807 9.096 13.718 9 14 9H17.2C16.6667 8.06667 15.9377 7.33334 15.013 6.8C14.0883 6.26667 13.084 6 12 6C10.3333 6 8.91667 6.58334 7.75 7.75C6.58333 8.91667 6 10.3333 6 12C6 13.6667 6.58333 15.0833 7.75 16.25C8.91667 17.4167 10.3333 18 12 18C13.1333 18 14.171 17.7127 15.113 17.138C16.055 16.5633 16.784 15.7923 17.3 14.825C17.4333 14.5917 17.621 14.4293 17.863 14.338C18.105 14.2467 18.3507 14.2423 18.6 14.325C18.8667 14.4083 19.0583 14.5833 19.175 14.85C19.2917 15.1167 19.2833 15.3667 19.15 15.6C18.4667 16.9333 17.4917 18 16.225 18.8C14.9583 19.6 13.55 20 12 20Z"
@@ -209,14 +204,14 @@ export default function MapSearchScreen() {
           style={[styles.iconButton, { marginLeft: 14 }]}
           onPress={() => {
             router.push({
-              pathname: "/(tabs)/map/filter",
+              pathname: '/(tabs)/map/filter',
               params: {
                 selectedFilter: selectedFilter,
                 selectedSort: selectedSort,
-                selectedThemes: selectedThemes.join(","),
-                selectedDistricts: selectedDistricts.join(","),
+                selectedThemes: selectedThemes.join(','),
+                selectedDistricts: selectedDistricts.join(','),
                 searchQuery: searchQuery, // 검색어 전달
-              }
+              },
             });
           }}
         >
@@ -239,8 +234,8 @@ export default function MapSearchScreen() {
         >
           <View style={styles.category}>
             <Text style={styles.categoryText}>
-              {selectedThemes.length === 1 && selectedThemes[0] === "All Themes"
-                ? "All Themes"
+              {selectedThemes.length === 1 && selectedThemes[0] === 'All Themes'
+                ? 'All Themes'
                 : selectedThemes.length === 1
                   ? selectedThemes[0]
                   : `${selectedThemes.length} Themes`}
@@ -248,8 +243,8 @@ export default function MapSearchScreen() {
           </View>
           <View style={styles.category}>
             <Text style={styles.categoryText}>
-              {selectedDistricts.length === 1 && selectedDistricts[0] === "All Districts"
-                ? "All Districts"
+              {selectedDistricts.length === 1 && selectedDistricts[0] === 'All Districts'
+                ? 'All Districts'
                 : selectedDistricts.length === 1
                   ? selectedDistricts[0]
                   : `${selectedDistricts.length} Districts`}
@@ -263,7 +258,11 @@ export default function MapSearchScreen() {
               />
             </Svg>
             <Text style={styles.categoryIconText}>
-              {selectedSort === "nearest" ? "Nearest Trip" : selectedSort === "rewarded" ? "Most Rewarded" : "Newest"}
+              {selectedSort === 'nearest'
+                ? 'Nearest Trip'
+                : selectedSort === 'rewarded'
+                  ? 'Most Rewarded'
+                  : 'Newest'}
             </Text>
           </View>
         </ScrollView>
@@ -277,7 +276,7 @@ export default function MapSearchScreen() {
           </View>
         )}
 
-        {!loading && searchQuery !== "" && searchResults.length > 0 && (
+        {!loading && searchQuery !== '' && searchResults.length > 0 && (
           <View style={styles.resultsContainer}>
             <Text style={styles.resultsTitle}>
               Found {searchResults.length} place{searchResults.length > 1 ? 's' : ''}
@@ -289,7 +288,7 @@ export default function MapSearchScreen() {
                   style={styles.cardWrapper}
                   onPress={() => {
                     router.push({
-                      pathname: "/(tabs)/map",
+                      pathname: '/(tabs)/map',
                       params: {
                         searchResult: JSON.stringify(quest),
                         focusQuestId: quest.id.toString(),
@@ -299,39 +298,54 @@ export default function MapSearchScreen() {
                 >
                   <View style={styles.placeImageContainer}>
                     {quest.place_image_url && (
-                      <Image
-                        source={{ uri: quest.place_image_url }}
-                        style={styles.placeImage}
-                      />
+                      <Image source={{ uri: quest.place_image_url }} style={styles.placeImage} />
                     )}
                     <Text style={styles.placeCategoryText}>{quest.category || 'Place'}</Text>
                     <Pressable style={styles.plusButton}>
                       <Svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <Path d="M14.8571 9.14286H9.14286V14.8571C9.14286 15.1602 9.02245 15.4509 8.80812 15.6653C8.59379 15.8796 8.30311 16 8 16C7.6969 16 7.40621 15.8796 7.19188 15.6653C6.97755 15.4509 6.85714 15.1602 6.85714 14.8571V9.14286H1.14286C0.839753 9.14286 0.549063 9.02245 0.334735 8.80812C0.120408 8.59379 0 8.30311 0 8C0 7.6969 0.120408 7.40621 0.334735 7.19188C0.549063 6.97755 0.839753 6.85714 1.14286 6.85714H6.85714V1.14286C6.85714 0.839753 6.97755 0.549062 7.19188 0.334735C7.40621 0.120407 7.6969 0 8 0C8.30311 0 8.59379 0.120407 8.80812 0.334735C9.02245 0.549062 9.14286 0.839753 9.14286 1.14286V6.85714H14.8571C15.1602 6.85714 15.4509 6.97755 15.6653 7.19188C15.8796 7.40621 16 7.6969 16 8C16 8.30311 15.8796 8.59379 15.6653 8.80812C15.4509 9.02245 15.1602 9.14286 14.8571 9.14286Z" fill="white"/>
+                        <Path
+                          d="M14.8571 9.14286H9.14286V14.8571C9.14286 15.1602 9.02245 15.4509 8.80812 15.6653C8.59379 15.8796 8.30311 16 8 16C7.6969 16 7.40621 15.8796 7.19188 15.6653C6.97755 15.4509 6.85714 15.1602 6.85714 14.8571V9.14286H1.14286C0.839753 9.14286 0.549063 9.02245 0.334735 8.80812C0.120408 8.59379 0 8.30311 0 8C0 7.6969 0.120408 7.40621 0.334735 7.19188C0.549063 6.97755 0.839753 6.85714 1.14286 6.85714H6.85714V1.14286C6.85714 0.839753 6.97755 0.549062 7.19188 0.334735C7.40621 0.120407 7.6969 0 8 0C8.30311 0 8.59379 0.120407 8.80812 0.334735C9.02245 0.549062 9.14286 0.839753 9.14286 1.14286V6.85714H14.8571C15.1602 6.85714 15.4509 6.97755 15.6653 7.19188C15.8796 7.40621 16 7.6969 16 8C16 8.30311 15.8796 8.59379 15.6653 8.80812C15.4509 9.02245 15.1602 9.14286 14.8571 9.14286Z"
+                          fill="white"
+                        />
                       </Svg>
                     </Pressable>
                     {quest.distance_km !== undefined && (
                       <View style={styles.distanceBadge}>
                         <Svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                          <Path d="M9.49609 0.501953C9.4967 0.511802 9.50014 0.523321 9.5 0.537109C9.49887 0.64138 9.4678 0.808104 9.38184 1.04883L5.61035 9.19434L5.60156 9.21387L5.59375 9.2334C5.56315 9.31782 5.50604 9.38903 5.43262 9.43652C5.35932 9.48388 5.27333 9.50595 5.1875 9.49902C5.1016 9.49207 5.01943 9.45648 4.9541 9.39746C4.88881 9.33843 4.84406 9.25842 4.82715 9.16992V9.16895L4.79199 9.01465C4.59556 8.24175 4.04883 7.43937 3.41504 6.80273C2.7393 6.12398 1.87207 5.54092 1.04492 5.38672L0.828125 5.34375L0.824219 5.34277L0.761719 5.32617C0.701821 5.30413 0.647322 5.2667 0.603516 5.21777C0.545136 5.15242 0.508439 5.06864 0.500977 4.97949C0.493596 4.89034 0.515442 4.8013 0.5625 4.72656C0.609571 4.65182 0.679301 4.59552 0.759766 4.56543L0.78125 4.55762L0.801758 4.54785L8.95898 0.625C9.19511 0.535375 9.35976 0.503188 9.46289 0.5C9.47568 0.499607 9.48672 0.501617 9.49609 0.501953Z" stroke="#F5F5F5"/>
+                          <Path
+                            d="M9.49609 0.501953C9.4967 0.511802 9.50014 0.523321 9.5 0.537109C9.49887 0.64138 9.4678 0.808104 9.38184 1.04883L5.61035 9.19434L5.60156 9.21387L5.59375 9.2334C5.56315 9.31782 5.50604 9.38903 5.43262 9.43652C5.35932 9.48388 5.27333 9.50595 5.1875 9.49902C5.1016 9.49207 5.01943 9.45648 4.9541 9.39746C4.88881 9.33843 4.84406 9.25842 4.82715 9.16992V9.16895L4.79199 9.01465C4.59556 8.24175 4.04883 7.43937 3.41504 6.80273C2.7393 6.12398 1.87207 5.54092 1.04492 5.38672L0.828125 5.34375L0.824219 5.34277L0.761719 5.32617C0.701821 5.30413 0.647322 5.2667 0.603516 5.21777C0.545136 5.15242 0.508439 5.06864 0.500977 4.97949C0.493596 4.89034 0.515442 4.8013 0.5625 4.72656C0.609571 4.65182 0.679301 4.59552 0.759766 4.56543L0.78125 4.55762L0.801758 4.54785L8.95898 0.625C9.19511 0.535375 9.35976 0.503188 9.46289 0.5C9.47568 0.499607 9.48672 0.501617 9.49609 0.501953Z"
+                            stroke="#F5F5F5"
+                          />
                         </Svg>
                         <Text style={styles.distanceText}>{quest.distance_km.toFixed(1)}km</Text>
                       </View>
                     )}
                     <LinearGradient
-                      colors={["#76C7AD", "#3A6154"]}
+                      colors={['#76C7AD', '#3A6154']}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                       style={styles.mintBadge}
                     >
-                      <Svg width="16" height="10" viewBox="0 0 16 10" fill="none" style={styles.mintIcon}>
-                        <Path d="M7.97656 0.5C8.66625 0.505346 9.34579 0.688996 9.95508 1.03613C10.5644 1.38334 11.0863 1.88423 11.4727 2.49707L11.8076 3.02832L12.25 2.58301C12.4078 2.42426 12.5942 2.30362 12.7959 2.22754L12.8047 2.22461L13.7578 1.84473C14.1608 1.68634 14.5665 1.6956 14.874 1.81055C15.1809 1.92526 15.3604 2.12924 15.4121 2.3584L15.4814 2.6709V2.67188C15.5433 2.94777 15.4221 3.28911 15.0869 3.56152L14.5449 4.00098L15.1367 4.37207C15.2406 4.43732 15.3299 4.53127 15.3945 4.64648C15.443 4.73304 15.476 4.82923 15.4912 4.92969L15.5 5.03125V5.33789C15.5 5.58665 15.3625 5.83372 15.0674 6.02734L14.4883 6.40723L15.0303 6.83789C15.4195 7.14688 15.5503 7.53718 15.4688 7.83594L15.3818 8.13477L15.3809 8.13965C15.3167 8.37087 15.1173 8.5688 14.7861 8.66113C14.4546 8.75345 14.0298 8.72287 13.6309 8.5166H13.6299L12.71 8.04199L12.707 8.04102C12.5122 7.94195 12.3377 7.79878 12.1973 7.61914L11.7764 7.0791L11.3906 7.64453C11.2577 7.8391 11.1098 8.02158 10.9482 8.18945L10.9453 8.19141C10.5132 8.64672 9.99469 8.9976 9.42578 9.2207C8.85712 9.44368 8.25031 9.53447 7.64648 9.48828C7.04246 9.44203 6.45323 9.25922 5.91992 8.95117C5.38666 8.64311 4.92044 8.21673 4.55469 7.69922L4.18359 7.17383L3.76562 7.66309C3.63164 7.82006 3.47111 7.9469 3.29395 8.03711L3.29199 8.03809L2.37207 8.51172H2.37109C1.97187 8.71816 1.54829 8.74853 1.21777 8.65625C0.888053 8.56416 0.686747 8.36684 0.620117 8.13281L0.619141 8.12988L0.533203 7.83398C0.454976 7.53756 0.584715 7.14438 0.974609 6.83008L1.50879 6.39941L0.93457 6.02344C0.640255 5.83044 0.502024 5.57912 0.501953 5.33398V5.03027C0.505997 4.89354 0.542223 4.76088 0.606445 4.64551C0.670593 4.53039 0.759897 4.43663 0.863281 4.37109L1.44727 4.00098L0.912109 3.5625C0.577499 3.28772 0.454259 2.9457 0.515625 2.67188V2.6709L0.584961 2.35645C0.63714 2.12824 0.817559 1.92506 1.12402 1.81055C1.43186 1.69559 1.83729 1.68655 2.23926 1.84473V1.8457L3.19434 2.22461L3.19824 2.22559C3.37976 2.29627 3.54914 2.40209 3.69727 2.53809L4.13184 2.9375L4.4541 2.44238C4.84885 1.83571 5.3772 1.34256 5.99121 1.00488C6.60505 0.667345 7.28698 0.494722 7.97656 0.5Z" fill="#76C7AD" stroke="white"/>
+                      <Svg
+                        width="16"
+                        height="10"
+                        viewBox="0 0 16 10"
+                        fill="none"
+                        style={styles.mintIcon}
+                      >
+                        <Path
+                          d="M7.97656 0.5C8.66625 0.505346 9.34579 0.688996 9.95508 1.03613C10.5644 1.38334 11.0863 1.88423 11.4727 2.49707L11.8076 3.02832L12.25 2.58301C12.4078 2.42426 12.5942 2.30362 12.7959 2.22754L12.8047 2.22461L13.7578 1.84473C14.1608 1.68634 14.5665 1.6956 14.874 1.81055C15.1809 1.92526 15.3604 2.12924 15.4121 2.3584L15.4814 2.6709V2.67188C15.5433 2.94777 15.4221 3.28911 15.0869 3.56152L14.5449 4.00098L15.1367 4.37207C15.2406 4.43732 15.3299 4.53127 15.3945 4.64648C15.443 4.73304 15.476 4.82923 15.4912 4.92969L15.5 5.03125V5.33789C15.5 5.58665 15.3625 5.83372 15.0674 6.02734L14.4883 6.40723L15.0303 6.83789C15.4195 7.14688 15.5503 7.53718 15.4688 7.83594L15.3818 8.13477L15.3809 8.13965C15.3167 8.37087 15.1173 8.5688 14.7861 8.66113C14.4546 8.75345 14.0298 8.72287 13.6309 8.5166H13.6299L12.71 8.04199L12.707 8.04102C12.5122 7.94195 12.3377 7.79878 12.1973 7.61914L11.7764 7.0791L11.3906 7.64453C11.2577 7.8391 11.1098 8.02158 10.9482 8.18945L10.9453 8.19141C10.5132 8.64672 9.99469 8.9976 9.42578 9.2207C8.85712 9.44368 8.25031 9.53447 7.64648 9.48828C7.04246 9.44203 6.45323 9.25922 5.91992 8.95117C5.38666 8.64311 4.92044 8.21673 4.55469 7.69922L4.18359 7.17383L3.76562 7.66309C3.63164 7.82006 3.47111 7.9469 3.29395 8.03711L3.29199 8.03809L2.37207 8.51172H2.37109C1.97187 8.71816 1.54829 8.74853 1.21777 8.65625C0.888053 8.56416 0.686747 8.36684 0.620117 8.13281L0.619141 8.12988L0.533203 7.83398C0.454976 7.53756 0.584715 7.14438 0.974609 6.83008L1.50879 6.39941L0.93457 6.02344C0.640255 5.83044 0.502024 5.57912 0.501953 5.33398V5.03027C0.505997 4.89354 0.542223 4.76088 0.606445 4.64551C0.670593 4.53039 0.759897 4.43663 0.863281 4.37109L1.44727 4.00098L0.912109 3.5625C0.577499 3.28772 0.454259 2.9457 0.515625 2.67188V2.6709L0.584961 2.35645C0.63714 2.12824 0.817559 1.92506 1.12402 1.81055C1.43186 1.69559 1.83729 1.68655 2.23926 1.84473V1.8457L3.19434 2.22461L3.19824 2.22559C3.37976 2.29627 3.54914 2.40209 3.69727 2.53809L4.13184 2.9375L4.4541 2.44238C4.84885 1.83571 5.3772 1.34256 5.99121 1.00488C6.60505 0.667345 7.28698 0.494722 7.97656 0.5Z"
+                          fill="#76C7AD"
+                          stroke="white"
+                        />
                       </Svg>
                       <Text style={styles.mintText}>{quest.reward_point}</Text>
                     </LinearGradient>
                   </View>
                   <View style={styles.placeInfoBottom}>
-                    <Text style={styles.placeNameText} numberOfLines={2}>{quest.name}</Text>
+                    <Text style={styles.placeNameText} numberOfLines={2}>
+                      {quest.name}
+                    </Text>
                     {quest.district && (
                       <Text style={styles.placeLocationText}>{quest.district}</Text>
                     )}
@@ -342,20 +356,14 @@ export default function MapSearchScreen() {
           </View>
         )}
 
-        {!loading && searchQuery !== "" && searchResults.length === 0 && (
+        {!loading && searchQuery !== '' && searchResults.length === 0 && (
           <View style={styles.noResultsContainer}>
             <Image
-              source={require("@/assets/images/face-2-2.png")}
+              source={require('@/assets/images/face-2-2.png')}
               style={styles.docentFaceImage}
               resizeMode="contain"
             />
-            <Svg
-              width="130"
-              height="46"
-              viewBox="0 0 130 46"
-              fill="none"
-              style={styles.oopsText}
-            >
+            <Svg width="130" height="46" viewBox="0 0 130 46" fill="none" style={styles.oopsText}>
               <Path
                 d="M15.936 36.3333C12.5016 36.3333 9.59688 35.5873 7.22173 34.0952C4.84658 32.6032 3.04918 30.5397 1.82951 27.9048C0.609835 25.2698 0 22.2381 0 18.8095C0 15.4127 0.609835 12.3968 1.82951 9.76191C3.04918 7.09524 4.84658 5.01587 7.22173 3.52381C9.59688 2 12.5016 1.2381 15.936 1.2381C19.3703 1.2381 22.259 2 24.602 3.52381C26.9772 5.01587 28.7746 7.09524 29.9943 9.76191C31.2139 12.3968 31.8238 15.4127 31.8238 18.8095C31.8238 22.2381 31.2139 25.2698 29.9943 27.9048C28.7746 30.5397 26.9772 32.6032 24.602 34.0952C22.259 35.5873 19.3703 36.3333 15.936 36.3333ZM6.06625 18.0476C6.06625 19.0317 6.30698 19.9683 6.78843 20.8571C7.26988 21.7143 8.21672 22.4127 9.62897 22.9524C11.0412 23.4603 13.1436 23.7143 15.936 23.7143C18.7284 23.7143 20.8146 23.4603 22.1948 22.9524C23.607 22.4127 24.5539 21.7143 25.0353 20.8571C25.5168 19.9683 25.7575 19.0317 25.7575 18.0476C25.7575 17.0317 25.5168 16.127 25.0353 15.3333C24.5539 14.5079 23.607 13.8571 22.1948 13.381C20.8146 12.873 18.7284 12.619 15.936 12.619C13.1436 12.619 11.0412 12.873 9.62897 13.381C8.21672 13.8571 7.26988 14.5079 6.78843 15.3333C6.30698 16.127 6.06625 17.0317 6.06625 18.0476Z"
                 fill="#FEF5E7"
@@ -386,20 +394,14 @@ export default function MapSearchScreen() {
           </View>
         )}
 
-        {searchQuery === "" && (
+        {searchQuery === '' && (
           <View style={styles.noResultsContainer}>
             <Image
-              source={require("@/assets/images/face-2-2.png")}
+              source={require('@/assets/images/face-2-2.png')}
               style={styles.docentFaceImage}
               resizeMode="contain"
             />
-            <Svg
-              width="130"
-              height="46"
-              viewBox="0 0 130 46"
-              fill="none"
-              style={styles.oopsText}
-            >
+            <Svg width="130" height="46" viewBox="0 0 130 46" fill="none" style={styles.oopsText}>
               <Path
                 d="M15.936 36.3333C12.5016 36.3333 9.59688 35.5873 7.22173 34.0952C4.84658 32.6032 3.04918 30.5397 1.82951 27.9048C0.609835 25.2698 0 22.2381 0 18.8095C0 15.4127 0.609835 12.3968 1.82951 9.76191C3.04918 7.09524 4.84658 5.01587 7.22173 3.52381C9.59688 2 12.5016 1.2381 15.936 1.2381C19.3703 1.2381 22.259 2 24.602 3.52381C26.9772 5.01587 28.7746 7.09524 29.9943 9.76191C31.2139 12.3968 31.8238 15.4127 31.8238 18.8095C31.8238 22.2381 31.2139 25.2698 29.9943 27.9048C28.7746 30.5397 26.9772 32.6032 24.602 34.0952C22.259 35.5873 19.3703 36.3333 15.936 36.3333ZM6.06625 18.0476C6.06625 19.0317 6.30698 19.9683 6.78843 20.8571C7.26988 21.7143 8.21672 22.4127 9.62897 22.9524C11.0412 23.4603 13.1436 23.7143 15.936 23.7143C18.7284 23.7143 20.8146 23.4603 22.1948 22.9524C23.607 22.4127 24.5539 21.7143 25.0353 20.8571C25.5168 19.9683 25.7575 19.0317 25.7575 18.0476C25.7575 17.0317 25.5168 16.127 25.0353 15.3333C24.5539 14.5079 23.607 13.8571 22.1948 13.381C20.8146 12.873 18.7284 12.619 15.936 12.619C13.1436 12.619 11.0412 12.873 9.62897 13.381C8.21672 13.8571 7.26988 14.5079 6.78843 15.3333C6.30698 16.127 6.06625 17.0317 6.06625 18.0476Z"
                 fill="#FEF5E7"
@@ -431,15 +433,15 @@ export default function MapSearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#659DF2",
+    backgroundColor: '#659DF2',
   },
   header: {
     paddingTop: 74,
     paddingLeft: 27,
     paddingRight: 27,
     paddingBottom: 20,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   backButton: {
     width: 9,
@@ -451,11 +453,11 @@ const styles = StyleSheet.create({
     height: 47,
     flexShrink: 0,
     borderRadius: 10,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     paddingVertical: 15,
     paddingHorizontal: 15,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   searchIcon: {
     marginRight: 9,
@@ -463,15 +465,15 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
-    color: "#34495E",
-    fontFamily: "Pretendard",
+    color: '#34495E',
+    fontFamily: 'Pretendard',
   },
   filterRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingLeft: 11,
     paddingRight: 0,
     marginTop: 10,
@@ -479,8 +481,8 @@ const styles = StyleSheet.create({
   iconButton: {
     width: 24,
     height: 24,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   categoriesScroll: {
     marginLeft: 14,
@@ -494,51 +496,51 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: 10,
     borderRadius: 42,
-    backgroundColor: "#FF7F50",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#FF7F50',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   categoryActiveText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   category: {
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 42,
     borderWidth: 1,
-    borderColor: "#FFF",
-    backgroundColor: "#FFF",
+    borderColor: '#FFF',
+    backgroundColor: '#FFF',
   },
   categoryText: {
-    color: "#659DF2",
-    fontFamily: "Pretendard",
+    color: '#659DF2',
+    fontFamily: 'Pretendard',
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   categoryWithIcon: {
     paddingVertical: 7,
     paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
     gap: 10,
     borderRadius: 42,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
   categoryIconText: {
-    color: "#659DF2",
-    fontFamily: "Pretendard",
+    color: '#659DF2',
+    fontFamily: 'Pretendard',
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
@@ -548,15 +550,15 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   recommendationCard: {
-    flexDirection: "row",
+    flexDirection: 'row',
     padding: 20,
-    alignItems: "center",
+    alignItems: 'center',
     gap: 20,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#FEF5E7",
-    backgroundColor: "#FEF5E7",
-    shadowColor: "#000",
+    borderColor: '#FEF5E7',
+    backgroundColor: '#FEF5E7',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -565,53 +567,53 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   cardImagesContainer: {
-    position: "relative",
+    position: 'relative',
     width: 65,
     height: 66,
   },
   rionImage: {
     width: 65,
     height: 66,
-    transform: [{ rotate: "-15deg" }],
-    position: "absolute",
+    transform: [{ rotate: '-15deg' }],
+    position: 'absolute',
     top: -15,
     left: 0,
   },
   mapIconImage: {
     width: 40,
     height: 40,
-    transform: [{ rotate: "15deg" }],
-    position: "absolute",
+    transform: [{ rotate: '15deg' }],
+    position: 'absolute',
     bottom: -20,
     right: -15,
   },
   cardTextContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: 10,
   },
   cardTitle: {
-    color: "#4A90E2",
-    fontFamily: "Inter",
+    color: '#4A90E2',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 22,
     letterSpacing: -0.18,
-    textAlign: "left",
+    textAlign: 'left',
   },
   cardDescription: {
-    color: "#4A90E2",
-    fontFamily: "Pretendard",
+    color: '#4A90E2',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
-    textAlign: "left",
+    textAlign: 'left',
   },
   tryItButtonContainer: {
     marginBottom: 54,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -622,17 +624,17 @@ const styles = StyleSheet.create({
     height: 47,
     flexShrink: 0,
     borderRadius: 10,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   tryItIcon: {
     marginLeft: 13,
   },
   tryItText: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     marginLeft: 8,
     flex: 1,
   },
@@ -641,14 +643,14 @@ const styles = StyleSheet.create({
   },
   aiDocentCard: {
     padding: 20,
-    alignItems: "center",
+    alignItems: 'center',
     gap: 20,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#FEF5E7",
-    backgroundColor: "#FEF5E7",
-    flexDirection: "row",
-    shadowColor: "#000",
+    borderColor: '#FEF5E7',
+    backgroundColor: '#FEF5E7',
+    flexDirection: 'row',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -657,40 +659,40 @@ const styles = StyleSheet.create({
   },
   aiDocentIconContainer: {
     padding: 20,
-    alignItems: "center",
+    alignItems: 'center',
     gap: 10,
     flex: 1,
     borderRadius: 10,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
   aiDocentTextContainer: {
     width: 161.865,
-    flexDirection: "column",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: 10,
     flexShrink: 0,
   },
   aiDocentTitle: {
-    color: "#4A90E2",
-    fontFamily: "Inter",
+    color: '#4A90E2',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 22,
     letterSpacing: -0.18,
-    textAlign: "left",
+    textAlign: 'left',
   },
   aiDocentDescription: {
-    color: "#4A90E2",
-    fontFamily: "Pretendard",
+    color: '#4A90E2',
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 20,
     letterSpacing: -0.16,
-    textAlign: "left",
+    textAlign: 'left',
   },
   askAiButtonContainer: {
     marginBottom: 20,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -701,9 +703,9 @@ const styles = StyleSheet.create({
     height: 47,
     flexShrink: 0,
     borderRadius: 10,
-    backgroundColor: "#8FB6F1",
-    flexDirection: "row",
-    alignItems: "center",
+    backgroundColor: '#8FB6F1',
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 13,
   },
   askAiArrow: {
@@ -711,34 +713,34 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingVertical: 60,
   },
   emptyText: {
     fontSize: 16,
-    color: "#999",
-    textAlign: "center",
+    color: '#999',
+    textAlign: 'center',
   },
   resultsContainer: {
     gap: 16,
   },
   resultsTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#FFF",
+    fontWeight: 'bold',
+    color: '#FFF',
     marginBottom: 12,
   },
   noResults: {
     fontSize: 14,
-    color: "#999",
-    textAlign: "center",
+    color: '#999',
+    textAlign: 'center',
     paddingVertical: 40,
   },
   noResultsContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingTop: 100,
   },
   docentFaceImage: {
@@ -758,120 +760,120 @@ const styles = StyleSheet.create({
     letterSpacing: -0.16,
   },
   noResultsRegular: {
-    fontFamily: "Pretendard",
+    fontFamily: 'Pretendard',
     fontSize: 14,
-    fontWeight: "400",
-    color: "#FEF5E7",
+    fontWeight: '400',
+    color: '#FEF5E7',
   },
   noResultsBold: {
-    fontFamily: "Inter",
+    fontFamily: 'Inter',
     fontSize: 14,
-    fontWeight: "700",
-    color: "#FEF5E7",
+    fontWeight: '700',
+    color: '#FEF5E7',
   },
   loadingContainer: {
     paddingVertical: 40,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   filterButtonContainer: {
     padding: 15,
-    alignItems: "center",
+    alignItems: 'center',
   },
   filterResultButton: {
-    backgroundColor: "#FF7F50",
+    backgroundColor: '#FF7F50',
     borderRadius: 25,
     paddingVertical: 12,
     paddingHorizontal: 30,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
   },
   filterResultNumber: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   filterResultText: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   resultsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     paddingHorizontal: 10,
     gap: 10,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   cardWrapper: {
-    width: "48%",
+    width: '48%',
     marginBottom: 10,
   },
   placeImageContainer: {
-    width: "100%",
+    width: '100%',
     aspectRatio: 1,
-    backgroundColor: "#ccc",
+    backgroundColor: '#ccc',
     borderRadius: 10,
-    position: "relative",
+    position: 'relative',
   },
   placeImage: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
     borderRadius: 10,
   },
   placeCategoryText: {
-    position: "absolute",
+    position: 'absolute',
     top: 10,
     left: 10,
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   plusButton: {
-    position: "absolute",
+    position: 'absolute',
     top: 5,
     right: 5,
     width: 38,
     height: 38,
     padding: 11,
     borderRadius: 10,
-    backgroundColor: "rgba(255, 127, 80, 0.85)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(255, 127, 80, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   distanceBadge: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 5,
     left: 5,
     height: 16,
     paddingHorizontal: 5,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 5,
     flexShrink: 0,
     borderRadius: 14,
-    backgroundColor: "rgba(52, 73, 94, 0.50)",
+    backgroundColor: 'rgba(52, 73, 94, 0.50)',
   },
   distanceText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   mintBadge: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 5,
     right: 5,
     height: 16,
     paddingHorizontal: 5,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 5,
     flexShrink: 0,
     borderRadius: 14,
@@ -882,37 +884,37 @@ const styles = StyleSheet.create({
     aspectRatio: 8 / 5,
   },
   mintText: {
-    color: "#FFF",
-    textAlign: "right",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    textAlign: 'right',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
   placeInfoBottom: {
-    width: "100%",
-    flexDirection: "column",
-    alignItems: "flex-start",
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: 5,
     marginTop: 8,
   },
   placeNameText: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 22,
     letterSpacing: -0.18,
-    textAlign: "left",
+    textAlign: 'left',
   },
   placeLocationText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 16,
     letterSpacing: -0.12,
-    textAlign: "left",
+    textAlign: 'left',
   },
 });

@@ -4,10 +4,9 @@ import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { useAuthStore } from '@/store/useAuthStore';
 import { usePointsStore } from '@/store/usePointsStore';
+import { ThemedText, ThemedView } from '@shared/ui';
 
 export default function MyScreen() {
   const router = useRouter();
@@ -21,24 +20,20 @@ export default function MyScreen() {
   }, [isAuthenticated]);
 
   const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: async () => {
+          await logout();
+          router.replace('/login');
         },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            await logout();
-            router.replace('/login');
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleGuestToLogin = async () => {
@@ -50,13 +45,8 @@ export default function MyScreen() {
     return (
       <ThemedView style={styles.container}>
         <ThemedText type="title">My</ThemedText>
-        <ThemedText style={styles.description}>
-          Login required.
-        </ThemedText>
-        <Pressable
-          style={styles.loginButton}
-          onPress={() => router.push('/login')}
-        >
+        <ThemedText style={styles.description}>Login required.</ThemedText>
+        <Pressable style={styles.loginButton} onPress={() => router.push('/login')}>
           <ThemedText style={styles.loginButtonText}>Login</ThemedText>
         </Pressable>
       </ThemedView>
@@ -65,10 +55,7 @@ export default function MyScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <LinearGradient
-        colors={['#7EC8E3', '#4A90E2']}
-        style={styles.header}
-      >
+      <LinearGradient colors={['#7EC8E3', '#4A90E2']} style={styles.header}>
         <View style={styles.profileContainer}>
           <View style={styles.avatar}>
             <Ionicons name="person" size={40} color="#fff" />
