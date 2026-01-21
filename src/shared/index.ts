@@ -4,12 +4,12 @@
  */
 
 // Config
-export * from "./config";
+export * from './config';
 
 // Lib (hooks, utils)
-export * from "./lib";
+export * from './lib';
 
 // UI components
-export * from "./ui";
+export * from './ui';
 
 // API client - will be exported separately due to size

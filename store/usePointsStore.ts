@@ -40,4 +40,3 @@ export const usePointsStore = create<PointsStore>((set, get) => ({
     await get().fetchPoints();
   },
 }));
-

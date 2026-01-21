@@ -31,7 +31,7 @@ export const useQuestStore = create<QuestStore>((set, get) => ({
     const { selectedQuests } = get();
 
     // 이미 선택된 퀘스트인지 확인
-    if (selectedQuests.some(q => q.id === quest.id)) {
+    if (selectedQuests.some((q) => q.id === quest.id)) {
       return;
     }
 
@@ -45,13 +45,13 @@ export const useQuestStore = create<QuestStore>((set, get) => ({
   },
 
   removeQuest: (questId: number) => {
-    set(state => ({
-      selectedQuests: state.selectedQuests.filter(q => q.id !== questId)
+    set((state) => ({
+      selectedQuests: state.selectedQuests.filter((q) => q.id !== questId),
     }));
   },
 
   reorderQuests: (fromIndex: number, toIndex: number) => {
-    set(state => {
+    set((state) => {
       const newQuests = [...state.selectedQuests];
       const [removed] = newQuests.splice(fromIndex, 1);
       newQuests.splice(toIndex, 0, removed);
@@ -64,7 +64,7 @@ export const useQuestStore = create<QuestStore>((set, get) => ({
   },
 
   isQuestSelected: (questId: number) => {
-    return get().selectedQuests.some(q => q.id === questId);
+    return get().selectedQuests.some((q) => q.id === questId);
   },
 
   startQuest: (quest: Quest) => {
@@ -73,7 +73,7 @@ export const useQuestStore = create<QuestStore>((set, get) => ({
         quest_id: quest.id,
         place_id: quest.place_id,
         quest: quest,
-      }
+      },
     });
   },
 

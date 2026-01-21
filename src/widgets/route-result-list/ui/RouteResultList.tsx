@@ -1,7 +1,7 @@
-import { ThemedText } from "@/components/themed-text";
-import { LinearGradient } from "expo-linear-gradient";
-import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
-import Svg, { ClipPath, Defs, G, Path, Rect } from "react-native-svg";
+import { ThemedText } from '@/components/themed-text';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import Svg, { ClipPath, Defs, G, Path, Rect } from 'react-native-svg';
 
 export default function RouteResultList({
   places,
@@ -14,7 +14,6 @@ export default function RouteResultList({
   onClose?: () => void;
   onStartNavigation?: () => void;
 }) {
-
   return (
     <View style={styles.wrapper}>
       {/* 상단 헤더 */}
@@ -77,9 +76,7 @@ export default function RouteResultList({
                 fill="#FF7F50"
               />
             </Svg>
-            <ThemedText style={styles.badgeText}>
-              Best route planned!
-            </ThemedText>
+            <ThemedText style={styles.badgeText}>Best route planned!</ThemedText>
           </View>
         </View>
 
@@ -92,7 +89,7 @@ export default function RouteResultList({
               {/* 왼쪽: 번호 */}
               <View style={styles.numberBox}>
                 <ThemedText style={styles.numberText}>
-                  {String(index + 1).padStart(2, "0")}
+                  {String(index + 1).padStart(2, '0')}
                 </ThemedText>
               </View>
 
@@ -101,7 +98,7 @@ export default function RouteResultList({
                 {/* 마지막 카드에만 배경 이미지 */}
                 {isLastCard && (
                   <Image
-                    source={require("@/assets/images/back-night.jpg")}
+                    source={require('@/assets/images/back-night.jpg')}
                     style={styles.cardBackgroundImage}
                     resizeMode="cover"
                   />
@@ -118,12 +115,7 @@ export default function RouteResultList({
                   {/* 마지막 카드에만 달 아이콘 */}
                   {isLastCard && (
                     <View style={styles.moonIcon}>
-                      <Svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 30 30"
-                        fill="none"
-                      >
+                      <Svg width="30" height="30" viewBox="0 0 30 30" fill="none">
                         <Rect width="30" height="30" rx="15" fill="#0E1419" />
                         <Path
                           d="M19.9079 7.79339L17.6727 9.54716L18.4767 12.3134L16.1532 10.6772L13.8297 12.3134L14.6336 9.54716L12.3985 7.79339L15.2167 7.71203L16.1532 5L17.0896 7.71203L19.9079 7.79339ZM23 14.0401L21.5511 15.1701L22.0724 16.96L20.5705 15.9023L19.0686 16.96L19.5898 15.1701L18.141 14.0401L19.9609 13.9949L20.5705 12.2321L21.1801 13.9949L23 14.0401ZM20.9857 18.5149C21.719 18.4426 22.5053 19.5093 22.037 20.1873C21.7543 20.5941 21.4539 20.9738 21.0829 21.3354C17.6286 24.8882 12.0362 24.8882 8.59075 21.3354C5.13642 17.8098 5.13642 12.0784 8.59075 8.55275C8.94413 8.19115 9.31519 7.86571 9.71274 7.57642C10.3753 7.0973 11.4178 7.90187 11.3471 8.65219C11.1086 11.2377 11.9567 13.9226 13.9004 15.9023C14.8188 16.8472 15.9308 17.5717 17.1561 18.0235C18.3813 18.4753 19.6893 18.6431 20.9857 18.5149ZM19.5368 20.341C16.9433 20.1885 14.4932 19.0731 12.6458 17.2041C10.7287 15.2243 9.70391 12.6841 9.56256 10.1348C7.08003 12.9734 7.17721 17.3307 9.83643 20.0608C12.5045 22.7818 16.7628 22.8813 19.5368 20.341Z"
@@ -136,29 +128,16 @@ export default function RouteResultList({
 
                 {/* 정보 영역 - 오른쪽 */}
                 <View style={styles.cardInfo}>
-                  <ThemedText
-                    style={[
-                      styles.categoryText,
-                      isLastCard && styles.categoryTextWhite,
-                    ]}
-                  >
+                  <ThemedText style={[styles.categoryText, isLastCard && styles.categoryTextWhite]}>
                     {p.category}
                   </ThemedText>
                   <ThemedText
-                    style={[
-                      styles.placeName,
-                      isLastCard && styles.placeNameWhite,
-                    ]}
+                    style={[styles.placeName, isLastCard && styles.placeNameWhite]}
                     numberOfLines={2}
                   >
                     {p.name}
                   </ThemedText>
-                  <ThemedText
-                    style={[
-                      styles.districtText,
-                      isLastCard && styles.districtTextWhite,
-                    ]}
-                  >
+                  <ThemedText style={[styles.districtText, isLastCard && styles.districtTextWhite]}>
                     {p.district}
                   </ThemedText>
                 </View>
@@ -172,13 +151,13 @@ export default function RouteResultList({
                     />
                   </Svg>
                   <ThemedText style={styles.distanceBadgeText}>
-                    {p.distance_km?.toFixed(1) ?? "0.0"}km
+                    {p.distance_km?.toFixed(1) ?? '0.0'}km
                   </ThemedText>
                 </View>
 
                 {/* 포인트 뱃지 - 카드 우하단 */}
                 <LinearGradient
-                  colors={["#76C7AD", "#3A6154"]}
+                  colors={['#76C7AD', '#3A6154']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.pointBadge}
@@ -189,9 +168,7 @@ export default function RouteResultList({
                       stroke="#F5F5F5"
                     />
                   </Svg>
-                  <ThemedText style={styles.pointText}>
-                    {p.reward_point ?? 300}
-                  </ThemedText>
+                  <ThemedText style={styles.pointText}>{p.reward_point ?? 300}</ThemedText>
                 </LinearGradient>
               </Pressable>
             </View>
@@ -220,58 +197,58 @@ export default function RouteResultList({
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: "#1A2332",
+    backgroundColor: '#1A2332',
   },
 
   // 상단 헤더
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingTop: 78,
     paddingBottom: 12,
-    backgroundColor: "#1A2332",
+    backgroundColor: '#1A2332',
   },
 
   headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 11,
   },
 
   menuButton: {
     width: 32,
     height: 32,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   headerTitle: {
-    color: "#FFF",
-    fontFamily: "Inter",
+    color: '#FFF',
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 12,
   },
 
   iconButton: {
     width: 32,
     height: 32,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   closeButton: {
     width: 32,
     height: 32,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   // 스크롤 영역
@@ -286,54 +263,54 @@ const styles = StyleSheet.create({
 
   // Best Route 배지
   badgeContainer: {
-    alignItems: "center",
+    alignItems: 'center',
     paddingVertical: 16,
   },
 
   badge: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 10,
     gap: 10,
     borderRadius: 30,
     borderWidth: 1,
-    borderColor: "#FF7F50",
+    borderColor: '#FF7F50',
   },
 
   badgeText: {
-    color: "#FF7F50",
-    fontFamily: "Pretendard",
+    color: '#FF7F50',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: '700',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   // 경로 아이템 (번호 + 카드)
   routeItem: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginBottom: 16,
     gap: 12,
-    alignItems: "center",
+    alignItems: 'center',
   },
 
   numberBox: {
     width: 55,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     borderRadius: 10,
-    backgroundColor: "#121A21",
+    backgroundColor: '#121A21',
   },
 
   numberText: {
-    color: "#EF6A39",
-    textAlign: "center",
-    fontFamily: "BagelFatOne-Regular",
+    color: '#EF6A39',
+    textAlign: 'center',
+    fontFamily: 'BagelFatOne-Regular',
     fontSize: 24,
-    fontWeight: "400",
+    fontWeight: '400',
     lineHeight: 28,
     letterSpacing: -0.12,
   },
@@ -341,24 +318,24 @@ const styles = StyleSheet.create({
   // 카드
   card: {
     flex: 1,
-    flexDirection: "row",
-    backgroundColor: "#FFF",
+    flexDirection: 'row',
+    backgroundColor: '#FFF',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#FFF",
-    shadowColor: "#000",
+    borderColor: '#FFF',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 4,
     padding: 5,
-    position: "relative",
+    position: 'relative',
     height: 110,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
 
   cardBackgroundImage: {
-    position: "absolute",
+    position: 'absolute',
     top: -1,
     left: -1,
     right: -1,
@@ -368,18 +345,18 @@ const styles = StyleSheet.create({
   },
 
   imageContainer: {
-    position: "relative",
+    position: 'relative',
   },
 
   cardImage: {
     width: 100,
     height: 100,
     borderRadius: 8,
-    backgroundColor: "#E5E5E5",
+    backgroundColor: '#E5E5E5',
   },
 
   moonIcon: {
-    position: "absolute",
+    position: 'absolute',
     top: 2,
     left: 2,
   },
@@ -388,69 +365,69 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 10,
     paddingRight: 55,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
 
   categoryText: {
     fontSize: 11,
-    color: "#94A3B8",
-    fontWeight: "500",
+    color: '#94A3B8',
+    fontWeight: '500',
     marginBottom: 4,
   },
 
   categoryTextWhite: {
-    color: "#FFF",
+    color: '#FFF',
   },
 
   placeName: {
     fontSize: 14,
-    fontWeight: "700",
-    color: "#1A2332",
+    fontWeight: '700',
+    color: '#1A2332',
     marginBottom: 4,
   },
 
   placeNameWhite: {
-    color: "#FFF",
+    color: '#FFF',
   },
 
   districtText: {
     fontSize: 12,
-    color: "#64748B",
+    color: '#64748B',
   },
 
   districtTextWhite: {
-    color: "#FFF",
+    color: '#FFF',
   },
 
   distanceBadge: {
-    position: "absolute",
+    position: 'absolute',
     top: 5,
     right: 5,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     height: 16,
     paddingHorizontal: 5,
     gap: 5,
     borderRadius: 14,
-    backgroundColor: "rgba(52, 73, 94, 0.50)",
+    backgroundColor: 'rgba(52, 73, 94, 0.50)',
   },
 
   distanceBadgeText: {
-    color: "#FFF",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   pointBadge: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 5,
     right: 5,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
     height: 16,
     paddingHorizontal: 5,
     gap: 5,
@@ -458,45 +435,45 @@ const styles = StyleSheet.create({
   },
 
   pointText: {
-    color: "#FFF",
-    textAlign: "right",
-    fontFamily: "Pretendard",
+    color: '#FFF',
+    textAlign: 'right',
+    fontFamily: 'Pretendard',
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
     lineHeight: 16,
     letterSpacing: -0.12,
   },
 
   // 하단 네비게이션 버튼
   bottomBar: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#1A2332",
+    backgroundColor: '#1A2332',
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderTopWidth: 1,
-    borderTopColor: "#2A3441",
+    borderTopColor: '#2A3441',
   },
 
   navigationButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     width: 320,
     height: 50,
     padding: 10,
     gap: 10,
     borderRadius: 35,
-    backgroundColor: "#FF7F50",
-    alignSelf: "center",
+    backgroundColor: '#FF7F50',
+    alignSelf: 'center',
   },
 
   navigationButtonText: {
-    fontFamily: "Inter",
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: "700",
-    color: "#FFF",
+    fontWeight: '700',
+    color: '#FFF',
   },
 });

@@ -2,4 +2,4 @@
  * Points entity - model Public API
  */
 
-export { usePointsStore } from "./store";
+export { usePointsStore } from './store';

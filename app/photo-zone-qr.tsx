@@ -1,8 +1,8 @@
-import { View, Text, Pressable, Image, StyleSheet } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import Svg, { Path, G, Defs, ClipPath, Rect } from 'react-native-svg';
 import { useQuestStore } from '@/store/useQuestStore';
-import { Images } from '@/constants/images';
+import { Colors, Images } from '@shared/config';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import Svg, { ClipPath, Defs, G, Path, Rect } from 'react-native-svg';
 
 export default function PhotoZoneQRScreen() {
   const router = useRouter();

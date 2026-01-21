@@ -15,7 +15,8 @@ export const QuizMock: QuizItem[] = [
     question: '“Gyeongbokgung” was the main royal palace of which Korean dynasty?',
     choices: ['Silla', 'Goryeo', 'Joseon', 'Baekje'],
     answer: 'Joseon',
-    description: 'Gyeongbokgung was built in 1395 and served as the main palace of Joseon for over 500 years.',
+    description:
+      'Gyeongbokgung was built in 1395 and served as the main palace of Joseon for over 500 years.',
     hint: 'It was the first and grandest palace of the Joseon era.',
   },
   {
@@ -55,4 +56,3 @@ export const QuizMock: QuizItem[] = [
     hint: 'Banquets and celebrations were held here.',
   },
 ];
-

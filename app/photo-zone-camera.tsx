@@ -99,6 +99,7 @@ export default function PhotoZoneCameraScreen() {
 
   const mergeWithScreenshot = async () => {
     try {
+      // @ts-ignore: captureScreenAsync does not exist on expo-screen-capture
       const uri = await ScreenCapture.captureScreenAsync({
         quality: 0.7,
       });

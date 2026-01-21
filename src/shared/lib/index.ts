@@ -2,4 +2,4 @@
  * Shared lib - Public API
  */
 
-export * from "./hooks";
+export * from './hooks';

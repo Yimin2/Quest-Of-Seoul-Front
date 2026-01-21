@@ -2,4 +2,4 @@
  * RouteResultList widget - Public API
  */
 
-export * from "./ui";
+export * from './ui';

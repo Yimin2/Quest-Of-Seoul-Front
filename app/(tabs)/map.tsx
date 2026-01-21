@@ -1,7 +1,7 @@
 import QuestMiniModal from '@/components/quest-mini-modal';
-import { Images } from '@/constants/images';
 import { pointsApi, questApi, type Quest } from '@/services/api';
 import { useQuestStore } from '@/store/useQuestStore';
+import { Images } from '@shared/config';
 import { ThemedText, ThemedView } from '@shared/ui';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';

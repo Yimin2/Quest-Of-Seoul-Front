@@ -1,48 +1,41 @@
-import { useAuthStore } from "@/store/useAuthStore";
-import Constants from "expo-constants";
-import { Platform } from "react-native";
+import { useAuthStore } from '@/store/useAuthStore';
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 const API_URL =
   Constants.expoConfig?.extra?.apiUrl ||
-  (Platform.OS === "android"
-    ? "http://10.0.2.2:8000"
-    : "http://localhost:8000");
+  (Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000');
 
 // API 성능 측정을 위한 경량 로깅 함수
 const logApiTrace = (method: string, endpoint: string, startTime: number) => {
   if (__DEV__) {
     const now = new Date();
-    const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+    const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
     const duration = (performance.now() - startTime).toFixed(2);
-    console.log(
-      `🚀 [API] [${timestamp}] ${method} ${endpoint} | ${duration}ms`,
-    );
+    console.log(`🚀 [API] [${timestamp}] ${method} ${endpoint} | ${duration}ms`);
   }
 };
 
 // API 요청 헬퍼 함수 - Authorization 헤더 자동 추가
-async function apiRequest<T>(
-  endpoint: string,
-  options: RequestInit = {},
-): Promise<T> {
+async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = useAuthStore.getState().token;
 
   const headers: Record<string, string> = {
-    Accept: "application/json",
+    Accept: 'application/json',
     ...((options.headers as Record<string, string>) || {}),
   };
 
   // 토큰이 있으면 Authorization 헤더 추가
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
   // Content-Type이 설정되지 않았고 body가 있으면 기본값 설정
-  if (options.body && !headers["Content-Type"]) {
+  if (options.body && !headers['Content-Type']) {
     if (options.body instanceof FormData) {
       // FormData는 Content-Type을 설정하지 않음 (브라우저가 자동 설정)
     } else {
-      headers["Content-Type"] = "application/json";
+      headers['Content-Type'] = 'application/json';
     }
   }
 
@@ -59,29 +52,29 @@ async function apiRequest<T>(
       // 토큰 갱신 후 재시도
       const newToken = useAuthStore.getState().token;
       if (newToken) {
-        headers["Authorization"] = `Bearer ${newToken}`;
+        headers['Authorization'] = `Bearer ${newToken}`;
         const retryStartTime = performance.now();
         const retryResponse = await fetch(`${API_URL}${endpoint}`, {
           ...options,
           headers: headers as HeadersInit,
         });
         if (!retryResponse.ok) {
-          logApiTrace(options.method || "GET", endpoint, retryStartTime);
+          logApiTrace(options.method || 'GET', endpoint, retryStartTime);
           throw new Error(`HTTP error! status: ${retryResponse.status}`);
         }
         const retryData = await retryResponse.json();
-        logApiTrace(options.method || "GET", endpoint, retryStartTime);
+        logApiTrace(options.method || 'GET', endpoint, retryStartTime);
         return retryData;
       }
     } catch (refreshError) {
       // 토큰 갱신 실패 시 로그아웃 처리
       await useAuthStore.getState().logout();
-      throw new Error("Authentication failed. Please login again.");
+      throw new Error('Authentication failed. Please login again.');
     }
   }
 
   if (!response.ok) {
-    logApiTrace(options.method || "GET", endpoint, startTime);
+    logApiTrace(options.method || 'GET', endpoint, startTime);
     const error = await response
       .json()
       .catch(() => ({ detail: `HTTP error! status: ${response.status}` }));
@@ -89,7 +82,7 @@ async function apiRequest<T>(
   }
 
   const data = await response.json();
-  logApiTrace(options.method || "GET", endpoint, startTime);
+  logApiTrace(options.method || 'GET', endpoint, startTime);
   return data;
 }
 
@@ -104,7 +97,7 @@ export interface Quest {
   longitude: number;
   reward_point: number;
   points: number;
-  difficulty: "easy" | "medium" | "hard";
+  difficulty: 'easy' | 'medium' | 'hard';
   is_active: boolean;
   completion_count: number;
   created_at: string;
@@ -120,7 +113,7 @@ export interface QuestListResponse {
 export interface FilterRequest {
   categories?: string[];
   districts?: string[];
-  sort_by?: "nearest" | "rewarded" | "newest";
+  sort_by?: 'nearest' | 'rewarded' | 'newest';
   latitude?: number;
   longitude?: number;
   radius_km?: number;
@@ -187,21 +180,13 @@ export interface QuestStartResponse {
 export const questApi = {
   async getQuestDetail(questId: number): Promise<QuestDetailResponse> {
     try {
-      const data: QuestDetailResponse = await apiRequest<QuestDetailResponse>(
-        `/quest/${questId}`,
-        {
-          method: "GET",
-        },
-      );
+      const data: QuestDetailResponse = await apiRequest<QuestDetailResponse>(`/quest/${questId}`, {
+        method: 'GET',
+      });
       return data;
     } catch (error) {
-      if (
-        error instanceof TypeError &&
-        error.message.includes("Network request failed")
-      ) {
-        throw new Error(
-          "Unable to connect to server. Please check if the API server is running.",
-        );
+      if (error instanceof TypeError && error.message.includes('Network request failed')) {
+        throw new Error('Unable to connect to server. Please check if the API server is running.');
       }
       throw error;
     }
@@ -209,46 +194,28 @@ export const questApi = {
 
   async getQuestList(): Promise<Quest[]> {
     try {
-      const data: QuestListResponse = await apiRequest<QuestListResponse>(
-        "/quest/list",
-        {
-          method: "GET",
-        },
-      );
+      const data: QuestListResponse = await apiRequest<QuestListResponse>('/quest/list', {
+        method: 'GET',
+      });
       return data.quests;
     } catch (error) {
-      if (
-        error instanceof TypeError &&
-        error.message.includes("Network request failed")
-      ) {
-        throw new Error(
-          "Unable to connect to server. Please check if the API server is running.",
-        );
+      if (error instanceof TypeError && error.message.includes('Network request failed')) {
+        throw new Error('Unable to connect to server. Please check if the API server is running.');
       }
       throw error;
     }
   },
 
-  async getFilteredQuests(
-    filterParams: FilterRequest,
-  ): Promise<FilterResponse> {
+  async getFilteredQuests(filterParams: FilterRequest): Promise<FilterResponse> {
     try {
-      const data: FilterResponse = await apiRequest<FilterResponse>(
-        "/map/filter",
-        {
-          method: "POST",
-          body: JSON.stringify(filterParams),
-        },
-      );
+      const data: FilterResponse = await apiRequest<FilterResponse>('/map/filter', {
+        method: 'POST',
+        body: JSON.stringify(filterParams),
+      });
       return data;
     } catch (error) {
-      if (
-        error instanceof TypeError &&
-        error.message.includes("Network request failed")
-      ) {
-        throw new Error(
-          "Unable to connect to server. Please check if the API server is running.",
-        );
+      if (error instanceof TypeError && error.message.includes('Network request failed')) {
+        throw new Error('Unable to connect to server. Please check if the API server is running.');
       }
       throw error;
     }
@@ -256,22 +223,14 @@ export const questApi = {
 
   async searchQuests(searchParams: SearchRequest): Promise<SearchResponse> {
     try {
-      const data: SearchResponse = await apiRequest<SearchResponse>(
-        "/map/search",
-        {
-          method: "POST",
-          body: JSON.stringify(searchParams),
-        },
-      );
+      const data: SearchResponse = await apiRequest<SearchResponse>('/map/search', {
+        method: 'POST',
+        body: JSON.stringify(searchParams),
+      });
       return data;
     } catch (error) {
-      if (
-        error instanceof TypeError &&
-        error.message.includes("Network request failed")
-      ) {
-        throw new Error(
-          "Unable to connect to server. Please check if the API server is running.",
-        );
+      if (error instanceof TypeError && error.message.includes('Network request failed')) {
+        throw new Error('Unable to connect to server. Please check if the API server is running.');
       }
       throw error;
     }
@@ -280,22 +239,14 @@ export const questApi = {
   async startQuest(request: QuestStartRequest): Promise<QuestStartResponse> {
     try {
       const { place_id, ...requestBody } = request;
-      const data: QuestStartResponse = await apiRequest<QuestStartResponse>(
-        "/quest/start",
-        {
-          method: "POST",
-          body: JSON.stringify(requestBody),
-        },
-      );
+      const data: QuestStartResponse = await apiRequest<QuestStartResponse>('/quest/start', {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+      });
       return data;
     } catch (error) {
-      if (
-        error instanceof TypeError &&
-        error.message.includes("Network request failed")
-      ) {
-        throw new Error(
-          "Unable to connect to server. Please check if the API server is running.",
-        );
+      if (error instanceof TypeError && error.message.includes('Network request failed')) {
+        throw new Error('Unable to connect to server. Please check if the API server is running.');
       }
       throw error;
     }
@@ -358,26 +309,18 @@ export interface QuizSubmitResponse {
 }
 
 export const quizApi = {
-  async getQuiz(
-    landmark: string,
-    language: string = "en",
-  ): Promise<QuizResponse> {
+  async getQuiz(landmark: string, language: string = 'en'): Promise<QuizResponse> {
     try {
       const data: QuizResponse = await apiRequest<QuizResponse>(
         `/docent/quiz?landmark=${encodeURIComponent(landmark)}&language=${language}`,
         {
-          method: "POST",
+          method: 'POST',
         },
       );
       return data;
     } catch (error) {
-      if (
-        error instanceof TypeError &&
-        error.message.includes("Network request failed")
-      ) {
-        throw new Error(
-          "Unable to connect to server. Please check if the API server is running.",
-        );
+      if (error instanceof TypeError && error.message.includes('Network request failed')) {
+        throw new Error('Unable to connect to server. Please check if the API server is running.');
       }
       throw error;
     }
@@ -386,12 +329,10 @@ export const quizApi = {
   async getMultipleQuizzes(
     landmark: string,
     count: number = 5,
-    language: string = "en",
+    language: string = 'en',
   ): Promise<QuizItem[]> {
     try {
-      const quizPromises = Array.from({ length: count }, () =>
-        this.getQuiz(landmark, language),
-      );
+      const quizPromises = Array.from({ length: count }, () => this.getQuiz(landmark, language));
 
       const responses = await Promise.all(quizPromises);
 
@@ -401,8 +342,8 @@ export const quizApi = {
         question: response.question,
         choices: response.options,
         answer: response.options[response.correct_answer],
-        description: response.explanation || "",
-        hint: "Think carefully about this question!",
+        description: response.explanation || '',
+        hint: 'Think carefully about this question!',
       }));
 
       return quizItems;
@@ -417,7 +358,7 @@ export const quizApi = {
       const data: QuestQuizResponse = await apiRequest<QuestQuizResponse>(
         `/quest/${questId}/quizzes`,
         {
-          method: "GET",
+          method: 'GET',
         },
       );
       return data;
@@ -436,7 +377,7 @@ export const quizApi = {
       const data: QuizSubmitResponse = await apiRequest<QuizSubmitResponse>(
         `/quest/${questId}/quizzes/${quizId}/submit`,
         {
-          method: "POST",
+          method: 'POST',
           body: JSON.stringify({ answer, is_last_quiz: isLastQuiz }),
         },
       );
@@ -454,10 +395,8 @@ export const quizApi = {
       question: quiz.question,
       choices: quiz.options,
       answer:
-        quiz.correct_answer !== undefined
-          ? quiz.options[quiz.correct_answer]
-          : quiz.options[0],
-      description: "",
+        quiz.correct_answer !== undefined ? quiz.options[quiz.correct_answer] : quiz.options[0],
+      description: '',
       hint: quiz.hint,
       difficulty: quiz.difficulty,
     }));
@@ -648,8 +587,8 @@ export interface ChatMessage {
 
 export interface ChatSession {
   session_id: string;
-  function_type: "rag_chat" | "vlm_chat" | "route_recommend";
-  mode: "explore" | "quest";
+  function_type: 'rag_chat' | 'vlm_chat' | 'route_recommend';
+  mode: 'explore' | 'quest';
   title: string;
   is_read_only: boolean;
   created_at: string;
@@ -695,26 +634,24 @@ export interface PointsResponse {
 export const aiStationApi = {
   // Docent Chat (인증 필요)
   async docentChat(request: DocentChatRequest): Promise<DocentChatResponse> {
-    return apiRequest<DocentChatResponse>("/docent/chat", {
-      method: "POST",
+    return apiRequest<DocentChatResponse>('/docent/chat', {
+      method: 'POST',
       body: JSON.stringify(request),
     });
   },
 
   // VLM Analyze (인증 필요)
   async vlmAnalyze(request: VLMAnalyzeRequest): Promise<VLMAnalyzeResponse> {
-    return apiRequest<VLMAnalyzeResponse>("/vlm/analyze", {
-      method: "POST",
+    return apiRequest<VLMAnalyzeResponse>('/vlm/analyze', {
+      method: 'POST',
       body: JSON.stringify(request),
     });
   },
 
   // Similar Places (인증 필요)
-  async similarPlaces(
-    request: SimilarPlacesRequest,
-  ): Promise<SimilarPlacesResponse> {
-    return apiRequest<SimilarPlacesResponse>("/recommend/similar-places", {
-      method: "POST",
+  async similarPlaces(request: SimilarPlacesRequest): Promise<SimilarPlacesResponse> {
+    return apiRequest<SimilarPlacesResponse>('/recommend/similar-places', {
+      method: 'POST',
       body: JSON.stringify(request),
     });
   },
@@ -725,17 +662,17 @@ export const aiStationApi = {
 
     const startTime = performance.now();
     const response = await fetch(`${API_URL}/ai-station/stt-tts`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify(request),
     });
 
     const data = await response.json().catch(() => null);
-    logApiTrace("POST", "/ai-station/stt-tts", startTime);
+    logApiTrace('POST', '/ai-station/stt-tts', startTime);
 
     // 400 에러가 발생했지만 전사된 텍스트가 있으면 사용 (TTS 실패해도 STT 결과는 사용)
     if (!response.ok && response.status === 400) {
@@ -749,9 +686,7 @@ export const aiStationApi = {
       }
       // 전사된 텍스트도 없으면 에러 throw (백엔드에서 반환한 에러 메시지 사용)
       const errorMessage =
-        data?.detail ||
-        data?.error ||
-        `STT transcription failed: ${response.status}`;
+        data?.detail || data?.error || `STT transcription failed: ${response.status}`;
       throw new Error(errorMessage);
     }
 
@@ -763,30 +698,27 @@ export const aiStationApi = {
         if (newToken) {
           const retryStartTime = performance.now();
           const retryResponse = await fetch(`${API_URL}/ai-station/stt-tts`, {
-            method: "POST",
+            method: 'POST',
             headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
               Authorization: `Bearer ${newToken}`,
             },
             body: JSON.stringify(request),
           });
 
           if (!retryResponse.ok) {
-            logApiTrace("POST", "/ai-station/stt-tts", retryStartTime);
+            logApiTrace('POST', '/ai-station/stt-tts', retryStartTime);
             const retryData = await retryResponse.json().catch(() => null);
-            throw new Error(
-              retryData?.detail ||
-                `HTTP error! status: ${retryResponse.status}`,
-            );
+            throw new Error(retryData?.detail || `HTTP error! status: ${retryResponse.status}`);
           }
           const retryData = await retryResponse.json().catch(() => null);
-          logApiTrace("POST", "/ai-station/stt-tts", retryStartTime);
+          logApiTrace('POST', '/ai-station/stt-tts', retryStartTime);
           return retryData;
         }
       } catch (refreshError) {
         await useAuthStore.getState().logout();
-        throw new Error("Authentication failed. Please login again.");
+        throw new Error('Authentication failed. Please login again.');
       }
     }
 
@@ -798,31 +730,25 @@ export const aiStationApi = {
   },
 
   // Explore RAG Chat (인증 필요)
-  async exploreRAGChat(
-    request: ExploreRAGChatRequest,
-  ): Promise<ExploreRAGChatResponse> {
-    return apiRequest<ExploreRAGChatResponse>("/ai-station/explore/rag-chat", {
-      method: "POST",
+  async exploreRAGChat(request: ExploreRAGChatRequest): Promise<ExploreRAGChatResponse> {
+    return apiRequest<ExploreRAGChatResponse>('/ai-station/explore/rag-chat', {
+      method: 'POST',
       body: JSON.stringify(request),
     });
   },
 
   // Quest RAG Chat (인증 필요) - Quest Mode 텍스트/음성 채팅
-  async questRAGChat(
-    request: QuestRAGChatRequest,
-  ): Promise<QuestRAGChatResponse> {
-    return apiRequest<QuestRAGChatResponse>("/ai-station/quest/rag-chat", {
-      method: "POST",
+  async questRAGChat(request: QuestRAGChatRequest): Promise<QuestRAGChatResponse> {
+    return apiRequest<QuestRAGChatResponse>('/ai-station/quest/rag-chat', {
+      method: 'POST',
       body: JSON.stringify(request),
     });
   },
 
   // Route Recommend (인증 필요)
-  async routeRecommend(
-    request: RouteRecommendRequest,
-  ): Promise<RouteRecommendResponse> {
-    return apiRequest<RouteRecommendResponse>("/ai-station/route-recommend", {
-      method: "POST",
+  async routeRecommend(request: RouteRecommendRequest): Promise<RouteRecommendResponse> {
+    return apiRequest<RouteRecommendResponse>('/ai-station/route-recommend', {
+      method: 'POST',
       body: JSON.stringify(request),
     });
   },
@@ -830,39 +756,33 @@ export const aiStationApi = {
   // Chat List (인증 필요)
   async getChatList(params?: {
     limit?: number;
-    mode?: "explore" | "quest";
-    function_type?: "rag_chat" | "vlm_chat" | "route_recommend";
+    mode?: 'explore' | 'quest';
+    function_type?: 'rag_chat' | 'vlm_chat' | 'route_recommend';
   }): Promise<ChatListResponse> {
     const queryParams = new URLSearchParams();
-    if (params?.limit) queryParams.append("limit", params.limit.toString());
-    if (params?.mode) queryParams.append("mode", params.mode);
-    if (params?.function_type)
-      queryParams.append("function_type", params.function_type);
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.mode) queryParams.append('mode', params.mode);
+    if (params?.function_type) queryParams.append('function_type', params.function_type);
 
     const queryString = queryParams.toString();
-    const endpoint = `/ai-station/chat-list${queryString ? `?${queryString}` : ""}`;
+    const endpoint = `/ai-station/chat-list${queryString ? `?${queryString}` : ''}`;
 
     return apiRequest<ChatListResponse>(endpoint, {
-      method: "GET",
+      method: 'GET',
     });
   },
 
   // Chat Session (인증 필요)
   async getChatSession(sessionId: string): Promise<ChatSessionResponse> {
-    return apiRequest<ChatSessionResponse>(
-      `/ai-station/chat-session/${sessionId}`,
-      {
-        method: "GET",
-      },
-    );
+    return apiRequest<ChatSessionResponse>(`/ai-station/chat-session/${sessionId}`, {
+      method: 'GET',
+    });
   },
 
   // Quest VLM Chat (인증 필요)
-  async questVlmChat(
-    request: QuestVLMChatRequest,
-  ): Promise<QuestVLMChatResponse> {
-    return apiRequest<QuestVLMChatResponse>("/ai-station/quest/vlm-chat", {
-      method: "POST",
+  async questVlmChat(request: QuestVLMChatRequest): Promise<QuestVLMChatResponse> {
+    return apiRequest<QuestVLMChatResponse>('/ai-station/quest/vlm-chat', {
+      method: 'POST',
       body: JSON.stringify(request),
     });
   },
@@ -897,8 +817,8 @@ export interface RouteRecommendResponse {
 export const pointsApi = {
   // Get user points (인증 필요)
   async getPoints(): Promise<PointsResponse> {
-    return apiRequest<PointsResponse>("/reward/points", {
-      method: "GET",
+    return apiRequest<PointsResponse>('/reward/points', {
+      method: 'GET',
     });
   },
 };
@@ -906,11 +826,9 @@ export const pointsApi = {
 // Add route recommend to aiStationApi
 export const routeRecommendApi = {
   // Route Recommend (인증 필요)
-  async routeRecommend(
-    request: RouteRecommendRequest,
-  ): Promise<RouteRecommendResponse> {
-    return apiRequest<RouteRecommendResponse>("/ai-station/route-recommend", {
-      method: "POST",
+  async routeRecommend(request: RouteRecommendRequest): Promise<RouteRecommendResponse> {
+    return apiRequest<RouteRecommendResponse>('/ai-station/route-recommend', {
+      method: 'POST',
       body: JSON.stringify(request),
     });
   },
@@ -966,36 +884,36 @@ export const rewardApi = {
   // Get rewards list with optional filters
   async getRewards(type?: string, search?: string): Promise<RewardsResponse> {
     const params = new URLSearchParams();
-    if (type) params.append("type", type);
-    if (search) params.append("search", search);
+    if (type) params.append('type', type);
+    if (search) params.append('search', search);
 
     const queryString = params.toString();
-    const url = queryString ? `/reward/list?${queryString}` : "/reward/list";
+    const url = queryString ? `/reward/list?${queryString}` : '/reward/list';
 
     return apiRequest<RewardsResponse>(url, {
-      method: "GET",
+      method: 'GET',
     });
   },
 
   // Claim a reward (purchase)
   async claim(reward_id: number): Promise<ClaimRewardResponse> {
-    return apiRequest<ClaimRewardResponse>("/reward/claim", {
-      method: "POST",
+    return apiRequest<ClaimRewardResponse>('/reward/claim', {
+      method: 'POST',
       body: JSON.stringify({ reward_id }),
     });
   },
 
   // Get claimed rewards (user's coupons)
   async getClaimedRewards(): Promise<ClaimedRewardsResponse> {
-    return apiRequest<ClaimedRewardsResponse>("/reward/claimed", {
-      method: "GET",
+    return apiRequest<ClaimedRewardsResponse>('/reward/claimed', {
+      method: 'GET',
     });
   },
 
   // Use a reward (mark as used)
   async useReward(reward_id: number): Promise<UseRewardResponse> {
     return apiRequest<UseRewardResponse>(`/reward/use/${reward_id}`, {
-      method: "POST",
+      method: 'POST',
     });
   },
 };
@@ -1030,22 +948,15 @@ export interface WalkDistanceResponse {
 
 export const mapApi = {
   // Calculate walk distance for a route
-  async calculateWalkDistance(
-    request: WalkDistanceRequest,
-  ): Promise<WalkDistanceResponse> {
-    return apiRequest<WalkDistanceResponse>("/map/stats/walk-distance", {
-      method: "POST",
+  async calculateWalkDistance(request: WalkDistanceRequest): Promise<WalkDistanceResponse> {
+    return apiRequest<WalkDistanceResponse>('/map/stats/walk-distance', {
+      method: 'POST',
       body: JSON.stringify(request),
     });
   },
 
   // Calculate distance between two points using Haversine formula
-  calculateDistance(
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number,
-  ): number {
+  calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
     const R = 6371; // Earth's radius in kilometers
     const phi1 = (lat1 * Math.PI) / 180;
     const phi2 = (lat2 * Math.PI) / 180;
@@ -1054,10 +965,7 @@ export const mapApi = {
 
     const a =
       Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-      Math.cos(phi1) *
-        Math.cos(phi2) *
-        Math.sin(deltaLambda / 2) *
-        Math.sin(deltaLambda / 2);
+      Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return R * c; // Distance in km

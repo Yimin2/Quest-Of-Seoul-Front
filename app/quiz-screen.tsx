@@ -1,5 +1,5 @@
-import { Images } from '@/constants/images';
 import { Ionicons } from '@expo/vector-icons';
+import { Images } from '@shared/config';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Modal, Pressable, StyleSheet, View } from 'react-native';

@@ -2,4 +2,5 @@
  * Quest entity - model Public API
  */
 
-export { useQuestStore } from "./store";
+export * from './quiz-mock';
+export { useQuestStore } from './store';

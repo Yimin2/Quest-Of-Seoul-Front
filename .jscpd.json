@@ -1,13 +1,6 @@
 {
   "threshold": 15,
   "reporters": ["console", "summary"],
-  "ignore": [
-    "node_modules/**",
-    ".expo/**",
-    "assets/**",
-    "*.js",
-    "*.json",
-    "*.md"
-  ],
+  "ignore": ["node_modules/**", ".expo/**", "assets/**", "*.js", "*.json", "*.md"],
   "absolute": false
 }

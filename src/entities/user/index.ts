@@ -2,4 +2,4 @@
  * User entity - Public API
  */
 
-export * from "./model";
+export * from './model';

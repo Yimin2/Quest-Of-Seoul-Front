@@ -1,7 +1,7 @@
-import { Images } from '@/constants/images';
 import { useQuestStore } from '@/store/useQuestStore';
 import { Ionicons } from '@expo/vector-icons';
 import MaskedView from '@react-native-masked-view/masked-view';
+import { Images } from '@shared/config';
 import { ThemedText } from '@shared/ui';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';

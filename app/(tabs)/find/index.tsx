@@ -1,4 +1,5 @@
 import { mapApi, pointsApi, questApi, type Quest } from '@/services/api';
+import { Colors, Images } from '@shared/config';
 import { useQuestStore } from '@/store/useQuestStore';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
@@ -15,7 +16,6 @@ import {
   View,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { Images } from '@/constants/images';
 
 type SortByType = 'nearest' | 'rewarded' | 'newest';
 
@@ -27,9 +27,10 @@ export default function FindScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Quest[]>([]);
   const [loading, setLoading] = useState(false);
-  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(
-    null,
-  );
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   const [selectedSort, setSelectedSort] = useState<SortByType>('nearest');
   const [selectedThemes, setSelectedThemes] = useState<string[]>(['All Themes']);

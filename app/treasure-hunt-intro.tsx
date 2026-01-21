@@ -5,8 +5,8 @@ import { useRouter } from 'expo-router';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 
-import { Images } from '@/constants/images';
 import { useQuestStore } from '@/store/useQuestStore';
+import { Images } from '@shared/config';
 import { ThemedText } from '@shared/ui';
 
 export default function TreasureHuntIntroScreen() {
