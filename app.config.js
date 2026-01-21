@@ -1,6 +1,6 @@
 const dotenv = require('dotenv');
 const path = require('path');
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 module.exports = {
   expo: {
@@ -46,6 +46,7 @@ module.exports = {
     plugins: [
       'expo-router',
       'expo-speech-recognition',
+      'expo-audio',
       [
         'expo-font',
         {
