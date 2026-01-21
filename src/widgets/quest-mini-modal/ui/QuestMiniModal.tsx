@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Path, Stop } from 'react-native-svg';
-import { useQuestStore } from '@/store/useQuestStore';
+import { useQuestStore } from '@entities/quest';
 import { router } from 'expo-router';
 import * as Location from 'expo-location';
 import { mapApi } from '@/services/api';

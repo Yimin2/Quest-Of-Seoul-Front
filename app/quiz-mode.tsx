@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 
-import { useQuestStore } from '@/store/useQuestStore';
+import { useQuestStore } from '@entities/quest';
 import { Images } from '@shared/config';
 import { ThemedText } from '@shared/ui';
 

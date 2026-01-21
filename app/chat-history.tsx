@@ -1,8 +1,8 @@
 import RouteResultList from '@/components/RouteResultList';
 import type { ChatSession, Quest } from '@/services/api';
 import { questApi } from '@/services/api';
-import { useAuthStore } from '@/store/useAuthStore';
-import { useChatHistoryStore } from '@/store/useChatHistoryStore';
+import { useAuthStore } from '@entities/user';
+import { useChatHistoryStore } from '@entities/chat';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText, ThemedView } from '@shared/ui';
 import Constants from 'expo-constants';

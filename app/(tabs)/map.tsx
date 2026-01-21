@@ -1,6 +1,6 @@
 import QuestMiniModal from '@/components/quest-mini-modal';
 import { pointsApi, questApi, type Quest } from '@/services/api';
-import { useQuestStore } from '@/store/useQuestStore';
+import { useQuestStore } from '@entities/quest';
 import { Images } from '@shared/config';
 import { ThemedText, ThemedView } from '@shared/ui';
 import Constants from 'expo-constants';

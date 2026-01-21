@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/themed-text';
-import { usePointsStore } from '@/store/usePointsStore';
-import { useAuthStore } from '@/store/useAuthStore';
+import { usePointsStore } from '@entities/points';
+import { useAuthStore } from '@entities/user';
 
 interface PointsDisplayProps {
   showIcon?: boolean;

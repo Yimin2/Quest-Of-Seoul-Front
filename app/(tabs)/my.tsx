@@ -4,8 +4,8 @@ import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
 
-import { useAuthStore } from '@/store/useAuthStore';
-import { usePointsStore } from '@/store/usePointsStore';
+import { useAuthStore } from '@entities/user';
+import { usePointsStore } from '@entities/points';
 import { ThemedText, ThemedView } from '@shared/ui';
 
 export default function MyScreen() {

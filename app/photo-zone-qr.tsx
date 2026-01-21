@@ -1,4 +1,4 @@
-import { useQuestStore } from '@/store/useQuestStore';
+import { useQuestStore } from '@entities/quest';
 import { Colors, Images } from '@shared/config';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';

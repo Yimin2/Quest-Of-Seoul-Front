@@ -26,7 +26,7 @@ import Svg, {
   LinearGradient as SvgLinearGradient,
 } from 'react-native-svg';
 
-import { useQuestStore } from '@/store/useQuestStore';
+import { useQuestStore } from '@entities/quest';
 import { ThemedText } from '@shared/ui';
 
 // Hamburger Menu Icon

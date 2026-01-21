@@ -39,7 +39,7 @@ import Svg, {
 } from 'react-native-svg';
 
 import { aiStationApi } from '@/services/api';
-import { useQuestStore } from '@/store/useQuestStore';
+import { useQuestStore } from '@entities/quest';
 import { ThemedText } from '@shared/ui';
 
 const API_URL =

@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { useQuestStore } from '@/store/useQuestStore';
+import { useQuestStore } from '@entities/quest';
 import { Images } from '@shared/config';
 import { ThemedText } from '@shared/ui';
 import { LinearGradient } from 'expo-linear-gradient';

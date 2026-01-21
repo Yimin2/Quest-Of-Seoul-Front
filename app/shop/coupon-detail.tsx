@@ -1,5 +1,5 @@
 import { Reward, rewardApi } from '@/services/api';
-import { usePointsStore } from '@/store/usePointsStore';
+import { usePointsStore } from '@entities/points';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@shared/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';

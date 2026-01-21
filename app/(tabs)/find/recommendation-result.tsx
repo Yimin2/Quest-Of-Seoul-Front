@@ -15,7 +15,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, G, Defs, ClipPath, Rect } from 'react-native-svg';
 import Constants from 'expo-constants';
-import { useQuestStore } from '@/store/useQuestStore';
+import { useQuestStore } from '@entities/quest';
 
 const API_URL =
   Constants.expoConfig?.extra?.apiUrl ||

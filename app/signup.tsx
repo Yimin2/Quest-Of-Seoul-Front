@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 
-import { useAuthStore } from '@/store/useAuthStore';
+import { useAuthStore } from '@entities/user';
 import { ThemedText } from '@shared/ui';
 
 export default function SignupScreen() {

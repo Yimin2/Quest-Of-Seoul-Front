@@ -1,6 +1,6 @@
 import { mapApi, pointsApi, questApi, type Quest } from '@/services/api';
 import { Colors, Images } from '@shared/config';
-import { useQuestStore } from '@/store/useQuestStore';
+import { useQuestStore } from '@entities/quest';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';

@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/store/useAuthStore';
+import { useAuthStore } from '@entities/user';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 

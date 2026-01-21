@@ -7,7 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import { useAuthStore } from '@/store/useAuthStore';
+import { useAuthStore } from '@entities/user';
 import { useColorScheme } from '@shared/lib';
 
 // 폰트 로딩 중 스플래시 화면 유지
