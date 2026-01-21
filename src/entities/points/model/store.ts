@@ -1,4 +1,4 @@
-import { pointsApi, type PointsResponse, type PointTransaction } from '@/services/api';
+import { pointsApi, type PointsResponse, type PointTransaction } from '@shared/api';
 import { create } from 'zustand';
 
 interface PointsStore {

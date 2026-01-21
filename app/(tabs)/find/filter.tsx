@@ -1,4 +1,4 @@
-import { questApi } from '@/services/api';
+import { questApi } from '@shared/api';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';

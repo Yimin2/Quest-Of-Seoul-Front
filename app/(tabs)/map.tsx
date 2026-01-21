@@ -1,5 +1,5 @@
 import { QuestMiniModal } from '@widgets/quest-mini-modal';
-import { pointsApi, questApi, type Quest } from '@/services/api';
+import { pointsApi, questApi, type Quest } from '@shared/api';
 import { useQuestStore } from '@entities/quest';
 import { Images } from '@shared/config';
 import { ThemedText, ThemedView } from '@shared/ui';

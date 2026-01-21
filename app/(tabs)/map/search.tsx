@@ -1,4 +1,4 @@
-import { questApi, type Quest } from '@/services/api';
+import { questApi, type Quest } from '@shared/api';
 import * as Location from 'expo-location';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';

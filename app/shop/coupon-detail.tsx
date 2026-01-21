@@ -1,4 +1,4 @@
-import { Reward, rewardApi } from '@/services/api';
+import { Reward, rewardApi } from '@shared/api';
 import { usePointsStore } from '@entities/points';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@shared/ui';

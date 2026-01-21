@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Modal, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 
-import { questApi, quizApi, QuizItem } from '@/services/api';
+import { questApi, quizApi, QuizItem } from '@shared/api';
 import { ThemedText } from '@shared/ui';
 
 export default function QuizScreen() {

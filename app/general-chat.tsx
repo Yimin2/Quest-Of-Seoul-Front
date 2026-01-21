@@ -33,7 +33,7 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 
-import { aiStationApi } from '@/services/api';
+import { aiStationApi } from '@shared/api';
 import { ThemedText } from '@shared/ui';
 
 const API_URL =

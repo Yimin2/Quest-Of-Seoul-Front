@@ -1,4 +1,4 @@
-import { pointsApi, Reward, rewardApi } from '@/services/api';
+import { pointsApi, Reward, rewardApi } from '@shared/api';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { ThemedText } from '@shared/ui';

@@ -38,7 +38,7 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 
-import { aiStationApi } from '@/services/api';
+import { aiStationApi } from '@shared/api';
 import { useQuestStore } from '@entities/quest';
 import { ThemedText } from '@shared/ui';
 

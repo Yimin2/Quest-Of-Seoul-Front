@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import Svg, { ClipPath, Defs, G, Path, Rect } from 'react-native-svg';
 
-import { aiStationApi, mapApi } from '@/services/api';
+import { aiStationApi, mapApi } from '@shared/api';
 import { useQuestStore } from '@entities/quest';
 import { Images } from '@shared/config';
 import { ThemedText } from '@shared/ui';

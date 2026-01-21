@@ -1,4 +1,4 @@
-import { ClaimedReward, rewardApi } from '@/services/api';
+import { ClaimedReward, rewardApi } from '@shared/api';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@shared/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';

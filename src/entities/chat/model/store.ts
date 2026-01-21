@@ -1,4 +1,4 @@
-import { aiStationApi, type ChatSession, type ChatSessionResponse } from '@/services/api';
+import { aiStationApi, type ChatSession, type ChatSessionResponse } from '@shared/api';
 import { create } from 'zustand';
 
 interface ChatHistoryStore {

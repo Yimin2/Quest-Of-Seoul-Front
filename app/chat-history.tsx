@@ -1,6 +1,6 @@
 import { RouteResultList } from '@widgets/route-result-list';
-import type { ChatSession, Quest } from '@/services/api';
-import { questApi } from '@/services/api';
+import type { ChatSession, Quest } from '@shared/api';
+import { questApi } from '@shared/api';
 import { useAuthStore } from '@entities/user';
 import { useChatHistoryStore } from '@entities/chat';
 import { Ionicons } from '@expo/vector-icons';

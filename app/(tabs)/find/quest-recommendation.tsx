@@ -20,7 +20,7 @@ import {
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { aiStationApi } from '@/services/api';
+import { aiStationApi } from '@shared/api';
 
 const API_URL =
   Constants.expoConfig?.extra?.apiUrl ||

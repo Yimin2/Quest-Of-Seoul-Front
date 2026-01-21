@@ -15,7 +15,7 @@ import Svg, { Defs, LinearGradient as SvgLinearGradient, Path, Stop } from 'reac
 import { useQuestStore } from '@entities/quest';
 import { router } from 'expo-router';
 import * as Location from 'expo-location';
-import { mapApi } from '@/services/api';
+import { mapApi } from '@shared/api';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const HEADER_HEIGHT = 50;

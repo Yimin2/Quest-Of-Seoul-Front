@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import * as Location from 'expo-location';
-import { mapApi } from '@/services/api';
+import { mapApi } from '@shared/api';
 
 interface Quest {
   id: number;

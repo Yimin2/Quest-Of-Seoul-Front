@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Quest } from '@/services/api';
+import type { Quest } from '@shared/api';
 
 interface ActiveQuest {
   quest_id: number;
