@@ -1,9 +1,9 @@
 import { Image } from 'expo-image';
 import { Platform, StyleSheet } from 'react-native';
 
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { Collapsible } from '@/components/ui/collapsible';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import ParallaxScrollView from '@shared/ui/ParallaxScrollView';
+import { Collapsible } from '@shared/ui';
+import { IconSymbol } from '@shared/ui';
 import { Fonts, Images } from '@shared/config';
 import { ExternalLink, ThemedText, ThemedView } from '@shared/ui';
 

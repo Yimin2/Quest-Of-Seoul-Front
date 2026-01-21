@@ -4,8 +4,8 @@ import { Text } from 'react-native';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { MapIcon, FindIcon, AIStationIcon, ShopIcon, MyIcon } from '@/components/tab-icons';
+import { HapticTab } from '@shared/ui';
+import { MapIcon, FindIcon, AIStationIcon, ShopIcon, MyIcon } from '@shared/ui';
 
 export default function TabLayout() {
   return (

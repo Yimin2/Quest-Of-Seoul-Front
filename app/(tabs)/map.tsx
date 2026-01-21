@@ -1,4 +1,4 @@
-import QuestMiniModal from '@/components/quest-mini-modal';
+import { QuestMiniModal } from '@widgets/quest-mini-modal';
 import { pointsApi, questApi, type Quest } from '@/services/api';
 import { useQuestStore } from '@entities/quest';
 import { Images } from '@shared/config';

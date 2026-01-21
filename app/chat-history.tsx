@@ -1,4 +1,4 @@
-import RouteResultList from '@/components/RouteResultList';
+import { RouteResultList } from '@widgets/route-result-list';
 import type { ChatSession, Quest } from '@/services/api';
 import { questApi } from '@/services/api';
 import { useAuthStore } from '@entities/user';

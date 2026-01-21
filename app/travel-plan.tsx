@@ -19,7 +19,7 @@ import { useQuestStore } from '@entities/quest';
 import { Images } from '@shared/config';
 import { ThemedText } from '@shared/ui';
 
-import RouteResultList from '@/components/RouteResultList';
+import { RouteResultList } from '@widgets/route-result-list';
 
 const makeId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 

@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
-import { StyleSheet, View, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themed-text';
 import { usePointsStore } from '@entities/points';
 import { useAuthStore } from '@entities/user';
+import { Ionicons } from '@expo/vector-icons';
+import { ThemedText } from '@shared/ui';
+import { useEffect } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 interface PointsDisplayProps {
   showIcon?: boolean;
@@ -11,7 +11,11 @@ interface PointsDisplayProps {
   style?: any;
 }
 
-export function PointsDisplay({ showIcon = true, size = 'medium', style }: PointsDisplayProps) {
+export function PointsDisplay({
+  showIcon = true,
+  size = 'medium',
+  style,
+}: PointsDisplayProps) {
   const { totalPoints, isLoading, fetchPoints } = usePointsStore();
   const { isAuthenticated } = useAuthStore();
 
@@ -39,9 +43,16 @@ export function PointsDisplay({ showIcon = true, size = 'medium', style }: Point
   return (
     <View style={[styles.container, style]}>
       {showIcon && (
-        <Ionicons name="cash-outline" size={iconSize} color="#fff" style={styles.icon} />
+        <Ionicons
+          name="cash-outline"
+          size={iconSize}
+          color="#fff"
+          style={styles.icon}
+        />
       )}
-      <ThemedText style={[styles.points, { fontSize }]}>{totalPoints.toLocaleString()}</ThemedText>
+      <ThemedText style={[styles.points, { fontSize }]}>
+        {totalPoints.toLocaleString()}
+      </ThemedText>
     </View>
   );
 }
