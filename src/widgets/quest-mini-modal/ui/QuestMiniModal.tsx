@@ -144,7 +144,7 @@ export default function QuestMiniModal({ quest, onClose }: QuestMiniModalProps) 
         // 전체 페이지로 네비게이트
         onClose();
         router.push({
-          pathname: '/(tabs)/map/quest-detail',
+          pathname: '/(app)/(tabs)/map/quest-detail',
           params: {
             quest: JSON.stringify(quest),
           },
