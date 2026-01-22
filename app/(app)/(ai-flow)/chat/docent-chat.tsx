@@ -40,7 +40,7 @@ import Svg, {
 
 import { aiStationApi } from '@shared/api';
 import { useQuestStore } from '@entities/quest';
-import { ThemedText } from '@shared/ui';
+import { Spacing, ThemedText } from '@shared/ui';
 
 const API_URL =
   Constants.expoConfig?.extra?.apiUrl ||
@@ -692,21 +692,8 @@ ${text}`;
           style={styles.backgroundGradient}
         >
           <View style={styles.container}>
-            <View style={styles.headerContainer}>
-              <View style={styles.headerContent}>
-                <Pressable onPress={() => router.push('/(app)/(ai-flow)/chat/history')} style={styles.headerButton}>
-                  <HamburgerIcon />
-                </Pressable>
-                <ThemedText style={styles.headerTitle}>
-                  {activeQuest?.quest.name || 'Gyeongbokgung Palace'}
-                </ThemedText>
-                <Pressable onPress={exitToPrevious} style={styles.headerButton}>
-                  <CloseIcon />
-                </Pressable>
-              </View>
-            </View>
-
             <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={styles.messages}>
+              <Spacing size={12} />
               {messages.map((msg) => (
                 <View key={msg.id} style={styles.messageContainer}>
                   {msg.role === 'assistant' ? (

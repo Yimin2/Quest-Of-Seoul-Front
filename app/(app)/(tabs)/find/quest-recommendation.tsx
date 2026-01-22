@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import Constants from 'expo-constants';
 import { File } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,7 +9,6 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -21,10 +19,6 @@ import {
 import Svg, { Path } from 'react-native-svg';
 
 import { aiStationApi } from '@shared/api';
-
-const API_URL =
-  Constants.expoConfig?.extra?.apiUrl ||
-  (Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000');
 
 const categories = [
   'History',
@@ -180,7 +174,7 @@ export default function QuestRecommendationScreen() {
           result: JSON.stringify(allRecommendations.slice(0, 10)), // 최대 10개
         },
       });
-    } catch (err) {
+    } catch {
       Alert.alert('Error', 'Failed to load recommendations.');
     } finally {
       setIsLoading(false);

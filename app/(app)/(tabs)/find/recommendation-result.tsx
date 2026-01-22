@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import {
   Image,
-  Platform,
+
   ScrollView,
   StyleSheet,
   Text,
@@ -14,16 +14,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, G, Defs, ClipPath, Rect } from 'react-native-svg';
-import Constants from 'expo-constants';
-import { useQuestStore } from '@entities/quest';
 
-const API_URL =
-  Constants.expoConfig?.extra?.apiUrl ||
-  (Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000');
+import { useQuestStore } from '@entities/quest';
 
 export default function RecommendationResultScreen() {
   const router = useRouter();
-  const { category, imageUri, result } = useLocalSearchParams();
+  const { category, result } = useLocalSearchParams();
   const allRecommendations = JSON.parse((result as string) || '[]');
 
   const recommendations = allRecommendations.filter((item: any) => item.quest_id);

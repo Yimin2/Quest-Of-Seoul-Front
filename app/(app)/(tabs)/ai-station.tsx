@@ -380,18 +380,12 @@ export default function AIStationScreen() {
         {/* Background Area - Behind everything */}
         <View style={styles.backgroundContainer}>
           <View style={styles.solidBackground} />
-          <ImageBackground
-            source={require('@/assets/images/explore-mode.png')}
-            style={styles.backgroundImage}
-            imageStyle={{ resizeMode: 'cover' }}
-          >
-            <LinearGradient
-              colors={['rgba(101, 157, 242, 0)', '#659DF2']}
-              start={{ x: 0.5, y: 1 }}
-              end={{ x: 0.5, y: 0 }}
-              style={styles.gradientOverlay}
-            />
-          </ImageBackground>
+          <LinearGradient
+            colors={['rgba(101, 157, 242, 0)', '#659DF2']}
+            start={{ x: 0.5, y: 1 }}
+            end={{ x: 0.5, y: 0 }}
+            style={styles.gradientOverlay}
+          />
         </View>
 
         {/* Content Layer - On top of background */}

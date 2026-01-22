@@ -81,7 +81,7 @@ export default function ShopScreen() {
   const handleRewardClick = (item: Reward) => {
     // Navigate to coupon detail page
     router.push({
-      pathname: '/(app)/(shop-flow)/reward-detail',
+      pathname: '/(app)/(shop-flow)/coupon-detail',
       params: {
         reward: JSON.stringify(item),
         category: CATEGORIES.find((c) => c.key === selectedCategory)?.label || selectedCategory,
@@ -93,15 +93,6 @@ export default function ShopScreen() {
     <View style={styles.container}>
       {/* Custom Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.push('/(app)/(shop-flow)/my-purchase')} style={styles.menuButton}>
-          <Svg width="15" height="10" viewBox="0 0 15 10" fill="none">
-            <Path
-              d="M0.833336 10C0.597225 10 0.399447 9.92 0.240003 9.76C0.0805585 9.6 0.000558429 9.40222 2.87356e-06 9.16667C-0.000552682 8.93111 0.0794474 8.73333 0.240003 8.57333C0.400559 8.41333 0.598336 8.33333 0.833336 8.33333H14.1667C14.4028 8.33333 14.6008 8.41333 14.7608 8.57333C14.9208 8.73333 15.0006 8.93111 15 9.16667C14.9994 9.40222 14.9194 9.60028 14.76 9.76083C14.6006 9.92139 14.4028 10.0011 14.1667 10H0.833336ZM0.833336 5.83333C0.597225 5.83333 0.399447 5.75333 0.240003 5.59333C0.0805585 5.43333 0.000558429 5.23556 2.87356e-06 5C-0.000552682 4.76444 0.0794474 4.56667 0.240003 4.40667C0.400559 4.24667 0.598336 4.16667 0.833336 4.16667H14.1667C14.4028 4.16667 14.6008 4.24667 14.7608 4.40667C14.9208 4.56667 15.0006 4.76444 15 5C14.9994 5.23556 14.9194 5.43361 14.76 5.59417C14.6006 5.75472 14.4028 5.83444 14.1667 5.83333H0.833336ZM0.833336 1.66667C0.597225 1.66667 0.399447 1.58667 0.240003 1.42667C0.0805585 1.26667 0.000558429 1.06889 2.87356e-06 0.833333C-0.000552682 0.597778 0.0794474 0.4 0.240003 0.24C0.400559 0.0800001 0.598336 0 0.833336 0H14.1667C14.4028 0 14.6008 0.0800001 14.7608 0.24C14.9208 0.4 15.0006 0.597778 15 0.833333C14.9994 1.06889 14.9194 1.26694 14.76 1.4275C14.6006 1.58806 14.4028 1.66778 14.1667 1.66667H0.833336Z"
-              fill="white"
-            />
-          </Svg>
-        </Pressable>
-
         <View style={styles.headerRight}>
           {/* Search Box */}
           <View style={styles.searchBox}>
@@ -148,13 +139,27 @@ export default function ShopScreen() {
             <ThemedText style={styles.mintValue}>{userMint}</ThemedText>
           </View>
         </View>
+        <Pressable
+          onPress={() => router.push('/(app)/(shop-flow)/my-purchase')}
+          style={styles.menuButton}
+        >
+          <Svg width="15" height="10" viewBox="0 0 15 10" fill="none">
+            <Path
+              d="M0.833336 10C0.597225 10 0.399447 9.92 0.240003 9.76C0.0805585 9.6 0.000558429 9.40222 2.87356e-06 9.16667C-0.000552682 8.93111 0.0794474 8.73333 0.240003 8.57333C0.400559 8.41333 0.598336 8.33333 0.833336 8.33333H14.1667C14.4028 8.33333 14.6008 8.41333 14.7608 8.57333C14.9208 8.73333 15.0006 8.93111 15 9.16667C14.9994 9.40222 14.9194 9.60028 14.76 9.76083C14.6006 9.92139 14.4028 10.0011 14.1667 10H0.833336ZM0.833336 5.83333C0.597225 5.83333 0.399447 5.75333 0.240003 5.59333C0.0805585 5.43333 0.000558429 5.23556 2.87356e-06 5C-0.000552682 4.76444 0.0794474 4.56667 0.240003 4.40667C0.400559 4.24667 0.598336 4.16667 0.833336 4.16667H14.1667C14.4028 4.16667 14.6008 4.24667 14.7608 4.40667C14.9208 4.56667 15.0006 4.76444 15 5C14.9994 5.23556 14.9194 5.43361 14.76 5.59417C14.6006 5.75472 14.4028 5.83444 14.1667 5.83333H0.833336ZM0.833336 1.66667C0.597225 1.66667 0.399447 1.58667 0.240003 1.42667C0.0805585 1.26667 0.000558429 1.06889 2.87356e-06 0.833333C-0.000552682 0.597778 0.0794474 0.4 0.240003 0.24C0.400559 0.0800001 0.598336 0 0.833336 0H14.1667C14.4028 0 14.6008 0.0800001 14.7608 0.24C14.9208 0.4 15.0006 0.597778 15 0.833333C14.9994 1.06889 14.9194 1.26694 14.76 1.4275C14.6006 1.58806 14.4028 1.66778 14.1667 1.66667H0.833336Z"
+              fill="white"
+            />
+          </Svg>
+        </Pressable>
       </View>
 
       <ScrollView style={styles.scrollContent} contentContainerStyle={styles.contentContainer}>
         {/* ====================== */}
         {/* ⭐ 상단 배너 추가       */}
         {/* ====================== */}
-        <Pressable style={styles.bannerWrapper} onPress={() => router.push('/(app)/(shop-flow)/day-pass')}>
+        <Pressable
+          style={styles.bannerWrapper}
+          onPress={() => router.push('/(app)/(shop-flow)/day-pass')}
+        >
           <Image
             source={require('@/assets/images/store_pass.png')}
             style={styles.bannerImage}
@@ -169,7 +174,10 @@ export default function ShopScreen() {
           </View>
 
           {/* 텍스트 오버레이 - 오른쪽 */}
-          <Pressable style={styles.bannerRightText} onPress={() => router.push('/(app)/(shop-flow)/day-pass')}>
+          <Pressable
+            style={styles.bannerRightText}
+            onPress={() => router.push('/(app)/(shop-flow)/day-pass')}
+          >
             <ThemedText style={styles.bannerRightTextLabel}>Day Pass Trials</ThemedText>
             <Ionicons name="chevron-forward" size={20} color="#fff" />
           </Pressable>

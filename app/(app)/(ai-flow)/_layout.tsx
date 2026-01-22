@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import { BackButton } from '@shared/ui';
 
 export default function AiFlowLayout() {
   return (
@@ -7,6 +8,7 @@ export default function AiFlowLayout() {
         headerShown: true,
         headerStyle: { backgroundColor: '#34495E' },
         headerTintColor: '#fff',
+        headerLeft: () => <BackButton />,
       }}
     >
       {/* Chat */}

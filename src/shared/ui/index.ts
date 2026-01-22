@@ -10,3 +10,5 @@ export * from './ParallaxScrollView';
 export * from './TabIcons';
 export { ThemedText, type ThemedTextProps } from './ThemedText';
 export { ThemedView, type ThemedViewProps } from './ThemedView';
+export { BackButton } from './BackButton';
+export { Spacing } from './Spacing';

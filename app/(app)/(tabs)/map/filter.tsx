@@ -146,7 +146,10 @@ export default function MapFilterScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Filter</Text>
-        <Pressable onPress={() => router.push('/(app)/(tabs)/map/search')} style={styles.closeButton}>
+        <Pressable
+          onPress={() => router.push('/(app)/(tabs)/map/search')}
+          style={styles.closeButton}
+        >
           <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <Path
               fillRule="evenodd"
