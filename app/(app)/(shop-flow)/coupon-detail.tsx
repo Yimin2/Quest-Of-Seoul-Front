@@ -1,4 +1,4 @@
-import { Reward, rewardApi } from '@shared/api';
+import { ClaimedReward, Reward, rewardApi } from '@shared/api';
 import { usePointsStore } from '@entities/points';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@shared/ui';
@@ -7,33 +7,43 @@ import { useEffect, useState } from 'react';
 import { Alert, Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Svg, { ClipPath, Defs, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
+type Mode = 'purchase' | 'owned';
+
 export default function CouponDetailScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const mode = (params.mode as Mode) || 'purchase';
+
+  // Purchase mode state
   const [reward, setReward] = useState<Reward | null>(null);
   const [loading, setLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const { fetchPoints } = usePointsStore();
 
-  // Parse reward data from params
+  // Owned mode state
+  const [coupon, setCoupon] = useState<ClaimedReward | null>(null);
+  const [showBarcode, setShowBarcode] = useState(false);
+
+  // Parse data from params
   useEffect(() => {
-    if (params.reward) {
+    if (mode === 'purchase' && params.reward) {
       try {
         const rewardData = JSON.parse(params.reward as string);
         setReward(rewardData);
-      } catch (e) {
-        // Ignore
-      }
+      } catch (e) {}
+    } else if (mode === 'owned' && params.coupon) {
+      try {
+        const couponData = JSON.parse(params.coupon as string);
+        setCoupon(couponData);
+      } catch (e) {}
     }
-  }, [params.reward]);
+  }, [params.reward, params.coupon, mode]);
 
-  const handleShowConfirmModal = () => {
-    setShowConfirmModal(true);
-  };
+  // Purchase handlers
+  const handleShowConfirmModal = () => setShowConfirmModal(true);
 
   const handleConfirmPurchase = async () => {
     if (!reward) return;
-
     try {
       setLoading(true);
       setShowConfirmModal(false);
@@ -42,21 +52,10 @@ export default function CouponDetailScreen() {
         Alert.alert(
           'Purchase Complete! 🎉',
           `You have purchased ${reward.name}!\n\nQR Code: ${res.qr_code}\n\nCheck it in My Coupon.`,
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                fetchPoints();
-                router.back();
-              },
-            },
-          ],
+          [{ text: 'OK', onPress: () => { fetchPoints(); router.back(); } }],
         );
       } else {
-        Alert.alert(
-          'Insufficient Points 💸',
-          `Required: ${res.required}\nCurrent: ${res.current}\nShortage: ${res.shortage}`,
-        );
+        Alert.alert('Insufficient Points 💸', `Required: ${res.required}\nCurrent: ${res.current}\nShortage: ${res.shortage}`);
       }
     } catch (e: any) {
       Alert.alert('Error', e.message || 'An error occurred during purchase.');
@@ -65,7 +64,24 @@ export default function CouponDetailScreen() {
     }
   };
 
-  if (!reward) {
+  // Owned handlers
+  const handleUseCoupon = async () => {
+    if (!coupon) return;
+    try {
+      const res = await rewardApi.useReward(coupon.id);
+      if (res.status === 'success') {
+        setShowBarcode(true);
+      } else {
+        Alert.alert('Error', 'This coupon has already been used.');
+      }
+    } catch (e: any) {
+      Alert.alert('Error', e.message || 'An error occurred while using the coupon.');
+    }
+  };
+
+  // Loading state
+  const data = mode === 'purchase' ? reward : coupon;
+  if (!data) {
     return (
       <View style={styles.container}>
         <ThemedText style={styles.loadingText}>Loading...</ThemedText>
@@ -73,14 +89,25 @@ export default function CouponDetailScreen() {
     );
   }
 
-  const category = (params.category as string) || 'Coupon';
+  // Barcode screen for owned mode
+  if (mode === 'owned' && showBarcode && coupon) {
+    return <BarcodeScreen coupon={coupon} onClose={() => setShowBarcode(false)} />;
+  }
+
+  const category = mode === 'purchase'
+    ? (params.category as string) || 'Coupon'
+    : coupon?.rewards?.type || 'Coupon';
+  const displayName = mode === 'purchase' ? reward?.name : coupon?.rewards?.name;
+  const imageUrl = mode === 'purchase' ? reward?.image_url : coupon?.rewards?.image_url;
+  const pointCost = mode === 'purchase' ? reward?.point_cost : coupon?.rewards?.point_cost;
+  const description = mode === 'purchase' ? reward?.description : coupon?.rewards?.description;
 
   return (
     <View style={styles.container}>
       {/* Image Container with Header */}
       <View style={styles.imageContainer}>
-        {reward.image_url ? (
-          <Image source={{ uri: reward.image_url }} style={styles.couponImage} resizeMode="cover" />
+        {imageUrl ? (
+          <Image source={{ uri: imageUrl }} style={styles.couponImage} resizeMode="cover" />
         ) : (
           <Ionicons name="gift" size={120} color="#76C7AD" />
         )}
@@ -100,7 +127,7 @@ export default function CouponDetailScreen() {
         {/* Product Info */}
         <View style={styles.productInfoContainer}>
           <ThemedText style={styles.brandText}>{category}</ThemedText>
-          <ThemedText style={styles.productName}>{reward.name}</ThemedText>
+          <ThemedText style={styles.productName}>{displayName}</ThemedText>
           <View style={styles.priceContainer}>
             <Svg width="47" height="20" viewBox="0 0 47 20">
               <Defs>
@@ -117,14 +144,14 @@ export default function CouponDetailScreen() {
                 />
               </G>
             </Svg>
-            <ThemedText style={styles.priceText}>{reward.point_cost}</ThemedText>
+            <ThemedText style={styles.priceText}>{pointCost}</ThemedText>
           </View>
         </View>
 
         {/* Overview Section */}
         <ThemedText style={styles.sectionTitle}>OverView</ThemedText>
         <ThemedText style={styles.descriptionText}>
-          {reward.description || 'Standard coupon'}
+          {description || 'Standard coupon'}
         </ThemedText>
 
         {/* Usage Section */}
@@ -134,19 +161,28 @@ export default function CouponDetailScreen() {
 
       {/* Bottom CTA Button */}
       <View style={styles.bottomContainer}>
-        <Pressable
-          style={[styles.ctaButton, loading && styles.ctaButtonDisabled]}
-          onPress={handleShowConfirmModal}
-          disabled={loading}
-        >
-          <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <Path
-              d="M12.586 2.586C12.211 2.2109 11.7024 2.00011 11.172 2H4C3.46957 2 2.96086 2.21071 2.58579 2.58579C2.21071 2.96086 2 3.46957 2 4V11.172C2.00011 11.7024 2.2109 12.211 2.586 12.586L10.586 20.586C10.9611 20.9609 11.4697 21.1716 12 21.1716C12.5303 21.1716 13.0389 20.9609 13.414 20.586L20.586 13.414C20.9609 13.0389 21.1716 12.5303 21.1716 12C21.1716 11.4697 20.9609 10.9611 20.586 10.586L12.586 2.586ZM7 9C6.46943 8.99987 5.96065 8.78897 5.58558 8.41371C5.21051 8.03845 4.99987 7.52957 5 6.999C5.00013 6.46843 5.21103 5.95965 5.58629 5.58458C5.96155 5.20951 6.47043 4.99887 7.001 4.999C7.53157 4.99913 8.04035 5.21003 8.41542 5.58529C8.79049 5.96055 9.00113 6.46943 9.001 7C9.00087 7.53057 8.78997 8.03935 8.41471 8.41442C8.03945 8.78949 7.53057 9.00013 7 9Z"
-              fill="white"
-            />
-          </Svg>
-          <ThemedText style={styles.ctaText}>{loading ? 'Processing...' : 'Get Coupon'}</ThemedText>
-        </Pressable>
+        {mode === 'purchase' ? (
+          <Pressable
+            style={[styles.ctaButton, loading && styles.ctaButtonDisabled]}
+            onPress={handleShowConfirmModal}
+            disabled={loading}
+          >
+            <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <Path
+                d="M12.586 2.586C12.211 2.2109 11.7024 2.00011 11.172 2H4C3.46957 2 2.96086 2.21071 2.58579 2.58579C2.21071 2.96086 2 3.46957 2 4V11.172C2.00011 11.7024 2.2109 12.211 2.586 12.586L10.586 20.586C10.9611 20.9609 11.4697 21.1716 12 21.1716C12.5303 21.1716 13.0389 20.9609 13.414 20.586L20.586 13.414C20.9609 13.0389 21.1716 12.5303 21.1716 12C21.1716 11.4697 20.9609 10.9611 20.586 10.586L12.586 2.586ZM7 9C6.46943 8.99987 5.96065 8.78897 5.58558 8.41371C5.21051 8.03845 4.99987 7.52957 5 6.999C5.00013 6.46843 5.21103 5.95965 5.58629 5.58458C5.96155 5.20951 6.47043 4.99887 7.001 4.999C7.53157 4.99913 8.04035 5.21003 8.41542 5.58529C8.79049 5.96055 9.00113 6.46943 9.001 7C9.00087 7.53057 8.78997 8.03935 8.41471 8.41442C8.03945 8.78949 7.53057 9.00013 7 9Z"
+                fill="white"
+              />
+            </Svg>
+            <ThemedText style={styles.ctaText}>{loading ? 'Processing...' : 'Get Coupon'}</ThemedText>
+          </Pressable>
+        ) : (
+          !coupon?.used_at && (
+            <Pressable style={styles.useButton} onPress={handleUseCoupon}>
+              <Ionicons name="barcode-outline" size={24} color="#FFF" />
+              <ThemedText style={styles.useButtonText}>Use this coupon</ThemedText>
+            </Pressable>
+          )
+        )}
       </View>
 
       {/* Confirmation Modal */}
@@ -163,7 +199,7 @@ export default function CouponDetailScreen() {
 
             {/* Coupon Preview Image */}
             <View style={styles.modalImageContainer}>
-              {reward.image_url ? (
+              {reward?.image_url ? (
                 <Image
                   source={{ uri: reward.image_url }}
                   style={styles.modalImage}
@@ -178,7 +214,7 @@ export default function CouponDetailScreen() {
             <View style={styles.modalProductInfo}>
               <ThemedText style={styles.modalBrandText}>{category}</ThemedText>
               <ThemedText style={styles.modalProductName} numberOfLines={2}>
-                {reward.name}
+                {reward?.name}
               </ThemedText>
               <View style={styles.priceContainer}>
                 <Svg width="47" height="20" viewBox="0 0 47 20">
@@ -196,7 +232,7 @@ export default function CouponDetailScreen() {
                     />
                   </G>
                 </Svg>
-                <ThemedText style={styles.priceText}>{reward.point_cost}</ThemedText>
+                <ThemedText style={styles.priceText}>{reward?.point_cost}</ThemedText>
               </View>
             </View>
 
@@ -216,7 +252,7 @@ export default function CouponDetailScreen() {
                     fill="white"
                   />
                 </Svg>
-                <ThemedText style={styles.modalMintAmount}>{reward.point_cost}</ThemedText>
+                <ThemedText style={styles.modalMintAmount}>{reward?.point_cost}</ThemedText>
               </Pressable>
             </View>
           </Pressable>
@@ -511,4 +547,108 @@ const styles = StyleSheet.create({
     gap: 2,
     padding: 3,
   },
+  useButton: {
+    backgroundColor: '#FF7F50',
+    height: 56,
+    borderRadius: 35,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+  },
+  useButtonText: {
+    color: '#FFF',
+    fontFamily: 'Pretendard',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+});
+
+/* ----------------------- Barcode Screen Component ----------------------- */
+function BarcodeScreen({ coupon, onClose }: { coupon: ClaimedReward; onClose: () => void }) {
+  const barcodeValue = coupon.qr_code || `978${String(coupon.id).padStart(9, '0')}`;
+
+  const generateBarcodePattern = (value: string) => {
+    const patterns: { width: number; x: number }[] = [];
+    let x = 0;
+    const thinBar = 2;
+    const thickBar = 4;
+
+    patterns.push({ width: thickBar, x });
+    x += thickBar + thinBar;
+    patterns.push({ width: thinBar, x });
+    x += thinBar + thinBar;
+    patterns.push({ width: thickBar, x });
+    x += thickBar + thinBar;
+
+    for (let i = 0; i < value.length; i++) {
+      const char = value.charCodeAt(i);
+      const pattern = (char % 4) + 1;
+      for (let j = 0; j < pattern; j++) {
+        const width = j % 2 === 0 ? thickBar : thinBar;
+        patterns.push({ width, x });
+        x += width + thinBar;
+      }
+    }
+
+    patterns.push({ width: thickBar, x });
+    x += thickBar + thinBar;
+    patterns.push({ width: thinBar, x });
+    x += thinBar + thinBar;
+    patterns.push({ width: thickBar, x });
+
+    return { patterns, totalWidth: x + thickBar };
+  };
+
+  const { patterns, totalWidth } = generateBarcodePattern(barcodeValue);
+
+  return (
+    <View style={barcodeStyles.container}>
+      <View style={barcodeStyles.rotatedContainer}>
+        <View style={barcodeStyles.content}>
+          <View style={barcodeStyles.barcodeContainer}>
+            <View style={[barcodeStyles.barcode, { width: totalWidth }]}>
+              <Svg width={totalWidth} height={300} viewBox={`0 0 ${totalWidth} 300`}>
+                {patterns.map((pattern, index) => (
+                  <Rect key={index} x={pattern.x} y={0} width={pattern.width} height={300} fill="#000000" />
+                ))}
+              </Svg>
+            </View>
+            <ThemedText style={barcodeStyles.barcodeNumber}>{barcodeValue}</ThemedText>
+          </View>
+          <View style={barcodeStyles.textContainer}>
+            <ThemedText style={barcodeStyles.textBrand}>{coupon.rewards.type || 'Reward'}</ThemedText>
+            <ThemedText style={barcodeStyles.textName}>{coupon.rewards.name}</ThemedText>
+            <View style={barcodeStyles.textPriceBadge}>
+              <Svg width="13" height="8" viewBox="0 0 13 8" fill="none">
+                <Path
+                  d="M13 4.01234V4.2707C13 4.63629 12.7895 4.94705 12.4648 5.15666C12.8671 5.47107 13.0823 5.9366 12.96 6.37531L12.8883 6.61904C12.6907 7.31976 11.712 7.58787 10.8887 7.16865L10.1406 6.78965C9.9279 6.68324 9.74007 6.53022 9.5901 6.34118C9.46947 6.51509 9.3349 6.67816 9.18782 6.82864C8.79662 7.23454 8.3256 7.54833 7.80681 7.74864C7.28802 7.94896 6.73366 8.0311 6.18148 7.98947C5.62929 7.94784 5.09225 7.7834 4.60692 7.50738C4.12158 7.23136 3.69936 6.85023 3.369 6.38993C3.22607 6.5549 3.05348 6.68943 2.86087 6.78599L2.11279 7.16499C1.28943 7.58421 0.315504 7.3161 0.113192 6.61538L0.041429 6.37165C-0.0761944 5.93781 0.134361 5.47229 0.536633 5.153C0.211993 4.94339 0.00144104 4.62898 0.00144104 4.26704V4.01234C0.00662526 3.83973 0.0534857 3.67121 0.13773 3.52219C0.221975 3.37317 0.340914 3.24841 0.483694 3.15929C0.130824 2.87412 -0.0703029 2.45857 0.0226196 2.05032L0.0790765 1.79927C0.235516 1.11439 1.13768 0.781702 1.96928 1.10464L2.7456 1.40809C2.94094 1.48295 3.12149 1.59403 3.27843 1.7359C3.63475 1.19668 4.11346 0.756388 4.67248 0.453726C5.23149 0.151063 5.8537 -0.00470551 6.48442 0.000108273C7.11515 0.00492205 7.73507 0.170173 8.28972 0.481336C8.84437 0.792498 9.31677 1.24004 9.66538 1.78465C9.8338 1.61783 10.0342 1.48954 10.2535 1.40809L11.0286 1.10464C11.8614 0.781702 12.7624 1.11439 12.9188 1.79927L12.9753 2.05032C13.0682 2.45857 12.8706 2.87412 12.5142 3.15929C12.6577 3.24797 12.7773 3.37255 12.8622 3.5216C12.9471 3.67064 12.9944 3.83938 13 4.01234Z"
+                  fill="#F5F5F5"
+                />
+              </Svg>
+              <ThemedText style={barcodeStyles.textPrice}>{coupon.rewards.point_cost}</ThemedText>
+            </View>
+          </View>
+        </View>
+      </View>
+      <Pressable style={barcodeStyles.closeButton} onPress={onClose}>
+        <Ionicons name="close" size={30} color="#34495E" />
+      </Pressable>
+    </View>
+  );
+}
+
+const barcodeStyles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#FFFFFF' },
+  rotatedContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', transform: [{ rotate: '90deg' }], width: '100%', height: '100%' },
+  content: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 60 },
+  barcodeContainer: { alignItems: 'center', justifyContent: 'center' },
+  barcode: { height: 300, backgroundColor: '#FFFFFF', borderWidth: 2, borderColor: '#000', marginBottom: 20, justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
+  barcodeNumber: { color: '#000', fontSize: 14, fontFamily: 'monospace', marginTop: 12, textAlign: 'center' },
+  textContainer: { flexDirection: 'column', alignItems: 'flex-start', gap: 12 },
+  textBrand: { color: '#000', fontFamily: 'Pretendard', fontSize: 16, fontWeight: '700' },
+  textName: { color: '#000', fontFamily: 'Inter', fontSize: 18, fontWeight: '400' },
+  textPriceBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#76C7AD', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, marginTop: 4 },
+  textPrice: { color: '#FFF', fontFamily: 'Inter', fontSize: 14, fontWeight: '700' },
+  closeButton: { position: 'absolute', bottom: 30, right: 30, width: 56, height: 56, borderRadius: 28, backgroundColor: '#34495E', justifyContent: 'center', alignItems: 'center', zIndex: 1000, elevation: 1000 },
 });

@@ -140,7 +140,7 @@ export default function ShopScreen() {
           </View>
         </View>
         <Pressable
-          onPress={() => router.push('/(app)/(shop-flow)/my-purchase')}
+          onPress={() => router.push('/(app)/(shop-flow)/coupon-list')}
           style={styles.menuButton}
         >
           <Svg width="15" height="10" viewBox="0 0 15 10" fill="none">

@@ -11,11 +11,10 @@ export default function ShopFlowLayout() {
         headerLeft: () => <BackButton />,
       }}
     >
-      <Stack.Screen name="my-coupon" options={{ title: 'My Coupons' }} />
+      <Stack.Screen name="coupon-list" options={{ title: 'My Coupons' }} />
       <Stack.Screen name="coupon-detail" options={{ title: 'Coupon Detail' }} />
       <Stack.Screen name="day-pass" options={{ title: 'Day Pass' }} />
-      <Stack.Screen name="my-purchase" options={{ title: 'My Purchases' }} />
-      <Stack.Screen name="my-purchase-coupon-detail" options={{ title: 'Coupon Detail' }} />
+      <Stack.Screen name="purchase-list" options={{ title: 'My Purchases' }} />
     </Stack>
   );
 }
