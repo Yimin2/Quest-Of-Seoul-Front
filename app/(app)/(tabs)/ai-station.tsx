@@ -260,9 +260,9 @@ export default function AIStationScreen() {
       pathname: '/(app)/(tabs)/find/image-search',
       params: { from: 'ai-station' },
     });
-  const openAIChat = () => router.push('/(app)/(ai-flow)/chat/ai-chat');
-  const openPlanChat = () => router.push('/(app)/(ai-flow)/chat/plan-chat');
-  const openAIPlusChat = () => router.push('/(app)/(ai-flow)/chat/docent-chat');
+  const openAIChat = () => router.push('/(app)/(ai-flow)/chat/ai');
+  const openPlanChat = () => router.push('/(app)/(ai-flow)/chat/plan');
+  const openAIPlusChat = () => router.push('/(app)/(ai-flow)/chat/ai-plus');
   const openQuest = () => {
     if (activeQuest) {
       router.push({
@@ -284,7 +284,7 @@ export default function AIStationScreen() {
   const openPhotoZone = () => {
     if (activeQuest) {
       router.push({
-        pathname: '/(app)/(ai-flow)/photo/qr',
+        pathname: '/(app)/(ai-flow)/photo/scan',
         params: {
           questId: activeQuest.quest_id.toString(),
           questImageUrl: activeQuest.quest.place_image_url || '',
@@ -292,14 +292,14 @@ export default function AIStationScreen() {
         },
       });
     } else {
-      router.push('/(app)/(ai-flow)/photo/qr' as any);
+      router.push('/(app)/(ai-flow)/photo/scan' as any);
     }
   };
 
   const submitFromStation = () => {
     if (!input.trim()) return;
     router.push({
-      pathname: '/(app)/(ai-flow)/chat/ai-chat',
+      pathname: '/(app)/(ai-flow)/chat/ai',
       params: { init: input.trim() },
     });
     setInput('');
@@ -326,7 +326,7 @@ export default function AIStationScreen() {
       if (!result.canceled && result.assets?.[0]?.base64) {
         // 이미지가 선택되면 quest-chat으로 이동하면서 이미지 전달
         router.push({
-          pathname: '/(app)/(ai-flow)/chat/docent-chat',
+          pathname: '/(app)/(ai-flow)/chat/ai-plus',
           params: { imageBase64: result.assets[0].base64 },
         });
       }
@@ -358,7 +358,7 @@ export default function AIStationScreen() {
           });
           // 이미지가 선택되면 quest-chat으로 이동하면서 이미지 전달
           router.push({
-            pathname: '/(app)/(ai-flow)/chat/docent-chat',
+            pathname: '/(app)/(ai-flow)/chat/ai-plus',
             params: { imageBase64: base64 },
           });
         } catch (convertError) {

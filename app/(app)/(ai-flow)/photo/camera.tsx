@@ -114,7 +114,7 @@ export default function PhotoZoneCameraScreen() {
     if (!combinedPhoto) return;
 
     router.push({
-      pathname: '/(app)/(ai-flow)/photo/save',
+      pathname: '/(app)/(ai-flow)/photo/result',
       params: {
         photoUri: combinedPhoto,
         questId: questId,

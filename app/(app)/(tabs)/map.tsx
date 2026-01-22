@@ -1189,7 +1189,7 @@ export default function MapScreen() {
             style={styles.aiDocentButton}
             onPress={() => {
               // AI Docent 화면으로 이동
-              router.push('/(app)/(ai-flow)/chat/plan-chat');
+              router.push('/(app)/(ai-flow)/chat/plan');
             }}
           >
             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">

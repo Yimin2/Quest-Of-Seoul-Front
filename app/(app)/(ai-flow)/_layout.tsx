@@ -12,9 +12,9 @@ export default function AiFlowLayout() {
       }}
     >
       {/* Chat */}
-      <Stack.Screen name="chat/ai-chat" options={{ title: 'AI Chat' }} />
-      <Stack.Screen name="chat/docent-chat" options={{ title: 'Docent Chat' }} />
-      <Stack.Screen name="chat/plan-chat" options={{ title: 'Plan Chat' }} />
+      <Stack.Screen name="chat/ai" options={{ title: 'AI Chat' }} />
+      <Stack.Screen name="chat/ai-plus" options={{ title: 'AI Plus Chat' }} />
+      <Stack.Screen name="chat/plan" options={{ title: 'Plan Chat' }} />
       <Stack.Screen name="chat/history" options={{ title: 'Chat History' }} />
 
       {/* Quiz */}
@@ -24,11 +24,11 @@ export default function AiFlowLayout() {
       <Stack.Screen name="quiz/completed" options={{ title: 'Complete' }} />
 
       {/* Photo */}
-      <Stack.Screen name="photo/index" options={{ title: 'Photo Zone' }} />
+      <Stack.Screen name="photo/intro" options={{ title: 'Photo Zone' }} />
       <Stack.Screen name="photo/camera" options={{ title: 'Camera' }} />
       <Stack.Screen name="photo/camera-mode" options={{ title: 'Camera Mode' }} />
-      <Stack.Screen name="photo/qr" options={{ title: 'QR Scan' }} />
-      <Stack.Screen name="photo/save" options={{ title: 'Save Photo' }} />
+      <Stack.Screen name="photo/scan" options={{ title: 'QR Scan' }} />
+      <Stack.Screen name="photo/result" options={{ title: 'Save Photo' }} />
 
       {/* Quest */}
       <Stack.Screen name="quest/intro" options={{ title: 'Treasure Hunt' }} />
