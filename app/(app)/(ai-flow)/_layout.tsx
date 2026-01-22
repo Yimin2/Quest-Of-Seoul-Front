@@ -18,10 +18,10 @@ export default function AiFlowLayout() {
       <Stack.Screen name="chat/history" options={{ title: 'Chat History' }} />
 
       {/* Quiz */}
-      <Stack.Screen name="quiz/mode" options={{ title: 'Quiz Mode' }} />
-      <Stack.Screen name="quiz/screen" options={{ title: 'Quiz' }} />
+      <Stack.Screen name="quiz/intro" options={{ title: 'Quiz Mode' }} />
+      <Stack.Screen name="quiz/play" options={{ title: 'Quiz' }} />
       <Stack.Screen name="quiz/result" options={{ title: 'Quiz Result' }} />
-      <Stack.Screen name="quiz/complete" options={{ title: 'Complete' }} />
+      <Stack.Screen name="quiz/completed" options={{ title: 'Complete' }} />
 
       {/* Photo */}
       <Stack.Screen name="photo/index" options={{ title: 'Photo Zone' }} />
@@ -32,7 +32,7 @@ export default function AiFlowLayout() {
 
       {/* Quest */}
       <Stack.Screen name="quest/intro" options={{ title: 'Treasure Hunt' }} />
-      <Stack.Screen name="quest/scan" options={{ title: 'Stamp Quest' }} />
+      <Stack.Screen name="quest/play" options={{ title: 'Treasure Hunt' }} />
 
       {/* Mode Selector */}
       <Stack.Screen name="mode-selector" options={{ title: 'Mode Selector' }} />

@@ -1271,7 +1271,7 @@ export default function MapScreen() {
         <Pressable
           style={styles.mapSmallButton}
           onPress={() => {
-            router.push('/(app)/(tabs)/find/quest-recommendation');
+            router.push('/(app)/(tabs)/find/image-search');
           }}
         >
           <Image source={Images.mapSmall} style={styles.mapSmallButtonImage} resizeMode="contain" />

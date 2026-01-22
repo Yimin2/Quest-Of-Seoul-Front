@@ -22,7 +22,7 @@ export default function TreasureHuntIntroScreen() {
 
   const close = () => router.back();
   const startTreasureHunt = () => {
-    router.push('/stamp/stamp-quest' as any);
+    router.push('/(app)/(ai-flow)/quest/play');
   };
 
   return (

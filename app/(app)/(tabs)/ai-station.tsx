@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import {
   Alert,
   Image,
-  ImageBackground,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -258,7 +257,7 @@ export default function AIStationScreen() {
   // navigation handlers
   const openImageFind = () =>
     router.push({
-      pathname: '/(app)/(tabs)/find/quest-recommendation',
+      pathname: '/(app)/(tabs)/find/image-search',
       params: { from: 'ai-station' },
     });
   const openAIChat = () => router.push('/(app)/(ai-flow)/chat/ai-chat');
@@ -267,7 +266,7 @@ export default function AIStationScreen() {
   const openQuest = () => {
     if (activeQuest) {
       router.push({
-        pathname: '/(app)/(ai-flow)/quiz/screen',
+        pathname: '/(app)/(ai-flow)/quiz/intro',
         params: {
           questId: activeQuest.quest_id.toString(),
           questName: activeQuest.quest.name,
@@ -278,10 +277,10 @@ export default function AIStationScreen() {
         },
       });
     } else {
-      router.push('/(app)/(ai-flow)/quiz/screen');
+      router.push('/(app)/(ai-flow)/quiz/intro');
     }
   };
-  const openStampQuest = () => router.push('/stamp/stamp-quest' as any);
+  const openTreasureHunt = () => router.push('/(app)/(ai-flow)/quest/intro');
   const openPhotoZone = () => {
     if (activeQuest) {
       router.push({
@@ -582,10 +581,11 @@ export default function AIStationScreen() {
                       </View>
                     </LinearGradient>
                   </Pressable>
+                  {/* Treasure Hunt Button */}
                   <Pressable
                     onPress={() => {
                       Keyboard.dismiss();
-                      openStampQuest();
+                      openTreasureHunt();
                     }}
                   >
                     <LinearGradient

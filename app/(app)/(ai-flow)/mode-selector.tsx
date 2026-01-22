@@ -9,7 +9,7 @@ export default function ChatModeScreen() {
   const router = useRouter();
 
   const goBack = () => router.back();
-  const goToQuiz = () => router.push('/(app)/(ai-flow)/quiz/mode');
+  const goToQuiz = () => router.push('/(app)/(ai-flow)/quiz/intro');
   const goToChat = () => router.push('/(app)/(ai-flow)/chat/plan-chat');
 
   return (
