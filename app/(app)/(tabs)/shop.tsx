@@ -45,7 +45,7 @@ export default function ShopScreen() {
 
   // React Query Hooks
   // React Query Hooks
-  const { data: pointsData, isLoading: isPointsLoading, error: pointsError, isError: isPointsError } = usePoints();
+  const { data: pointsData, isLoading: isPointsLoading } = usePoints();
   const {
     data: rewardsData,
     isLoading: isRewardsLoading,
@@ -63,10 +63,7 @@ export default function ShopScreen() {
     if (isRewardsError && rewardsError) {
       Alert.alert('Error', rewardsError.message || 'Failed to load reward list.');
     }
-    if (isPointsError && pointsError) {
-      Alert.alert('Error', 'Failed to load points.');
-    }
-  }, [isRewardsError, rewardsError, isPointsError, pointsError]);
+  }, [isRewardsError, rewardsError]);
 
   const handleRewardClick = (item: Reward) => {
     // Navigate to coupon detail page

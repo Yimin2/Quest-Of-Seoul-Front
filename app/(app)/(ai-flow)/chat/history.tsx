@@ -1,13 +1,13 @@
 import { RouteResultList } from '@widgets/route-result-list';
+import { useChatList } from '@shared/api/hooks';
 import type { ChatSession, Quest } from '@shared/api';
 import { questApi } from '@shared/api';
 import { useAuthStore } from '@entities/user';
-import { useChatHistoryStore } from '@entities/chat';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText, ThemedView } from '@shared/ui';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -48,48 +48,48 @@ const getFullImageUrl = (url?: string | null): string | null => {
 export default function ChatHistoryScreen() {
   const router = useRouter();
   const [tab, setTab] = useState<'ai' | 'plus' | 'plan'>('ai');
-  const { sessions, isLoading, error, fetchChatList } = useChatHistoryStore();
   const { isAuthenticated } = useAuthStore();
-  const [refreshing, setRefreshing] = useState(false);
-  const [selectedSession, setSelectedSession] = useState<ChatSession | null>(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
-  const [showRouteResults, setShowRouteResults] = useState(false);
-  const [routeQuests, setRouteQuests] = useState<Quest[]>([]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadChats();
-    }
-  }, [tab, isAuthenticated]);
-
-  const loadChats = async () => {
-    let params: {
+  
+  // Tab에 따른 Query Params 파생
+  const queryParams = useMemo(() => {
+    const params: {
       limit?: number;
       mode?: 'explore' | 'quest';
       function_type?: 'rag_chat' | 'vlm_chat' | 'route_recommend';
     } = { limit: 20 };
 
     if (tab === 'ai') {
-      // 일반 AI 채팅: Explore 모드 RAG 채팅
       params.mode = 'explore';
       params.function_type = 'rag_chat';
     } else if (tab === 'plus') {
-      // AI PLUS 채팅: Quest 모드 RAG + VLM 채팅 모두 포함
       params.mode = 'quest';
       // function_type을 지정하지 않으면 quest mode의 모든 채팅 (rag_chat, vlm_chat) 가져옴
     } else if (tab === 'plan') {
-      // Plan 채팅: 여행 경로 추천
       params.mode = 'explore';
       params.function_type = 'route_recommend';
     }
+    return params;
+  }, [tab]);
 
-    await fetchChatList(params);
-  };
+  // React Query Hook 사용
+  const { 
+    data: chatData, 
+    isLoading, 
+    isError,
+    error, 
+    refetch, 
+    isRefetching 
+  } = useChatList(isAuthenticated ? queryParams : undefined);
+
+  const sessions = chatData?.sessions || [];
+
+  const [selectedSession, setSelectedSession] = useState<ChatSession | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showRouteResults, setShowRouteResults] = useState(false);
+  const [routeQuests, setRouteQuests] = useState<Quest[]>([]);
 
   const onRefresh = async () => {
-    setRefreshing(true);
-    await loadChats();
-    setRefreshing(false);
+    await refetch();
   };
 
   const handleSessionPress = (session: ChatSession) => {
@@ -568,14 +568,14 @@ export default function ChatHistoryScreen() {
           <View style={styles.emptyContainer}>
             <ThemedText style={styles.emptyText}>로그인이 필요합니다.</ThemedText>
           </View>
-        ) : error ? (
+        ) : isError ? (
           <View style={styles.emptyContainer}>
-            <ThemedText style={styles.errorText}>{error}</ThemedText>
-            <Pressable onPress={loadChats} style={styles.retryButton}>
+            <ThemedText style={styles.errorText}>{error?.message || 'Failed to load'}</ThemedText>
+            <Pressable onPress={() => refetch()} style={styles.retryButton}>
               <ThemedText style={styles.retryText}>다시 시도</ThemedText>
             </Pressable>
           </View>
-        ) : isLoading && !refreshing ? (
+        ) : isLoading ? (
           <View style={styles.emptyContainer}>
             <ActivityIndicator size="large" color="#5B7DFF" />
           </View>
@@ -590,7 +590,7 @@ export default function ChatHistoryScreen() {
             renderItem={renderItem}
             style={{ width: '100%' }}
             contentContainerStyle={{ paddingBottom: 30, paddingHorizontal: 20 }}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />}
           />
         )}
       </View>

@@ -32,6 +32,7 @@ export const queryKeys = {
   // AI
   ai: {
     all: ['ai'] as const,
+    list: (params?: any) => [...queryKeys.ai.all, 'list', params] as const,
     chat: (sessionId: string) => [...queryKeys.ai.all, 'chat', sessionId] as const,
   },
 

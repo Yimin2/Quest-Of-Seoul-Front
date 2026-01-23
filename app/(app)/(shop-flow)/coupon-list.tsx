@@ -18,7 +18,7 @@ export default function MyCouponScreen() {
   const [tab, setTab] = useState<'available' | 'used'>('available');
 
   // React Query Hooks
-  const { data: pointsData, isLoading: isPointsLoading, error: pointsError, isError: isPointsError } = usePoints();
+  const { data: pointsData, isLoading: isPointsLoading } = usePoints();
   const {
     data: rewardsData,
     isLoading: isCouponsLoading,
@@ -33,13 +33,10 @@ export default function MyCouponScreen() {
 
   // Error Handling
   useEffect(() => {
-    if (isPointsError && pointsError) {
-      Alert.alert('Error', 'Failed to load points data.');
-    }
     if (isCouponsError && couponsError) {
       Alert.alert('Error', couponsError.message || 'Failed to load coupons.');
     }
-  }, [isPointsError, pointsError, isCouponsError, couponsError]);
+  }, [isCouponsError, couponsError]);
 
   // Day Pass 데이터 (추후 API 연동 필요)
   const [dayPassData, setDayPassData] = useState<{

@@ -11,16 +11,12 @@ import { ThemedText, ThemedView } from '@shared/ui';
 export default function MyScreen() {
   const router = useRouter();
   const { user, isAuthenticated, isGuest, logout } = useAuthStore();
-  const { data: pointsData, isLoading, error, isError } = usePoints();
+  const { data: pointsData, isLoading } = usePoints();
 
   const totalPoints = pointsData?.total_points || 0;
   const transactions = pointsData?.transactions || [];
 
-  useEffect(() => {
-    if (isError && error) {
-      Alert.alert('Error', 'Failed to load points data.');
-    }
-  }, [isError, error]);
+
 
   const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [

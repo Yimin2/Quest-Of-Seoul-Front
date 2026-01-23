@@ -1,8 +1,7 @@
-import { usePointsStore } from '@entities/points';
+import { usePoints } from '@shared/api/hooks';
 import { useAuthStore } from '@entities/user';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@shared/ui';
-import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 interface PointsDisplayProps {
@@ -12,14 +11,10 @@ interface PointsDisplayProps {
 }
 
 export function PointsDisplay({ showIcon = true, size = 'medium', style }: PointsDisplayProps) {
-  const { totalPoints, isLoading, fetchPoints } = usePointsStore();
+  const { data: pointsData, isLoading } = usePoints();
   const { isAuthenticated } = useAuthStore();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchPoints();
-    }
-  }, [isAuthenticated]);
+  
+  const totalPoints = pointsData?.total_points || 0;
 
   if (!isAuthenticated) {
     return null;

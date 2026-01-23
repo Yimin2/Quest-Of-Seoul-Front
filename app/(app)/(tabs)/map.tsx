@@ -33,8 +33,6 @@ export default function MapScreen() {
   const {
     data: pointsData,
     isLoading: isPointsLoading,
-    error: pointsError,
-    isError: isPointsError,
   } = usePoints();
   const startQuestMutation = useStartQuest();
 
@@ -117,10 +115,7 @@ export default function MapScreen() {
     if (isQuestError && questError) {
       setError(questError.message || 'Failed to load quests.');
     }
-    if (isPointsError && pointsError) {
-      setError('Failed to load points.');
-    }
-  }, [isQuestError, questError, isPointsError, pointsError]);
+  }, [isQuestError, questError]);
 
   // Fetch walking route from Kakao Directions API
   const fetchWalkingRoute = async (
