@@ -14,7 +14,6 @@ export default function ShopFlowLayout() {
       <Stack.Screen name="coupon-list" options={{ title: 'My Coupons' }} />
       <Stack.Screen name="coupon-detail" options={{ title: 'Coupon Detail' }} />
       <Stack.Screen name="day-pass" options={{ title: 'Day Pass' }} />
-      <Stack.Screen name="purchase-list" options={{ title: 'My Purchases' }} />
     </Stack>
   );
 }

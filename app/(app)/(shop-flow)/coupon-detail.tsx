@@ -1,11 +1,11 @@
-import { ClaimedReward, Reward, rewardApi } from '@shared/api';
-import { usePointsStore } from '@entities/points';
+import { ClaimedReward, Reward } from '@shared/api';
+import { useClaimReward, useUseReward } from '@shared/api/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@shared/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import Svg, { ClipPath, Defs, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
+import Svg, { Defs, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
 type Mode = 'purchase' | 'owned';
 
@@ -16,9 +16,11 @@ export default function CouponDetailScreen() {
 
   // Purchase mode state
   const [reward, setReward] = useState<Reward | null>(null);
-  const [loading, setLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const { fetchPoints } = usePointsStore();
+  const claimRewardMutation = useClaimReward();
+  const useRewardMutation = useUseReward();
+  
+  const loading = claimRewardMutation.isPending || useRewardMutation.isPending;
 
   // Owned mode state
   const [coupon, setCoupon] = useState<ClaimedReward | null>(null);
@@ -42,52 +44,55 @@ export default function CouponDetailScreen() {
   // Purchase handlers
   const handleShowConfirmModal = () => setShowConfirmModal(true);
 
-  const handleConfirmPurchase = async () => {
+  const handleConfirmPurchase = () => {
     if (!reward) return;
-    try {
-      setLoading(true);
-      setShowConfirmModal(false);
-      const res = await rewardApi.claim(reward.id);
-      if (res.status === 'success') {
-        Alert.alert(
-          'Purchase Complete! 🎉',
-          `You have purchased ${reward.name}!\n\nQR Code: ${res.qr_code}\n\nCheck it in My Coupon.`,
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                fetchPoints();
-                router.back();
+    
+    setShowConfirmModal(false);
+
+    claimRewardMutation.mutate(reward.id, {
+      onSuccess: (res) => {
+        if (res.status === 'success') {
+          Alert.alert(
+            'Purchase Complete! 🎉',
+            `You have purchased ${reward.name}!\n\nQR Code: ${res.qr_code}\n\nCheck it in My Coupon.`,
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  router.back();
+                },
               },
-            },
-          ],
-        );
-      } else {
-        Alert.alert(
-          'Insufficient Points 💸',
-          `Required: ${res.required}\nCurrent: ${res.current}\nShortage: ${res.shortage}`,
-        );
+            ],
+          );
+        } else {
+          Alert.alert(
+            'Insufficient Points 💸',
+            `Required: ${res.required}\nCurrent: ${res.current}\nShortage: ${res.shortage}`,
+          );
+        }
+      },
+      onError: (error: any) => {
+        Alert.alert('Error', error.message || 'An error occurred during purchase.');
       }
-    } catch (e: any) {
-      Alert.alert('Error', e.message || 'An error occurred during purchase.');
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   // Owned handlers
   const handleUseCoupon = async () => {
     if (!coupon) return;
-    try {
-      const res = await rewardApi.useReward(coupon.id);
-      if (res.status === 'success') {
-        setShowBarcode(true);
-      } else {
-        Alert.alert('Error', 'This coupon has already been used.');
+    
+    useRewardMutation.mutate(coupon.id, {
+      onSuccess: (res) => {
+        if (res.status === 'success') {
+          setShowBarcode(true);
+        } else {
+          Alert.alert('Error', 'This coupon has already been used.');
+        }
+      },
+      onError: (error: any) => {
+        Alert.alert('Error', error.message || 'An error occurred while using the coupon.');
       }
-    } catch (e: any) {
-      Alert.alert('Error', e.message || 'An error occurred while using the coupon.');
-    }
+    });
   };
 
   // Loading state

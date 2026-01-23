@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { aiStationApi, type ChatSession } from '../..';
+import { useQuery } from '@tanstack/react-query';
+import { aiStationApi } from '../ai';
 import { queryKeys } from '../queryKeys';
 
 export function useChatList(params?: {

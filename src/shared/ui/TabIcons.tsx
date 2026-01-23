@@ -97,7 +97,6 @@ export function FindIcon({ color, size = 28 }: TabIconProps) {
 }
 
 export function AIStationIcon({ color, size = 28 }: TabIconProps) {
-  const scale = size / 30;
   const isActive = color === '#FFFFFF';
 
   return (
@@ -138,7 +137,6 @@ export function AIStationIcon({ color, size = 28 }: TabIconProps) {
 }
 
 export function ShopIcon({ color, size = 28 }: TabIconProps) {
-  const scale = size / 29;
   const isActive = color === '#FFFFFF';
 
   return (
@@ -179,7 +177,6 @@ export function ShopIcon({ color, size = 28 }: TabIconProps) {
 }
 
 export function MyIcon({ color, size = 28 }: TabIconProps) {
-  const scale = size / 32;
   const isActive = color === '#FFFFFF';
 
   return (
