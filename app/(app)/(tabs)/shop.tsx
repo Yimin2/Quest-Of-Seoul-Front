@@ -1,6 +1,6 @@
-import { pointsApi, Reward, rewardApi } from '@shared/api';
+import { Reward } from '@shared/api';
+import { usePoints, useRewards } from '@shared/api/hooks';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
 import { ThemedText } from '@shared/ui';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -42,41 +42,31 @@ export default function ShopScreen() {
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('food');
-  const [rewards, setRewards] = useState<Reward[]>([]);
-  const [userMint, setUserMint] = useState<number>(0);
-  const [loading, setLoading] = useState(false);
 
-  const fetchUserPoints = async () => {
-    try {
-      const data = await pointsApi.getPoints();
-      setUserMint(data.total_points);
-    } catch (err) {}
-  };
+  // React Query Hooks
+  // React Query Hooks
+  const { data: pointsData, isLoading: isPointsLoading, error: pointsError, isError: isPointsError } = usePoints();
+  const {
+    data: rewardsData,
+    isLoading: isRewardsLoading,
+    error: rewardsError,
+    isError: isRewardsError,
+  } = useRewards(selectedCategory, search);
 
-  const fetchRewards = async () => {
-    try {
-      setLoading(true);
-      const data = await rewardApi.getRewards(selectedCategory, search);
-      setRewards(data.rewards);
-    } catch (e) {
-      Alert.alert('Error', 'Failed to load reward list.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const userMint = pointsData?.total_points || 0;
+  const rewards = rewardsData?.rewards || [];
 
+  const isLoading = isRewardsLoading || isPointsLoading;
+
+  // Error Checking
   useEffect(() => {
-    fetchUserPoints();
-    fetchRewards();
-  }, [selectedCategory, search]);
-
-  // Refresh points when screen comes into focus
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchUserPoints();
-      fetchRewards();
-    }, []),
-  );
+    if (isRewardsError && rewardsError) {
+      Alert.alert('Error', rewardsError.message || 'Failed to load reward list.');
+    }
+    if (isPointsError && pointsError) {
+      Alert.alert('Error', 'Failed to load points.');
+    }
+  }, [isRewardsError, rewardsError, isPointsError, pointsError]);
 
   const handleRewardClick = (item: Reward) => {
     // Navigate to coupon detail page
@@ -248,7 +238,7 @@ export default function ShopScreen() {
           <ThemedText style={styles.countText}>{rewards.length} Coupons</ThemedText>
         </View>
 
-        {loading ? (
+        {isLoading ? (
           <ThemedText style={styles.loadingText}>Loading...</ThemedText>
         ) : rewards.length === 0 ? (
           <ThemedText style={styles.emptyText}>No rewards available</ThemedText>

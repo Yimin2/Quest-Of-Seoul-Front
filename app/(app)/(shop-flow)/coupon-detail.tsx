@@ -52,10 +52,21 @@ export default function CouponDetailScreen() {
         Alert.alert(
           'Purchase Complete! 🎉',
           `You have purchased ${reward.name}!\n\nQR Code: ${res.qr_code}\n\nCheck it in My Coupon.`,
-          [{ text: 'OK', onPress: () => { fetchPoints(); router.back(); } }],
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                fetchPoints();
+                router.back();
+              },
+            },
+          ],
         );
       } else {
-        Alert.alert('Insufficient Points 💸', `Required: ${res.required}\nCurrent: ${res.current}\nShortage: ${res.shortage}`);
+        Alert.alert(
+          'Insufficient Points 💸',
+          `Required: ${res.required}\nCurrent: ${res.current}\nShortage: ${res.shortage}`,
+        );
       }
     } catch (e: any) {
       Alert.alert('Error', e.message || 'An error occurred during purchase.');
@@ -94,9 +105,10 @@ export default function CouponDetailScreen() {
     return <BarcodeScreen coupon={coupon} onClose={() => setShowBarcode(false)} />;
   }
 
-  const category = mode === 'purchase'
-    ? (params.category as string) || 'Coupon'
-    : coupon?.rewards?.type || 'Coupon';
+  const category =
+    mode === 'purchase'
+      ? (params.category as string) || 'Coupon'
+      : coupon?.rewards?.type || 'Coupon';
   const displayName = mode === 'purchase' ? reward?.name : coupon?.rewards?.name;
   const imageUrl = mode === 'purchase' ? reward?.image_url : coupon?.rewards?.image_url;
   const pointCost = mode === 'purchase' ? reward?.point_cost : coupon?.rewards?.point_cost;
@@ -150,9 +162,7 @@ export default function CouponDetailScreen() {
 
         {/* Overview Section */}
         <ThemedText style={styles.sectionTitle}>OverView</ThemedText>
-        <ThemedText style={styles.descriptionText}>
-          {description || 'Standard coupon'}
-        </ThemedText>
+        <ThemedText style={styles.descriptionText}>{description || 'Standard coupon'}</ThemedText>
 
         {/* Usage Section */}
         <ThemedText style={styles.sectionTitle}>Usage of redemption</ThemedText>
@@ -173,7 +183,9 @@ export default function CouponDetailScreen() {
                 fill="white"
               />
             </Svg>
-            <ThemedText style={styles.ctaText}>{loading ? 'Processing...' : 'Get Coupon'}</ThemedText>
+            <ThemedText style={styles.ctaText}>
+              {loading ? 'Processing...' : 'Get Coupon'}
+            </ThemedText>
           </Pressable>
         ) : (
           !coupon?.used_at && (
@@ -610,14 +622,23 @@ function BarcodeScreen({ coupon, onClose }: { coupon: ClaimedReward; onClose: ()
             <View style={[barcodeStyles.barcode, { width: totalWidth }]}>
               <Svg width={totalWidth} height={300} viewBox={`0 0 ${totalWidth} 300`}>
                 {patterns.map((pattern, index) => (
-                  <Rect key={index} x={pattern.x} y={0} width={pattern.width} height={300} fill="#000000" />
+                  <Rect
+                    key={index}
+                    x={pattern.x}
+                    y={0}
+                    width={pattern.width}
+                    height={300}
+                    fill="#000000"
+                  />
                 ))}
               </Svg>
             </View>
             <ThemedText style={barcodeStyles.barcodeNumber}>{barcodeValue}</ThemedText>
           </View>
           <View style={barcodeStyles.textContainer}>
-            <ThemedText style={barcodeStyles.textBrand}>{coupon.rewards.type || 'Reward'}</ThemedText>
+            <ThemedText style={barcodeStyles.textBrand}>
+              {coupon.rewards.type || 'Reward'}
+            </ThemedText>
             <ThemedText style={barcodeStyles.textName}>{coupon.rewards.name}</ThemedText>
             <View style={barcodeStyles.textPriceBadge}>
               <Svg width="13" height="8" viewBox="0 0 13 8" fill="none">
@@ -640,15 +661,58 @@ function BarcodeScreen({ coupon, onClose }: { coupon: ClaimedReward; onClose: ()
 
 const barcodeStyles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
-  rotatedContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', transform: [{ rotate: '90deg' }], width: '100%', height: '100%' },
+  rotatedContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    transform: [{ rotate: '90deg' }],
+    width: '100%',
+    height: '100%',
+  },
   content: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 60 },
   barcodeContainer: { alignItems: 'center', justifyContent: 'center' },
-  barcode: { height: 300, backgroundColor: '#FFFFFF', borderWidth: 2, borderColor: '#000', marginBottom: 20, justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
-  barcodeNumber: { color: '#000', fontSize: 14, fontFamily: 'monospace', marginTop: 12, textAlign: 'center' },
+  barcode: {
+    height: 300,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#000',
+    marginBottom: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  barcodeNumber: {
+    color: '#000',
+    fontSize: 14,
+    fontFamily: 'monospace',
+    marginTop: 12,
+    textAlign: 'center',
+  },
   textContainer: { flexDirection: 'column', alignItems: 'flex-start', gap: 12 },
   textBrand: { color: '#000', fontFamily: 'Pretendard', fontSize: 16, fontWeight: '700' },
   textName: { color: '#000', fontFamily: 'Inter', fontSize: 18, fontWeight: '400' },
-  textPriceBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#76C7AD', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, marginTop: 4 },
+  textPriceBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#76C7AD',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 14,
+    marginTop: 4,
+  },
   textPrice: { color: '#FFF', fontFamily: 'Inter', fontSize: 14, fontWeight: '700' },
-  closeButton: { position: 'absolute', bottom: 30, right: 30, width: 56, height: 56, borderRadius: 28, backgroundColor: '#34495E', justifyContent: 'center', alignItems: 'center', zIndex: 1000, elevation: 1000 },
+  closeButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#34495E',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+    elevation: 1000,
+  },
 });

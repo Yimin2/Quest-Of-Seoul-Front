@@ -1,5 +1,6 @@
 import { QuestMiniModal } from '@widgets/quest-mini-modal';
-import { pointsApi, questApi, type Quest } from '@shared/api';
+import { questApi, type Quest } from '@shared/api';
+import { usePoints, useQuestList, useStartQuest } from '@shared/api';
 import { useQuestStore } from '@entities/quest';
 import { Images } from '@shared/config';
 import { ThemedText, ThemedView } from '@shared/ui';
@@ -7,9 +8,8 @@ import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { useFocusEffect } from '@react-navigation/native';
 import { ActivityIndicator, Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, {
   Defs,
@@ -23,9 +23,22 @@ import { WebView } from 'react-native-webview';
 
 export default function MapScreen() {
   const params = useLocalSearchParams();
-  const [loading, setLoading] = useState(true);
+  // React Query Hooks
+  const {
+    data: allQuests,
+    isLoading: isQuestsLoading,
+    error: questError,
+    isError: isQuestError,
+  } = useQuestList();
+  const {
+    data: pointsData,
+    isLoading: isPointsLoading,
+    error: pointsError,
+    isError: isPointsError,
+  } = usePoints();
+  const startQuestMutation = useStartQuest();
+
   const [error, setError] = useState<string | null>(null);
-  const [quests, setQuests] = useState<Quest[]>([]);
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const { selectedQuests, removeQuest, startQuest, endQuest, reorderQuests } = useQuestStore();
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(null);
@@ -34,29 +47,38 @@ export default function MapScreen() {
     longitude: number;
   } | null>(null);
   const [isQuestActive, setIsQuestActive] = useState(false);
-  const [userMint, setUserMint] = useState<number>(0);
+  const userMint = pointsData?.total_points || 0;
   const [showStartModal, setShowStartModal] = useState(false);
   const webViewRef = useRef<WebView>(null);
   const locationSubscription = useRef<Location.LocationSubscription | null>(null);
   const kakaoMapJsKey = Constants.expoConfig?.extra?.kakaoMapJsKey;
   const kakaoRestApiKey = Constants.expoConfig?.extra?.kakaoRestApiKey;
 
-  // Handle filtered quests from filter screen
-  useEffect(() => {
+  // Filtered Quests 처리
+  const displayQuests = useMemo(() => {
     if (params.filteredQuests) {
       try {
-        const filtered = JSON.parse(params.filteredQuests as string) as Quest[];
-        setQuests(filtered);
+        return JSON.parse(params.filteredQuests as string) as Quest[];
+      } catch (e) {
+        return allQuests || [];
+      }
+    }
+    return allQuests || [];
+  }, [params.filteredQuests, allQuests]);
 
-        // Update markers on map
-        if (webViewRef.current && !loading) {
-          webViewRef.current.injectJavaScript(`
+  const loading = (isQuestsLoading && !displayQuests.length) || (isPointsLoading && !pointsData);
+
+  // Handle filtered quests (WebView update)
+  useEffect(() => {
+    if (params.filteredQuests && webViewRef.current && !loading) {
+      try {
+        const filtered = JSON.parse(params.filteredQuests as string) as Quest[];
+        webViewRef.current.injectJavaScript(`
             if (typeof updateMarkers === 'function') {
               updateMarkers(${JSON.stringify(filtered)});
             }
             true;
           `);
-        }
       } catch (error) {
         // Ignore
       }
@@ -64,9 +86,7 @@ export default function MapScreen() {
   }, [params.filteredQuests, loading]);
 
   useEffect(() => {
-    fetchQuests();
     startLocationTracking();
-    fetchUserPoints();
 
     return () => {
       // Cleanup location tracking
@@ -75,22 +95,6 @@ export default function MapScreen() {
       }
     };
   }, []);
-
-  // Refresh points when screen comes into focus
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchUserPoints();
-    }, []),
-  );
-
-  const fetchUserPoints = async () => {
-    try {
-      const data = await pointsApi.getPoints();
-      setUserMint(data.total_points);
-    } catch (err) {
-      // Ignore
-    }
-  };
 
   // Calculate distance between two coordinates using Haversine formula
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -107,6 +111,16 @@ export default function MapScreen() {
     const distance = R * c;
     return distance;
   };
+
+  // Sync Quest & Points Error to local state
+  useEffect(() => {
+    if (isQuestError && questError) {
+      setError(questError.message || 'Failed to load quests.');
+    }
+    if (isPointsError && pointsError) {
+      setError('Failed to load points.');
+    }
+  }, [isQuestError, questError, isPointsError, pointsError]);
 
   // Fetch walking route from Kakao Directions API
   const fetchWalkingRoute = async (
@@ -397,19 +411,10 @@ export default function MapScreen() {
     }
   };
 
-  const fetchQuests = async () => {
-    try {
-      const questList = await questApi.getQuestList();
-      setQuests(questList);
-    } catch (err) {
-      setError('Failed to load quest data.');
-    }
-  };
-
   useEffect(() => {
-    if (quests.length > 0 && webViewRef.current && !loading) {
+    if (displayQuests.length > 0 && webViewRef.current && !loading) {
       // WebView가 로드된 후 마커 추가
-      const questsJson = JSON.stringify(quests);
+      const questsJson = JSON.stringify(displayQuests);
       // 약간의 지연을 두고 마커 추가 (지도 초기화 완료 후)
       setTimeout(() => {
         webViewRef.current?.injectJavaScript(`
@@ -420,7 +425,7 @@ export default function MapScreen() {
         `);
       }, 500);
     }
-  }, [quests, loading]);
+  }, [displayQuests, loading]);
 
   const kakaoMapHTML = `
     <!DOCTYPE html>
@@ -1216,10 +1221,9 @@ export default function MapScreen() {
         javaScriptEnabled={true}
         domStorageEnabled={true}
         onLoad={() => {
-          setLoading(false);
           // WebView 로드 후 퀘스트가 있으면 마커 추가
-          if (quests.length > 0) {
-            const questsJson = JSON.stringify(quests);
+          if (displayQuests.length > 0) {
+            const questsJson = JSON.stringify(displayQuests);
             setTimeout(() => {
               webViewRef.current?.injectJavaScript(`
                 if (typeof addQuestMarkers === 'function') {
@@ -1233,7 +1237,6 @@ export default function MapScreen() {
         onError={(syntheticEvent) => {
           const { nativeEvent } = syntheticEvent;
           setError(nativeEvent.description);
-          setLoading(false);
         }}
         onMessage={(event) => {
           try {
@@ -1545,18 +1548,21 @@ export default function MapScreen() {
 
                     // 위치 정보 수집 (1km 이내일 때만)
                     if (distance <= 1.0) {
-                      questApi
-                        .startQuest({
+                      startQuestMutation.mutate(
+                        {
                           quest_id: firstQuest.id,
                           place_id: firstQuest.place_id || undefined,
                           latitude: userLocation.latitude,
                           longitude: userLocation.longitude,
                           start_latitude: userLocation.latitude,
                           start_longitude: userLocation.longitude,
-                        })
-                        .catch((err) => {
-                          // Ignore
-                        });
+                        },
+                        {
+                          onError: (err) => {
+                            // Ignore
+                          },
+                        },
+                      );
                     }
 
                     // 선택된 모든 퀘스트 표시 (거리와 관계없이)

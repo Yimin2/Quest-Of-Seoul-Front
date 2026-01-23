@@ -1,4 +1,5 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -8,6 +9,7 @@ import 'react-native-reanimated';
 
 import { useAuthStore } from '@entities/user';
 import { useColorScheme } from '@shared/lib';
+import { queryClient, useAppStateRefresh, useOnlineManager } from '@shared/lib/react-query';
 
 // 폰트 로딩 중 스플래시 화면 유지
 SplashScreen.preventAutoHideAsync();
@@ -21,6 +23,10 @@ export default function RootLayout() {
   const router = useRouter();
   const segments = useSegments();
   const { loadStoredAuth, isAuthenticated, isLoading } = useAuthStore();
+
+  // React Native 환경 최적화 훅
+  useOnlineManager();
+  useAppStateRefresh();
 
   const [fontsLoaded, fontError] = useFonts({
     'BagelFatOne-Regular': require('../assets/fonts/BagelFatOne-Regular.ttf'),
@@ -53,12 +59,14 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(app)" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(app)" />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }

@@ -5,19 +5,22 @@ import { useEffect } from 'react';
 import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
 
 import { useAuthStore } from '@entities/user';
-import { usePointsStore } from '@entities/points';
+import { usePoints } from '@shared/api/hooks';
 import { ThemedText, ThemedView } from '@shared/ui';
 
 export default function MyScreen() {
   const router = useRouter();
   const { user, isAuthenticated, isGuest, logout } = useAuthStore();
-  const { totalPoints, transactions, isLoading, fetchPoints } = usePointsStore();
+  const { data: pointsData, isLoading, error, isError } = usePoints();
+
+  const totalPoints = pointsData?.total_points || 0;
+  const transactions = pointsData?.transactions || [];
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchPoints();
+    if (isError && error) {
+      Alert.alert('Error', 'Failed to load points data.');
     }
-  }, [isAuthenticated]);
+  }, [isError, error]);
 
   const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [

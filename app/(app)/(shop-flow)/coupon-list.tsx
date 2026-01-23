@@ -1,19 +1,47 @@
-import { ClaimedReward, pointsApi, rewardApi } from '@shared/api';
+import { ClaimedReward, useClaimedRewards, usePoints, useUseReward } from '@shared/api';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
 import { ThemedText } from '@shared/ui';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function MyCouponScreen() {
   const router = useRouter();
   const [tab, setTab] = useState<'available' | 'used'>('available');
-  const [userMint, setUserMint] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [coupons, setCoupons] = useState<ClaimedReward[]>([]);
 
-  // Day Pass 데이터
+  // React Query Hooks
+  const { data: pointsData, isLoading: isPointsLoading, error: pointsError, isError: isPointsError } = usePoints();
+  const {
+    data: rewardsData,
+    isLoading: isCouponsLoading,
+    error: couponsError,
+    isError: isCouponsError,
+  } = useClaimedRewards();
+  const useRewardMutation = useUseReward();
+
+  const userMint = pointsData?.total_points || 0;
+  const coupons = rewardsData?.claimed_rewards || [];
+  const loading = isCouponsLoading || isPointsLoading;
+
+  // Error Handling
+  useEffect(() => {
+    if (isPointsError && pointsError) {
+      Alert.alert('Error', 'Failed to load points data.');
+    }
+    if (isCouponsError && couponsError) {
+      Alert.alert('Error', couponsError.message || 'Failed to load coupons.');
+    }
+  }, [isPointsError, pointsError, isCouponsError, couponsError]);
+
+  // Day Pass 데이터 (추후 API 연동 필요)
   const [dayPassData, setDayPassData] = useState<{
     days: number;
     expiresAt: string | null;
@@ -46,59 +74,28 @@ export default function MyCouponScreen() {
     return () => clearInterval(interval);
   }, [dayPassData]);
 
-  const fetchUserPoints = async () => {
-    try {
-      const data = await pointsApi.getPoints();
-      setUserMint(data.total_points);
-    } catch (err) {}
-  };
-
-  const fetchCoupons = async () => {
-    try {
-      setLoading(true);
-      const res = await rewardApi.getClaimedRewards();
-      setCoupons(res.claimed_rewards || []);
-    } catch (e) {
-      Alert.alert('Error', 'Failed to load coupon list.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleUseCoupon = async (id: number, name: string) => {
     Alert.alert('Use Coupon', `Would you like to use ${name}?`, [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Use',
-        onPress: async () => {
-          try {
-            const res = await rewardApi.useReward(id);
-            if (res.status === 'success') {
-              Alert.alert('Used ✅', 'Coupon has been successfully used!');
-              fetchCoupons();
-            } else {
-              Alert.alert('Error', 'This coupon has already been used.');
-            }
-          } catch (e: any) {
-            Alert.alert('Error', e.message || 'An error occurred while using the coupon.');
-          }
+        onPress: () => {
+          useRewardMutation.mutate(id, {
+            onSuccess: (res) => {
+              if (res.status === 'success') {
+                Alert.alert('Used ✅', 'Coupon has been successfully used!');
+              } else {
+                Alert.alert('Error', 'This coupon has already been used.');
+              }
+            },
+            onError: (error: any) => {
+              Alert.alert('Error', error.message || 'An error occurred while using the coupon.');
+            },
+          });
         },
       },
     ]);
   };
-
-  useEffect(() => {
-    fetchUserPoints();
-    fetchCoupons();
-  }, []);
-
-  // Refresh when screen comes into focus
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchUserPoints();
-      fetchCoupons();
-    }, []),
-  );
 
   // Filter coupons
   const availableCoupons = coupons.filter((c) => !c.used_at);
@@ -163,10 +160,12 @@ export default function MyCouponScreen() {
               key={item.id}
               item={item}
               onUse={() => handleUseCoupon(item.id, item.rewards.name)}
-              onPress={() => router.push({
-                pathname: '/(app)/(shop-flow)/coupon-detail',
-                params: { mode: 'owned', coupon: JSON.stringify(item) },
-              })}
+              onPress={() =>
+                router.push({
+                  pathname: '/(app)/(shop-flow)/coupon-detail',
+                  params: { mode: 'owned', coupon: JSON.stringify(item) },
+                })
+              }
             />
           ))
         )}
@@ -181,10 +180,12 @@ export default function MyCouponScreen() {
               key={item.id}
               item={item}
               used
-              onPress={() => router.push({
-                pathname: '/(app)/(shop-flow)/coupon-detail',
-                params: { mode: 'owned', coupon: JSON.stringify(item) },
-              })}
+              onPress={() =>
+                router.push({
+                  pathname: '/(app)/(shop-flow)/coupon-detail',
+                  params: { mode: 'owned', coupon: JSON.stringify(item) },
+                })
+              }
             />
           ))}
         </View>
@@ -246,7 +247,13 @@ function CouponItem({
 
         {/* Use button */}
         {!used && onUse && (
-          <TouchableOpacity style={styles.useButton} onPress={(e) => { e.stopPropagation?.(); onUse(); }}>
+          <TouchableOpacity
+            style={styles.useButton}
+            onPress={(e) => {
+              e.stopPropagation?.();
+              onUse();
+            }}
+          >
             <ThemedText style={styles.useText}>Use</ThemedText>
           </TouchableOpacity>
         )}
