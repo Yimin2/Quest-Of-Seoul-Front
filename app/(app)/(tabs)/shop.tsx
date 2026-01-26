@@ -44,7 +44,6 @@ export default function ShopScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string>('food');
 
   // React Query Hooks
-  // React Query Hooks
   const { data: pointsData, isLoading: isPointsLoading } = usePoints();
   const {
     data: rewardsData,
@@ -110,11 +109,13 @@ export default function ShopScreen() {
                 <Defs>
                   <RadialGradient
                     id="paint0_radial_mint"
-                    cx="0"
-                    cy="0"
-                    r="1"
+                    cx="13"
+                    cy="8"
+                    rx="13"
+                    ry="8"
+                    fx="13"
+                    fy="8"
                     gradientUnits="userSpaceOnUse"
-                    gradientTransform="translate(13 7.91304) rotate(90) scale(7.91304 13)"
                   >
                     <Stop stopColor="white" />
                     <Stop offset="1" stopColor="white" stopOpacity="0.85" />

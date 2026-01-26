@@ -6,7 +6,7 @@ export { Collapsible } from './Collapsible';
 export { ExternalLink } from './ExternalLink';
 export { HapticTab } from './HapticTab';
 export { IconSymbol } from './IconSymbol';
-export * from './ParallaxScrollView';
+export { default as ParallaxScrollView } from './ParallaxScrollView';
 export * from './TabIcons';
 export { ThemedText, type ThemedTextProps } from './ThemedText';
 export { ThemedView, type ThemedViewProps } from './ThemedView';

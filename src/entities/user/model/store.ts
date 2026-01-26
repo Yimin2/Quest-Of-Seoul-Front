@@ -1,11 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
-import { Platform } from 'react-native';
 import { create } from 'zustand';
-
-const API_URL =
-  Constants.expoConfig?.extra?.apiUrl ||
-  (Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000');
+import { authApi } from '../../../shared/api/auth';
 
 const TOKEN_KEY = 'access_token';
 const USER_ID_KEY = 'user_id';
@@ -154,6 +149,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         },
         isAuthenticated: true,
         isGuest: true,
+        isLoading: false,
       });
     } catch (error) {
       console.error('Guest login error:', error);
@@ -166,18 +162,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     if (!token) return;
 
     try {
-      const response = await fetch(`${API_URL}/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Token refresh failed');
-      }
-
-      const data = await response.json();
+      const data = await authApi.refresh(token);
+      
       await AsyncStorage.setItem(TOKEN_KEY, data.access_token);
       set({ token: data.access_token });
     } catch (error) {

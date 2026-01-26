@@ -1,269 +1,108 @@
 import { useAuthStore } from '@entities/user';
 import { apiRequest, API_URL, logApiTrace } from './base';
-import type { Quest } from './quest';
+import { fromZodError } from 'zod-validation-error';
+import {
+  ChatListResponseSchema,
+  ChatSessionResponseSchema,
+  DocentChatResponseSchema,
+  VLMAnalyzeResponseSchema,
+  SimilarPlacesResponseSchema,
+  STTTTSResponseSchema,
+  ExploreRAGChatResponseSchema,
+  QuestRAGChatResponseSchema,
+  RouteRecommendResponseSchema,
+  QuestVLMChatResponseSchema,
+  type ChatListResponse,
+  type ChatSessionResponse,
+  type DocentChatRequest,
+  type DocentChatResponse,
+  type VLMAnalyzeRequest,
+  type VLMAnalyzeResponse,
+  type SimilarPlacesRequest,
+  type SimilarPlacesResponse,
+  type STTTTSRequest,
+  type STTTTSResponse,
+  type ExploreRAGChatRequest,
+  type ExploreRAGChatResponse,
+  type QuestRAGChatRequest,
+  type QuestRAGChatResponse,
+  type RouteRecommendRequest,
+  type RouteRecommendResponse,
+  type QuestVLMChatRequest,
+  type QuestVLMChatResponse,
+} from './schema';
 
-// Docent Chat
-export interface DocentChatRequest {
-  landmark: string;
-  user_message: string;
-  language?: string;
-  prefer_url?: boolean;
-  enable_tts?: boolean;
-  quest_id?: number;
-  place_id?: string;
-}
-
-export interface DocentChatResponse {
-  message: string;
-  landmark: string;
-  audio?: string | null;
-  audio_url?: string | null;
-}
-
-// VLM Analyze
-export interface VLMAnalyzeRequest {
-  image: string;
-  latitude?: number;
-  longitude?: number;
-  language?: string;
-  prefer_url?: boolean;
-  enable_tts?: boolean;
-  use_cache?: boolean;
-}
-
-export interface VLMAnalyzeResponse {
-  success: boolean;
-  description: string;
-  place?: {
-    id: string;
-    name: string;
-    category: string;
-    address: string;
-  };
-  vlm_analysis?: string;
-  similar_places?: {
-    place_id: string;
-    similarity: number;
-    image_url: string;
-  }[];
-  confidence_score?: number;
-  processing_time_ms?: number;
-  vlm_provider?: string;
-  audio_url?: string;
-}
-
-// Quest VLM Chat
-export interface QuestVLMChatRequest {
-  image: string;
-  user_message?: string;
-  quest_id: number;
-  place_id?: string;
-  chat_session_id?: string;
-  language?: string;
-  prefer_url?: boolean;
-  enable_tts?: boolean;
-}
-
-export interface QuestVLMChatResponse {
-  success: boolean;
-  message: string;
-  place?: {
-    id: string;
-    name: string;
-    category: string;
-    address: string;
-  };
-  image_url?: string;
-  audio?: string;
-  audio_url?: string;
-  session_id: string;
-  quest_id: number;
-}
-
-// Similar Places
-export interface SimilarPlacesRequest {
-  image: string;
-  latitude?: number;
-  longitude?: number;
-  radius_km?: number;
-  limit?: number;
-  quest_only?: boolean;
-}
-
-export interface SimilarPlacesResponse {
-  success: boolean;
-  count: number;
-  recommendations: {
-    quest_id?: number;
-    place_id: string;
-    similarity: number;
-    name: string;
-    description: string;
-    category: string;
-    latitude: number;
-    longitude: number;
-    reward_point: number;
-    district?: string;
-    place_image_url?: string;
-    distance_km?: number;
-    place?: {
-      id: string;
-      name: string;
-      category: string;
-    };
-  }[];
-  filter?: {
-    gps_enabled: boolean;
-    radius_km: number;
-    quest_only: boolean;
-  };
-}
-
-// STT + TTS
-export interface STTTTSRequest {
-  audio: string;
-  language_code?: string;
-  prefer_url?: boolean;
-}
-
-export interface STTTTSResponse {
-  success: boolean;
-  transcribed_text: string;
-  audio_url?: string | null;
-  audio?: string;
-}
-
-// Explore RAG Chat
-export interface ExploreRAGChatRequest {
-  user_message: string;
-  language?: string;
-  prefer_url?: boolean;
-  enable_tts?: boolean;
-  chat_session_id?: string;
-}
-
-export interface ExploreRAGChatResponse {
-  success: boolean;
-  message: string;
-  session_id: string;
-  audio?: string | null;
-  audio_url?: string | null;
-}
-
-// Quest RAG Chat
-export interface QuestRAGChatRequest {
-  quest_id: number;
-  user_message: string;
-  language?: string;
-  prefer_url?: boolean;
-  enable_tts?: boolean;
-  chat_session_id?: string;
-}
-
-export interface QuestRAGChatResponse {
-  success: boolean;
-  message: string;
-  quest_id: number;
-  landmark?: string;
-  session_id: string;
-  audio?: string | null;
-  audio_url?: string | null;
-}
-
-// Route Recommend
-export interface RouteRecommendRequest {
-  preferences: {
-    includeCart?: boolean;
-    theme?: string | string[];
-    category?: string;
-    districts?: string[];
-    [key: string]: any;
-  };
-  must_visit_place_id?: string;
-  must_visit_quest_id?: number;
-  latitude?: number;
-  longitude?: number;
-  start_latitude?: number;
-  start_longitude?: number;
-  radius_km?: number;
-}
-
-export interface RouteRecommendResponse {
-  success: boolean;
-  quests: Quest[];
-  count: number;
-  session_id: string;
-}
-
-// Chat History
-export interface ChatMessage {
-  id: number;
-  user_message: string;
-  ai_response: string;
-  image_url?: string;
-  created_at: string;
-  landmark?: string;
-  title?: string;
-  selected_theme?: string;
-  selected_districts?: string[];
-  include_cart?: boolean;
-  quest_step?: number;
-  prompt_step_text?: string;
-  options?: any;
-}
-
-export interface ChatSession {
-  session_id: string;
-  function_type: 'rag_chat' | 'vlm_chat' | 'route_recommend';
-  mode: 'explore' | 'quest';
-  title: string;
-  is_read_only: boolean;
-  created_at: string;
-  updated_at: string;
-  time_ago: string;
-  chats: ChatMessage[];
-}
-
-export interface ChatListResponse {
-  success: boolean;
-  sessions: ChatSession[];
-  count: number;
-}
-
-export interface ChatSessionResponse {
-  success: boolean;
-  session: {
-    session_id: string;
-    function_type: string;
-    mode: string;
-    title: string;
-    is_read_only: boolean;
-    created_at: string;
-  };
-  chats: ChatMessage[];
-  count: number;
-}
+export type {
+  ChatListResponse,
+  ChatSessionResponse,
+  DocentChatRequest,
+  DocentChatResponse,
+  VLMAnalyzeRequest,
+  VLMAnalyzeResponse,
+  SimilarPlacesRequest,
+  SimilarPlacesResponse,
+  STTTTSRequest,
+  STTTTSResponse,
+  ExploreRAGChatRequest,
+  ExploreRAGChatResponse,
+  QuestRAGChatRequest,
+  QuestRAGChatResponse,
+  RouteRecommendRequest,
+  RouteRecommendResponse,
+  QuestVLMChatRequest,
+  QuestVLMChatResponse,
+};
 
 export const aiStationApi = {
   async docentChat(request: DocentChatRequest): Promise<DocentChatResponse> {
-    return apiRequest<DocentChatResponse>('/docent/chat', {
+    const data = await apiRequest<unknown>('/docent/chat', {
       method: 'POST',
       body: JSON.stringify(request),
     });
+
+    const result = DocentChatResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('DocentChat Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 
   async vlmAnalyze(request: VLMAnalyzeRequest): Promise<VLMAnalyzeResponse> {
-    return apiRequest<VLMAnalyzeResponse>('/vlm/analyze', {
+    const data = await apiRequest<unknown>('/vlm/analyze', {
       method: 'POST',
       body: JSON.stringify(request),
     });
+
+    const result = VLMAnalyzeResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('VLMAnalyze Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 
   async similarPlaces(request: SimilarPlacesRequest): Promise<SimilarPlacesResponse> {
-    return apiRequest<SimilarPlacesResponse>('/recommend/similar-places', {
+    const data = await apiRequest<unknown>('/recommend/similar-places', {
       method: 'POST',
       body: JSON.stringify(request),
     });
+
+    const result = SimilarPlacesResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('SimilarPlaces Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 
   async sttTts(request: STTTTSRequest): Promise<STTTTSResponse> {
@@ -320,10 +159,18 @@ export const aiStationApi = {
           }
           const retryData = await retryResponse.json().catch(() => null);
           logApiTrace('POST', '/ai-station/stt-tts', retryStartTime);
-          return retryData;
+          
+          const retryResult = STTTTSResponseSchema.safeParse(retryData);
+          if (!retryResult.success) {
+              // Retry success but validation failed
+               const validationError = fromZodError(retryResult.error);
+               console.error('STTTTS (Retry) Validation Error:', validationError.toString());
+               throw validationError;
+          }
+          return retryResult.data;
         }
       } catch (refreshError) {
-        await useAuthStore.getState().logout();
+        await useAuthStore.getState().clearAuth();
         throw new Error('Authentication failed. Please login again.');
       }
     }
@@ -332,28 +179,66 @@ export const aiStationApi = {
       throw new Error(data?.detail || `HTTP error! status: ${response.status}`);
     }
 
-    return data as STTTTSResponse;
+    const result = STTTTSResponseSchema.safeParse(data);
+
+     if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('STTTTS Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 
   async exploreRAGChat(request: ExploreRAGChatRequest): Promise<ExploreRAGChatResponse> {
-    return apiRequest<ExploreRAGChatResponse>('/ai-station/explore/rag-chat', {
+    const data = await apiRequest<unknown>('/ai-station/explore/rag-chat', {
       method: 'POST',
       body: JSON.stringify(request),
     });
+
+    const result = ExploreRAGChatResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('ExploreRAGChat Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 
   async questRAGChat(request: QuestRAGChatRequest): Promise<QuestRAGChatResponse> {
-    return apiRequest<QuestRAGChatResponse>('/ai-station/quest/rag-chat', {
+    const data = await apiRequest<unknown>('/ai-station/quest/rag-chat', {
       method: 'POST',
       body: JSON.stringify(request),
     });
+
+    const result = QuestRAGChatResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('QuestRAGChat Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 
   async routeRecommend(request: RouteRecommendRequest): Promise<RouteRecommendResponse> {
-    return apiRequest<RouteRecommendResponse>('/ai-station/route-recommend', {
+    const data = await apiRequest<unknown>('/ai-station/route-recommend', {
       method: 'POST',
       body: JSON.stringify(request),
     });
+
+    const result = RouteRecommendResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('RouteRecommend Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 
   async getChatList(params?: {
@@ -369,30 +254,57 @@ export const aiStationApi = {
     const queryString = queryParams.toString();
     const endpoint = `/ai-station/chat-list${queryString ? `?${queryString}` : ''}`;
 
-    return apiRequest<ChatListResponse>(endpoint, {
+    const data = await apiRequest<unknown>(endpoint, {
       method: 'GET',
     });
+
+    const result = ChatListResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('ChatList Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 
   async getChatSession(sessionId: string): Promise<ChatSessionResponse> {
-    return apiRequest<ChatSessionResponse>(`/ai-station/chat-session/${sessionId}`, {
+    const data = await apiRequest<unknown>(`/ai-station/chat-session/${sessionId}`, {
       method: 'GET',
     });
+
+    const result = ChatSessionResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('ChatSession Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 
   async questVlmChat(request: QuestVLMChatRequest): Promise<QuestVLMChatResponse> {
-    return apiRequest<QuestVLMChatResponse>('/ai-station/quest/vlm-chat', {
+    const data = await apiRequest<unknown>('/ai-station/quest/vlm-chat', {
       method: 'POST',
       body: JSON.stringify(request),
     });
+
+    const result = QuestVLMChatResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('QuestVLMChat Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 };
 
 export const routeRecommendApi = {
   async routeRecommend(request: RouteRecommendRequest): Promise<RouteRecommendResponse> {
-    return apiRequest<RouteRecommendResponse>('/ai-station/route-recommend', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
+    return aiStationApi.routeRecommend(request);
   },
 };

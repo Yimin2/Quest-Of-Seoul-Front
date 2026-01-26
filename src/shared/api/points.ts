@@ -1,22 +1,27 @@
 import { apiRequest } from './base';
+import { fromZodError } from 'zod-validation-error';
+import {
+  PointsResponseSchema,
+  type PointsResponse,
+  type PointTransaction,
+} from './schema';
 
-export interface PointTransaction {
-  id: number;
-  user_id: string;
-  value: number;
-  reason: string;
-  created_at: string;
-}
-
-export interface PointsResponse {
-  total_points: number;
-  transactions: PointTransaction[];
-}
+export type { PointsResponse, PointTransaction };
 
 export const pointsApi = {
   async getPoints(): Promise<PointsResponse> {
-    return apiRequest<PointsResponse>('/reward/points', {
+    const data = await apiRequest<unknown>('/reward/points', {
       method: 'GET',
     });
+
+    const result = PointsResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('Points Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 };

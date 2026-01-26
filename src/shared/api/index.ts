@@ -1,29 +1,17 @@
 // Base
 export { API_URL, apiRequest, logApiTrace } from './base';
+export * from './schema';
+
+// Auth
+export { authApi } from './auth';
+
+
 
 // Quest
-export {
-  type Quest,
-  type QuestListResponse,
-  type FilterRequest,
-  type FilterResponse,
-  type SearchRequest,
-  type SearchResponse,
-  type QuestDetailResponse,
-  type QuestStartRequest,
-  type QuestStartResponse,
-  questApi,
-} from './quest';
+export { questApi } from './quest';
 
 // Quiz
-export {
-  type QuizResponse,
-  type QuizItem,
-  type QuestQuizResponse,
-  type QuizSubmitRequest,
-  type QuizSubmitResponse,
-  quizApi,
-} from './quiz';
+export { quizApi } from './quiz';
 
 // AI Station
 export {
@@ -43,30 +31,18 @@ export {
   type QuestRAGChatResponse,
   type RouteRecommendRequest,
   type RouteRecommendResponse,
-  type ChatMessage,
-  type ChatSession,
-  type ChatListResponse,
-  type ChatSessionResponse,
   aiStationApi,
   routeRecommendApi,
 } from './ai';
 
 // Reward
-export {
-  type Reward,
-  type RewardsResponse,
-  type ClaimRewardResponse,
-  type ClaimedReward,
-  type ClaimedRewardsResponse,
-  type UseRewardResponse,
-  rewardApi,
-} from './reward';
+export { rewardApi } from './reward';
 
 // Points
-export { type PointTransaction, type PointsResponse, pointsApi } from './points';
+export { pointsApi } from './points';
 
 // Map
-export { type WalkDistanceRequest, type WalkDistanceResponse, mapApi } from './map';
+export { mapApi } from './map';
 
 // Hooks
 export * from './hooks';
