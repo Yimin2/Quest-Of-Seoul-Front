@@ -1,69 +1,43 @@
 import { apiRequest } from './base';
+import { fromZodError } from 'zod-validation-error';
+import {
+  QuizResponseSchema,
+  QuestQuizResponseSchema,
+  QuizSubmitResponseSchema,
+  type QuizResponse,
+  type QuizItem,
+  type QuestQuizResponse,
+  type QuizSubmitRequest,
+  type QuizSubmitResponse,
+} from './schema';
 
-export interface QuizResponse {
-  question: string;
-  options: string[];
-  correct_answer: number;
-  explanation?: string;
-}
-
-export interface QuizItem {
-  id: number;
-  place: string;
-  question: string;
-  choices: string[];
-  answer: string;
-  description: string;
-  hint: string;
-  difficulty?: string;
-}
-
-export interface QuestQuizResponse {
-  quest: {
-    id: number;
-    name: string;
-    reward_point: number;
-  };
-  quizzes: {
-    id: number;
-    question: string;
-    options: string[];
-    hint: string;
-    difficulty: string;
-    correct_answer?: number;
-  }[];
-  count: number;
-}
-
-export interface QuizSubmitRequest {
-  answer: number;
-  is_last_quiz?: boolean;
-}
-
-export interface QuizSubmitResponse {
-  success: boolean;
-  is_correct: boolean;
-  earned: number;
-  total_score: number;
-  retry_allowed: boolean;
-  hint?: string;
-  completed: boolean;
-  points_awarded: number;
-  already_completed: boolean;
-  new_balance?: number;
-  explanation?: string;
-}
+export type {
+  QuizResponse,
+  QuizItem,
+  QuestQuizResponse,
+  QuizSubmitRequest,
+  QuizSubmitResponse,
+};
 
 export const quizApi = {
   async getQuiz(landmark: string, language: string = 'en'): Promise<QuizResponse> {
     try {
-      const data: QuizResponse = await apiRequest<QuizResponse>(
+      const data = await apiRequest<unknown>(
         `/docent/quiz?landmark=${encodeURIComponent(landmark)}&language=${language}`,
         {
           method: 'POST',
         },
       );
-      return data;
+
+      const result = QuizResponseSchema.safeParse(data);
+
+      if (!result.success) {
+        const validationError = fromZodError(result.error);
+        console.error('Quiz Validation Error:', validationError.toString());
+        throw validationError;
+      }
+
+      return result.data;
     } catch (error) {
       if (error instanceof TypeError && error.message.includes('Network request failed')) {
         throw new Error('Unable to connect to server. Please check if the API server is running.');
@@ -100,13 +74,19 @@ export const quizApi = {
 
   async getQuestQuizzes(questId: number): Promise<QuestQuizResponse> {
     try {
-      const data: QuestQuizResponse = await apiRequest<QuestQuizResponse>(
-        `/quest/${questId}/quizzes`,
-        {
-          method: 'GET',
-        },
-      );
-      return data;
+      const data = await apiRequest<unknown>(`/quest/${questId}/quizzes`, {
+        method: 'GET',
+      });
+
+      const result = QuestQuizResponseSchema.safeParse(data);
+
+      if (!result.success) {
+        const validationError = fromZodError(result.error);
+        console.error('QuestQuizzes Validation Error:', validationError.toString());
+        throw validationError;
+      }
+
+      return result.data;
     } catch (error) {
       throw error;
     }
@@ -119,14 +99,23 @@ export const quizApi = {
     isLastQuiz: boolean = false,
   ): Promise<QuizSubmitResponse> {
     try {
-      const data: QuizSubmitResponse = await apiRequest<QuizSubmitResponse>(
+      const data = await apiRequest<unknown>(
         `/quest/${questId}/quizzes/${quizId}/submit`,
         {
           method: 'POST',
           body: JSON.stringify({ answer, is_last_quiz: isLastQuiz }),
         },
       );
-      return data;
+
+      const result = QuizSubmitResponseSchema.safeParse(data);
+
+      if (!result.success) {
+        const validationError = fromZodError(result.error);
+        console.error('QuizSubmit Validation Error:', validationError.toString());
+        throw validationError;
+      }
+
+      return result.data;
     } catch (error) {
       throw error;
     }

@@ -1,49 +1,26 @@
 import { apiRequest } from './base';
+import { fromZodError } from 'zod-validation-error';
+import {
+  RewardsResponseSchema,
+  ClaimRewardResponseSchema,
+  ClaimedRewardsResponseSchema,
+  UseRewardResponseSchema,
+  type Reward,
+  type RewardsResponse,
+  type ClaimRewardResponse,
+  type ClaimedReward,
+  type ClaimedRewardsResponse,
+  type UseRewardResponse,
+} from './schema';
 
-export interface Reward {
-  id: number;
-  name: string;
-  description: string;
-  point_cost: number;
-  type: string;
-  is_active: boolean;
-  image_url?: string | null;
-  expire_date?: string | null;
-}
-
-export interface RewardsResponse {
-  rewards: Reward[];
-}
-
-export interface ClaimRewardResponse {
-  status: string;
-  message: string;
-  reward?: string;
-  qr_code?: string;
-  remaining_points?: number;
-  required?: number;
-  current?: number;
-  shortage?: number;
-}
-
-export interface ClaimedReward {
-  id: number;
-  user_id: string;
-  reward_id: number;
-  qr_code: string;
-  claimed_at: string;
-  used_at: string | null;
-  rewards: Reward;
-}
-
-export interface ClaimedRewardsResponse {
-  claimed_rewards: ClaimedReward[];
-}
-
-export interface UseRewardResponse {
-  status: string;
-  message: string;
-}
+export type {
+  Reward,
+  RewardsResponse,
+  ClaimRewardResponse,
+  ClaimedReward,
+  ClaimedRewardsResponse,
+  UseRewardResponse,
+};
 
 export const rewardApi = {
   async getRewards(type?: string, search?: string): Promise<RewardsResponse> {
@@ -54,27 +31,67 @@ export const rewardApi = {
     const queryString = params.toString();
     const url = queryString ? `/reward/list?${queryString}` : '/reward/list';
 
-    return apiRequest<RewardsResponse>(url, {
+    const data = await apiRequest<unknown>(url, {
       method: 'GET',
     });
+
+    const result = RewardsResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('Rewards Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 
   async claim(reward_id: number): Promise<ClaimRewardResponse> {
-    return apiRequest<ClaimRewardResponse>('/reward/claim', {
+    const data = await apiRequest<unknown>('/reward/claim', {
       method: 'POST',
       body: JSON.stringify({ reward_id }),
     });
+
+    const result = ClaimRewardResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('ClaimReward Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 
   async getClaimedRewards(): Promise<ClaimedRewardsResponse> {
-    return apiRequest<ClaimedRewardsResponse>('/reward/claimed', {
+    const data = await apiRequest<unknown>('/reward/claimed', {
       method: 'GET',
     });
+
+    const result = ClaimedRewardsResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('ClaimedRewards Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 
   async useReward(reward_id: number): Promise<UseRewardResponse> {
-    return apiRequest<UseRewardResponse>(`/reward/use/${reward_id}`, {
+    const data = await apiRequest<unknown>(`/reward/use/${reward_id}`, {
       method: 'POST',
     });
+
+    const result = UseRewardResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('UseReward Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 };

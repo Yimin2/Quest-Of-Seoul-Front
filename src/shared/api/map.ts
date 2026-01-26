@@ -1,38 +1,29 @@
 import { apiRequest } from './base';
+import { fromZodError } from 'zod-validation-error';
+import {
+  WalkDistanceResponseSchema,
+  type WalkDistanceRequest,
+  type WalkDistanceResponse,
+} from './schema';
 
-export interface WalkDistanceRequest {
-  quest_ids: number[];
-  user_latitude: number;
-  user_longitude: number;
-}
-
-export interface WalkDistanceResponse {
-  success: boolean;
-  total_distance_km: number;
-  route: {
-    from: {
-      type: string;
-      quest_id?: number;
-      name?: string;
-      latitude?: number;
-      longitude?: number;
-    };
-    to: {
-      quest_id: number;
-      name: string;
-      latitude: number;
-      longitude: number;
-    };
-    distance_km: number;
-  }[];
-}
+export type { WalkDistanceRequest, WalkDistanceResponse };
 
 export const mapApi = {
   async calculateWalkDistance(request: WalkDistanceRequest): Promise<WalkDistanceResponse> {
-    return apiRequest<WalkDistanceResponse>('/map/stats/walk-distance', {
+    const data = await apiRequest<unknown>('/map/stats/walk-distance', {
       method: 'POST',
       body: JSON.stringify(request),
     });
+
+    const result = WalkDistanceResponseSchema.safeParse(data);
+
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      console.error('WalkDistance Validation Error:', validationError.toString());
+      throw validationError;
+    }
+
+    return result.data;
   },
 
   calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
