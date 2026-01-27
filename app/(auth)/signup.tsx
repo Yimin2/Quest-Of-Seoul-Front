@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 
-import { useAuthStore } from '@entities/user';
+import { useSignup } from '@shared/api/hooks';
 import { ThemedText } from '@shared/ui';
 
 export default function SignupScreen() {
@@ -27,7 +27,7 @@ export default function SignupScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const signup = useAuthStore((state) => state.signup);
+  const { mutateAsync: signupMutation } = useSignup();
 
   const handleSignup = async () => {
     // 유효성 검사
@@ -53,7 +53,11 @@ export default function SignupScreen() {
 
     setIsLoading(true);
     try {
-      await signup(email.trim(), password, nickname.trim() || undefined);
+      await signupMutation({
+        email: email.trim(),
+        password,
+        nickname: nickname.trim() || undefined,
+      });
       // 회원가입 성공 시 메인 화면으로 이동
       Alert.alert('Sign Up Success', 'Welcome!', [
         {

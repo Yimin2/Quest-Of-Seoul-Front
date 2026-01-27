@@ -32,26 +32,7 @@ import {
   type QuestVLMChatResponse,
 } from './schema';
 
-export type {
-  ChatListResponse,
-  ChatSessionResponse,
-  DocentChatRequest,
-  DocentChatResponse,
-  VLMAnalyzeRequest,
-  VLMAnalyzeResponse,
-  SimilarPlacesRequest,
-  SimilarPlacesResponse,
-  STTTTSRequest,
-  STTTTSResponse,
-  ExploreRAGChatRequest,
-  ExploreRAGChatResponse,
-  QuestRAGChatRequest,
-  QuestRAGChatResponse,
-  RouteRecommendRequest,
-  RouteRecommendResponse,
-  QuestVLMChatRequest,
-  QuestVLMChatResponse,
-};
+
 
 export const aiStationApi = {
   async docentChat(request: DocentChatRequest): Promise<DocentChatResponse> {

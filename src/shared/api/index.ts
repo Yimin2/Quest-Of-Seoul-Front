@@ -12,26 +12,7 @@ export { questApi } from './quest';
 export { quizApi } from './quiz';
 
 // AI Station
-export {
-  type DocentChatRequest,
-  type DocentChatResponse,
-  type VLMAnalyzeRequest,
-  type VLMAnalyzeResponse,
-  type QuestVLMChatRequest,
-  type QuestVLMChatResponse,
-  type SimilarPlacesRequest,
-  type SimilarPlacesResponse,
-  type STTTTSRequest,
-  type STTTTSResponse,
-  type ExploreRAGChatRequest,
-  type ExploreRAGChatResponse,
-  type QuestRAGChatRequest,
-  type QuestRAGChatResponse,
-  type RouteRecommendRequest,
-  type RouteRecommendResponse,
-  aiStationApi,
-  routeRecommendApi,
-} from './ai';
+export { aiStationApi, routeRecommendApi } from './ai';
 
 // Reward
 export { rewardApi } from './reward';

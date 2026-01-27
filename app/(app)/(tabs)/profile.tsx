@@ -4,12 +4,13 @@ import { useRouter } from 'expo-router';
 import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
 
 import { useAuthStore } from '@entities/user';
-import { usePoints } from '@shared/api/hooks';
+import { usePoints, useLogout } from '@shared/api/hooks';
 import { ThemedText, ThemedView } from '@shared/ui';
 
 export default function MyScreen() {
   const router = useRouter();
-  const { user, isAuthenticated, isGuest, logout } = useAuthStore();
+  const { user, isAuthenticated, isGuest } = useAuthStore();
+  const { mutateAsync: logoutMutation } = useLogout();
   const { data: pointsData, isLoading } = usePoints();
 
   const totalPoints = pointsData?.total_points || 0;
@@ -27,7 +28,7 @@ export default function MyScreen() {
         text: 'Logout',
         style: 'destructive',
         onPress: async () => {
-          await logout();
+          await logoutMutation();
           router.replace('/login');
         },
       },
@@ -35,7 +36,7 @@ export default function MyScreen() {
   };
 
   const handleGuestToLogin = async () => {
-    await logout();
+    await logoutMutation();
     router.replace('/login');
   };
 

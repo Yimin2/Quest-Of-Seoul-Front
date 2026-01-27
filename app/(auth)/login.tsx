@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 
 import { useAuthStore } from '@entities/user';
+import { useLogin } from '@shared/api/hooks';
 import { ThemedText } from '@shared/ui';
 
 export default function LoginScreen() {
@@ -24,7 +25,7 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const login = useAuthStore((state) => state.login);
+  const { mutateAsync: loginMutation } = useLogin();
   const loginAsGuest = useAuthStore((state) => state.loginAsGuest);
 
   const handleLogin = async () => {
@@ -35,7 +36,7 @@ export default function LoginScreen() {
 
     setIsLoading(true);
     try {
-      await login(email.trim(), password);
+      await loginMutation({ email: email.trim(), password: password.trim() });
       // 로그인 성공 시 메인 화면으로 이동
       router.replace('/(app)/(tabs)/map');
     } catch (error) {
